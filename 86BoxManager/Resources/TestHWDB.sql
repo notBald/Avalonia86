@@ -1,0 +1,61 @@
+CREATE TABLE hw_cdrom (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_chipset (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_device (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_disk (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_floppy (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_game (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_machine (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_mem (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_network (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_scsi (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_sio (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_sound (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_video (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL);
+--§
+CREATE TABLE hw_machines (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL,
+	type TEXT NOT NULL);
+--§
+CREATE TABLE hw_cpus (
+	field TEXT NOT NULL PRIMARY KEY,
+	value TEXT NOT NULL,
+	manufacturer TEXT NOT NULL);
