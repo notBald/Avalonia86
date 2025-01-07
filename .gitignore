@@ -335,3 +335,9 @@ ASALocalRun/
 /dist
 /pub
 .DS_Store
+
+#SQLite studio
+Tools/SQLiteStudio/
+
+## git ignore shortcut
+*.lnk
