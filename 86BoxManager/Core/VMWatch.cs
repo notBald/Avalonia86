@@ -4,9 +4,10 @@ using System.Diagnostics;
 using System.Threading;
 using _86BoxManager.Tools;
 using _86BoxManager.Models;
-using ButtonsType = MessageBox.Avalonia.Enums.ButtonEnum;
-using MessageType = MessageBox.Avalonia.Enums.Icon;
-using ResponseType = MessageBox.Avalonia.Enums.ButtonResult;
+using _86BoxManager.ViewModels;
+using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
+using MessageType = MsBox.Avalonia.Enums.Icon;
+using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 
 // ReSharper disable InconsistentNaming
 
@@ -15,12 +16,16 @@ namespace _86BoxManager.Core
     public sealed class VMWatch
     {
         private readonly BackgroundWorker _bgw;
+        private readonly VMVisual _vis;
 
-        public VMWatch(BackgroundWorker bgw)
+        public VM Tag { get => _vis.Tag; }
+
+        internal VMWatch(BackgroundWorker bgw, VMVisual tag)
         {
             _bgw = bgw;
             _bgw.DoWork += background_DoWork;
             _bgw.RunWorkerCompleted += background_RunCompleted;
+            _vis = tag;
         }
 
         public void Dispose()
@@ -30,8 +35,10 @@ namespace _86BoxManager.Core
             _bgw.Dispose();
         }
 
+        public void CommitUptime(DateTime d) => _vis.CommitUptime(d);
+
         // Wait for the associated window of a VM to close
-        private void background_DoWork(object sender, DoWorkEventArgs e)
+        private async void background_DoWork(object sender, DoWorkEventArgs e)
         {
             var vm = e.Argument as VM;
             try
@@ -44,9 +51,9 @@ namespace _86BoxManager.Core
             }
             catch (Exception ex)
             {
-                Dialogs.ShowMessageBox("An error has occurred. Please provide the following details" +
+                await Dialogs.ShowMessageBox("An error has occurred. Please provide the following details" +
                                        $" to the developer:\n{ex.Message}\n{ex.StackTrace}",
-                    MessageType.Error, ButtonsType.Ok, "Error");
+                    MessageType.Error, null, ButtonsType.Ok, "Error");
             }
             e.Result = vm;
         }
@@ -54,22 +61,25 @@ namespace _86BoxManager.Core
         // Update the UI once the VM's window is closed
         private void background_RunCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            var Now = DateTime.Now;
+
             var ui = Program.Root;
             var lstVMs = ui.lstVMs;
             var vm = e.Result as VM;
 
-            var allItems = lstVMs.GetAllItems();
-            var selected = lstVMs.GetSelItems();
+            _vis.CommitUptime(Now);
+
+            var allItems = ui.Model.AllMachines;
+            var selected = ui.Model.Machine;
 
             // Go through the listview, find the item representing the VM and update things accordingly
             foreach (var item in allItems)
             {
-                if (item.Tag.Equals(vm))
+                if (ReferenceEquals(item.Tag, vm))
                 {
                     vm.Status = VM.STATUS_STOPPED;
                     vm.hWnd = IntPtr.Zero;
-                    item.SetStatus(vm.GetStatusString());
-                    item.SetIcon(vm.Status);
+                    item.RefreshStatus(vm.Status);
 
                     if (vm.OnExit != null)
                     {
@@ -77,23 +87,15 @@ namespace _86BoxManager.Core
                         vm.OnExit = null;
                     }
 
-                    if (selected.Count > 0 && selected[0].Equals(item))
+                    if (ReferenceEquals(selected, item))
                     {
-                        ui.btnEdit.IsEnabled = true;
-                        ui.btnDelete.IsEnabled = true;
-                        ui.btnStart.IsEnabled = true;
-                        ui.btnStart.Content = "Start";
-                        ui.btnStart.SetToolTip("Start this virtual machine");
-                        ui.btnConfigure.IsEnabled = true;
-                        ui.btnPause.IsEnabled = false;
-                        ui.btnPause.Content = "Pause";
-                        ui.btnCtrlAltDel.IsEnabled = false;
-                        ui.btnReset.IsEnabled = false;
+                        ui.UpdateState();
                     }
                 }
             }
 
             VMCenter.CountRefresh();
+            VMCenter.DisposeMe(this, vm.Name);
         }
 
         public static bool TryWaitForInputIdle(Process process, int forceDelay)
@@ -109,7 +111,7 @@ namespace _86BoxManager.Core
             }
         }
 
-        public static uint GetTempId(VM vm)
+        internal static uint GetTempId(VMVisual vm)
         {
             /* This generates a VM ID on the fly from the VM path. The reason it's done this way is
                  * it doesn't break existing VMs and doesn't require extensive modifications to this

@@ -1,29 +1,63 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using _86BoxManager.API;
+using _86BoxManager.Common;
 using _86BoxManager.Models;
-using _86BoxManager.Registry;
 using _86BoxManager.Tools;
 using _86BoxManager.ViewModels;
 using _86BoxManager.Views;
 using _86BoxManager.Xplat;
-using ButtonsType = MessageBox.Avalonia.Enums.ButtonEnum;
-using MessageType = MessageBox.Avalonia.Enums.Icon;
-using ResponseType = MessageBox.Avalonia.Enums.ButtonResult;
-using IOPath = System.IO.Path;
-using RegistryValueKind = _86BoxManager.Registry.ValueKind;
-using System.IO;
+using Avalonia.Controls;
 using System;
-using _86BoxManager.API;
-using _86BoxManager.Common;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
+using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
+using IOPath = System.IO.Path;
+using MessageType = MsBox.Avalonia.Enums.Icon;
+using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 
 // ReSharper disable InconsistentNaming
 namespace _86BoxManager.Core
 {
     internal static class VMCenter
     {
-        private static VMWatch _watch;
+        private readonly static Dictionary<string, VMWatch> _watch = new();
+        private static AppSettings Sett => Program.Root.Settings;
+
+        public static bool IsWatching => _watch.Count > 0;
+
+        public static void DisposeMe(VMWatch w, string name)
+        {
+            w.Dispose();
+            _watch.Remove(name);
+        }
+
+        public async static Task<bool> CloseAllWindows(frmMain ui)
+        {
+            var vmCount = 0;
+            foreach (var w in _watch.Values)
+            {
+                var vm = w.Tag;
+                vmCount += await ForceStop(w, ui);
+
+                try
+                {
+                    var p = Process.GetProcessById(vm.Pid);
+                    // Wait 500 milliseconds for each VM to close
+                    p.WaitForExit(500);
+                }
+                catch { }
+            }
+
+            // Wait just a bit to make sure everything goes as planned
+            Thread.Sleep(vmCount * 500);
+
+            return true;
+        }
 
         public static (string cfgpath, string exepath) FindPaths()
         {
@@ -39,367 +73,377 @@ namespace _86BoxManager.Core
             return (cfgPath, exePath);
         }
 
-        // Checks if a VM with this name already exists
-        public static bool CheckIfExists(string name)
+        /// <summary>
+        /// Checks if a VM with this name already exists
+        /// </summary>
+        /// <param name="path">Path to the VM</param>
+        /// <param name="parent">Parent window to use for messages</param>
+        /// <returns></returns>
+        public static async Task<string> CheckIfExists(string path, Window parent)
         {
             try
             {
-                var regkey = Configs.Open86BoxVmKey(true);
-                if (regkey == null) //Regkey doesn't exist yet
-                {
-                    regkey = Configs.Open86BoxKey(true);
-                    Configs.Create86BoxVmKey();
-                    return false;
-                }
-
-                //VM's registry value doesn't exist yet
-                if (regkey.GetValue(name) == null)
-                {
-                    regkey.Close();
-                    return false;
-                }
-
-                //It really exists
-                regkey.Close();
-                return true;
+                return Sett.PathToName(path);
             }
             catch
             {
-                Dialogs.ShowMessageBox("Could not load the virtual machine information from the " +
+                await Dialogs.ShowMessageBox("Could not load the virtual machine information from the " +
                                        "registry. Make sure you have the required permissions " +
                                        "and try again.",
-                    MessageType.Error, ButtonsType.Ok, "Error");
-                return false;
+                    MessageType.Error, parent, ButtonsType.Ok, "Error");
+                return null;
             }
         }
 
-        public static void OpenConfig(IEnumerable<VMRow> selected)
+        public static void OpenConfig(VMVisual vm, Window parent)
         {
-            foreach (var lvi in selected)
+            try
             {
-                var vm = lvi.Tag;
-                try
-                {
-                    var file = IOPath.Combine(vm.Path, "86box.cfg");
-                    Platforms.Shell.EditFile(file);
-                }
-                catch
-                {
-                    Dialogs.ShowMessageBox($@"The config file for the virtual machine ""{vm.Name}"" could" +
-                                           " not be opened. Make sure it still exists and that you have " +
-                                           "sufficient privileges to access it.",
-                        MessageType.Error, ButtonsType.Ok, "Error");
-                }
+                var file = IOPath.Combine(vm.Path, "86box.cfg");
+                Platforms.Shell.EditFile(file);
+            }
+            catch
+            {
+                Dialogs.DispatchMSGBox($@"The config file for the virtual machine ""{vm.Name}"" could" +
+                                        " not be opened. Make sure it still exists and that you have " +
+                                        "sufficient privileges to access it.",
+                    MessageType.Error, parent, ButtonsType.Ok, "Error");
             }
         }
 
         // Opens the folder containing the selected VM
-        public static void OpenFolder(IEnumerable<VMRow> selected)
+        public static void OpenFolder(VMVisual vm, Window parent)
         {
-            foreach (var lvi in selected)
+            try
             {
-                var vm = lvi.Tag;
-                try
-                {
-                    Platforms.Shell.OpenFolder(vm.Path);
-                }
-                catch
-                {
-                    Dialogs.ShowMessageBox($@"The folder for the virtual machine ""{vm.Name}"" could" +
-                                           " not be opened. Make sure it still exists and that you have " +
-                                           "sufficient privileges to access it.",
-                        MessageType.Error, ButtonsType.Ok, "Error");
-                }
+                Platforms.Shell.OpenFolder(vm.Path);
+            }
+            catch
+            {
+                Dialogs.DispatchMSGBox($@"The folder for the virtual machine ""{vm.Name}"" could" +
+                                        " not be opened. Make sure it still exists and that you have " +
+                                        "sufficient privileges to access it.",
+                    MessageType.Error, parent, ButtonsType.Ok, "Error");
+            }
+        }
+
+        // Opens the folder containing the selected VM
+        public static void OpenScreenshotsFolder(VMVisual vm, Window parent)
+        {
+            try
+            {
+                var path = Path.Combine(vm.Path, "screenshots");
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+
+                Platforms.Shell.OpenFolder(path);
+            }
+            catch
+            {
+                Dialogs.DispatchMSGBox($@"The screenshots folder for the virtual machine ""{vm.Name}"" could" +
+                                        " not be opened. Make sure you have " +
+                                        "sufficient privileges to access it.",
+                    MessageType.Error, parent, ButtonsType.Ok, "Error");
+            }
+        }
+
+        // Opens the folder containing the selected VM
+        public static void OpenTrayFolder(VMVisual vm, Window parent)
+        {
+            try
+            {
+                var path = Path.Combine(vm.Path, "printer");
+                if (!Directory.Exists(path))
+                    throw new Exception("Folder does not exist");
+
+                Platforms.Shell.OpenFolder(path);
+            }
+            catch
+            {
+                Dialogs.DispatchMSGBox($@"The screenshots folder for the virtual machine ""{vm.Name}"" could" +
+                                        " not be opened. Make sure you have " +
+                                        "sufficient privileges to access it.",
+                    MessageType.Error, parent, ButtonsType.Ok, "Error");
             }
         }
 
         // Creates a new VM from the data received and adds it to the listview
-        public static void Add(string name, string desc, bool openCFG, bool startVM)
+        
+        public static void Add(string name, string vm_path, string desc, string cat, string icon_path, DateTime created, bool openCFG, bool startVM, Window parent)
         {
-            var ui = Program.Root;
-            var cfgpath = ui.cfgpath;
+            var m = Program.Root.Model;
 
-            var newVM = new VM(name, desc, Path.Combine(cfgpath, name));
-            var newLvi = ui.lstVMs.Insert(newVM.Name, newVM);
-            Directory.CreateDirectory(newVM.Path);
+            var id = Sett.RegisterVM(name, vm_path, icon_path, cat, created);
 
-            var data = Serializer.Write(newVM);
-            var regkey = Configs.Open86BoxVmKey(true);
-            regkey.SetValue(newVM.Name, data, RegistryValueKind.Binary);
-            regkey.Close();
+            var visual = Sett.RefreshVisual(id);
+            if (visual == null)
+                throw new Exception("Failed to create database entery");
+            visual.Desc = desc;
 
-            Dialogs.ShowMessageBox($@"Virtual machine ""{newVM.Name}"" was successfully created!",
-                MessageType.Info, ButtonsType.Ok, "Success");
+            //Create the folder, but only if it's in the VM folder we manage
+            CreateVMFolder(vm_path);
 
-            // Select the newly created VM
-            foreach (var lvi in ui.lstVMs.GetSelItems())
-            {
-                lvi.Selected = false;
-            }
-            newLvi.Focused = true;
-            newLvi.Selected = true;
+            //First we refersh the categories so that we know they're correct.
+            Sett.RefreshCats();
+
+            //Then we set the category equal to the new machine, if we're not showing all machines
+            if (m.CategoryIndex != 0)
+                m.CategoryName = cat;
+
+            //Then we refresh the machines to ensure the list is correct
+            Sett.RefreshVMs();
+
+            //When we created the visual, it got added to the cache, which the notified the
+            //list of changes, but did no sorting.
+
+            //Then we set the machine as selected
+            m.Machine = visual;
 
             // Start the VM and/or open settings window if the user chose this option
             if (startVM)
             {
-                Start();
+                Start(parent);
             }
             if (openCFG)
             {
                 Configure();
             }
-
-            Sort(ui.sortColumn, ui.sortOrder);
+            
             CountRefresh();
         }
 
-        // Imports existing VM files to a new VM
-        public static void Import(string name, string desc, string importPath, bool openCFG, bool startVM, frmMain ui)
+        private static void CreateVMFolder(string inputFolder)
         {
-            var cfgpath = Program.Root.cfgpath;
+            inputFolder = Path.GetFullPath(inputFolder);
 
-            var newVM = new VM(name, desc, Path.Combine(cfgpath, name));
-            var newLvi = Program.Root.lstVMs.Insert(newVM.Name, newVM);
-            Directory.CreateDirectory(newVM.Path);
-
-            var importFailed = false;
-
-            // Copy existing files to the new VM directory
-            try
+            // Check if the input folder exists
+            if (!Directory.Exists(inputFolder))
             {
-                var allDirs = Directory.GetDirectories(importPath, "*", SearchOption.AllDirectories);
-                foreach (var oldPath in allDirs)
+                // Check if the input folder is a direct child of CFGdir
+                string vm_dir = Sett.CFGdir;
+                if (string.IsNullOrWhiteSpace(vm_dir))
+                    return;
+                vm_dir = Path.GetFullPath(vm_dir).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                string parentDir = FolderHelper.GetParentFolderPath(inputFolder);
+
+                if (parentDir != null)
                 {
-                    Directory.CreateDirectory(oldPath.Replace(importPath, newVM.Path));
-                }
-                var allFiles = Directory.GetFiles(importPath, "*.*", SearchOption.AllDirectories);
-                foreach (var newPath in allFiles)
-                {
-                    var oldPath = newPath.Replace(importPath, newVM.Path);
-                    File.Copy(newPath, oldPath, true);
+                    parentDir = parentDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+                    if (parentDir.Equals(vm_dir, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Check if CFGdir exists
+                        if (Directory.Exists(vm_dir))
+                        {
+                            // Create the input folder
+                            Directory.CreateDirectory(inputFolder);
+                        }
+                    }
                 }
             }
-            catch
+        } 
+
+        // Imports existing VM files to a new VM
+        public static async Task<bool> Clone(long uid, string name, string dest_dir, Window parent)
+        {
+            var importFailed = false;
+            var vis = Sett.RefreshVisual(uid);
+            if (vis == null)
             {
-                // Set this flag so we can inform the user at the end
+                await Dialogs.ShowMessageBox($@"Virtual machine could not be imported.",
+                    MessageType.Error, parent, ButtonsType.Ok, "Import failed");
+                
+                return false;
+            }
+
+            try
+            {
+                FolderHelper.CopyFilesAndFolders(vis.Path, dest_dir, 1);
+
+                Add(name, dest_dir, vis.Desc, vis.Category, vis.IconPath, DateTime.Now, false, false, parent);
+
+                var new_vis = Sett.RefreshVisual(Sett.PathToId(dest_dir));
+                
+                new_vis.Comment = vis.Comment;
+            }
+            catch 
+            {
                 importFailed = true;
             }
 
-            var data = Serializer.Write(newVM);
-            var regkey = Configs.Open86BoxVmKey(true);
-            regkey.SetValue(newVM.Name, data, RegistryValueKind.Binary);
-            regkey.Close();
-
             if (importFailed)
             {
-                Dialogs.ShowMessageBox($@"Virtual machine ""{newVM.Name}"" was successfully created, but " +
-                                       "files could not be imported. Make sure the path you selected was correct " +
-                                       "and valid. If the VM is already located in your VMs folder, you don't " +
-                                       "need to select the Import option, just add a new VM with the same name.",
-                    MessageType.Warning, ButtonsType.Ok, "Import failed");
+                await Dialogs.ShowMessageBox($@"Virtual machine ""{vis.Name}"" could not be imported.",
+                    MessageType.Error, parent, ButtonsType.Ok, "Import failed");
             }
             else
             {
-                Dialogs.ShowMessageBox($@"Virtual machine ""{newVM.Name}"" was successfully created, files " +
+                await Dialogs.ShowMessageBox($@"Virtual machine ""{name}"" was successfully created, files " +
                                        "were imported. Remember to update any paths pointing to disk images in " +
                                        "your config!",
-                    MessageType.Info, ButtonsType.Ok, "Success");
+                    MessageType.Info, parent, ButtonsType.Ok, "Success");
             }
 
-            // Select the newly created VM
-            foreach (var lvi in ui.lstVMs.GetSelItems())
-            {
-                lvi.Selected = false;
-            }
-            newLvi.Focused = true;
-            newLvi.Selected = true;
-
-            // Start the VM and/or open settings window if the user chose this option
-            if (startVM)
-            {
-                Start();
-            }
-            if (openCFG)
-            {
-                Configure();
-            }
-
-            Sort(ui.sortColumn, ui.sortOrder);
-            CountRefresh();
+            return true;
         }
 
         // Deletes the config and nvr of selected VM
-        public static void Wipe(IEnumerable<VMRow> selected)
+        public static async Task<bool> Wipe(VMVisual vm, Window parent)
         {
-            foreach (var lvi in selected)
+            var result = await Dialogs.ShowMessageBox(
+                "Wiping a virtual machine deletes its configuration" +
+                " and nvr files. You'll have to reconfigure the virtual " +
+                "machine (and the BIOS if applicable).\n\n Are you sure " +
+                @$"you wish to wipe the virtual machine ""{vm.Name}""?",
+                MessageType.Warning, Program.Root, ButtonsType.YesNo, "Warning");
+            if (result == ResponseType.Yes)
             {
-                var vm = lvi.Tag;
-
-                var result = Dialogs.ShowMessageBox(
-                    "Wiping a virtual machine deletes its configuration" +
-                    " and nvr files. You'll have to reconfigure the virtual " +
-                    "machine (and the BIOS if applicable).\n\n Are you sure " +
-                    @$"you wish to wipe the virtual machine ""{vm.Name}""?",
-                    MessageType.Warning, ButtonsType.YesNo, "Warning");
-                if (result == ResponseType.Yes)
+                if (vm.Tag.Status != VM.STATUS_STOPPED)
                 {
-                    if (vm.Status != VM.STATUS_STOPPED)
-                    {
-                        Dialogs.ShowMessageBox($@"The virtual machine ""{vm.Name}"" is currently " +
-                                               "running and cannot be wiped. Please stop virtual machines " +
-                                               "before attempting to wipe them.",
-                            MessageType.Error, ButtonsType.Ok, "Success");
-                        continue;
-                    }
-                    try
-                    {
-                        File.Delete(Path.Combine(vm.Path, "86box.cfg"));
-                        Directory.Delete(Path.Combine(vm.Path, "nvr"), true);
-                        Dialogs.ShowMessageBox($@"The virtual machine ""{vm.Name}"" was successfully wiped.",
-                            MessageType.Info, ButtonsType.Ok, "Success");
-                    }
-                    catch (Exception ex)
-                    {
-                        Dialogs.ShowMessageBox($@"An error occurred trying to wipe the virtual machine ""{vm.Name}"".",
-                            MessageType.Error, ButtonsType.Ok, ex.GetType().Name);
-                    }
+                    await Dialogs.ShowMessageBox($@"The virtual machine ""{vm.Name}"" is currently " +
+                                            "running and cannot be wiped. Please stop virtual machines " +
+                                            "before attempting to wipe them.",
+                        MessageType.Error, parent, ButtonsType.Ok, "Success");
+                    return false;
+                }
+                try
+                {
+                    string p = Path.Combine(vm.Path, "86box.cfg");
+                    if (File.Exists(p))
+                        File.Delete(p);
+                    p = Path.Combine(vm.Path, "nvr");
+                    if (Directory.Exists(p))
+                        Directory.Delete(p, true);
+                    await Dialogs.ShowMessageBox($@"The virtual machine ""{vm.Name}"" was successfully wiped.",
+                        MessageType.Info, parent, ButtonsType.Ok, "Success");
+                }
+                catch (Exception ex)
+                {
+                    await Dialogs.ShowMessageBox($@"An error occurred trying to wipe the virtual machine ""{vm.Name}"".",
+                        MessageType.Error, parent, ButtonsType.Ok, ex.GetType().Name);
                 }
             }
+
+            return true;
         }
 
         // Kills the process associated with the selected VM
-        public static void Kill(IEnumerable<VMRow> selected, frmMain ui)
+        public static async Task<bool> Kill(VMVisual selected, frmMain ui)
         {
-            foreach (var lvi in selected)
-            {
-                var vm = lvi.Tag;
+            var vm = selected.Tag;
 
-                //Ask the user to confirm
-                var result = Dialogs.ShowMessageBox(
-                    $@"Killing a virtual machine can cause data loss. " +
-                    "Only do this if 86Box executable process gets stuck. Do you " +
-                    @$"really wish to kill the virtual machine ""{vm.Name}""?",
-                    MessageType.Warning, ButtonsType.YesNo, "Warning");
-                if (result == ResponseType.Yes)
-                {
-                    try
-                    {
-                        var p = Process.GetProcessById(vm.Pid);
-                        p.Kill();
-                    }
-                    catch
-                    {
-                        Dialogs.ShowMessageBox($@"Could not kill 86Box.exe process for virtual " +
-                                               @"machine ""{vm.Name}"". The process may have already " +
-                                               "ended on its own or access was denied.",
-                            MessageType.Error, ButtonsType.Ok, "Could not kill process");
-                        continue;
-                    }
-
-                    // We need to cleanup afterwards to make sure the VM is put back into a valid state
-                    vm.Status = VM.STATUS_STOPPED;
-                    vm.hWnd = IntPtr.Zero;
-
-                    lvi.SetStatus(vm.GetStatusString());
-                    lvi.SetIcon(vm.Status);
-
-                    ui.btnStart.Content = "Start";
-                    ui.btnStart.SetToolTip("Stop this virtual machine");
-                    ui.btnPause.Content = "Pause";
-
-                    if (ui.lstVMs.GetSelItems().Count > 0)
-                    {
-                        ui.btnEdit.IsEnabled = true;
-                        ui.btnDelete.IsEnabled = true;
-                        ui.btnStart.IsEnabled = true;
-                        ui.btnConfigure.IsEnabled = true;
-                        ui.btnPause.IsEnabled = false;
-                        ui.btnReset.IsEnabled = false;
-                        ui.btnCtrlAltDel.IsEnabled = false;
-                    }
-                    else
-                    {
-                        ui.btnEdit.IsEnabled = false;
-                        ui.btnDelete.IsEnabled = false;
-                        ui.btnStart.IsEnabled = false;
-                        ui.btnConfigure.IsEnabled = false;
-                        ui.btnPause.IsEnabled = false;
-                        ui.btnReset.IsEnabled = false;
-                        ui.btnCtrlAltDel.IsEnabled = false;
-                    }
-                }
-            }
-
-            Sort(ui.sortColumn, ui.sortOrder);
-            CountRefresh();
-        }
-
-        // Sends a running/pause VM a request to stop without asking the user for confirmation
-        public static void ForceStop(IList<VMRow> selected, frmMain ui)
-        {
-            var vm = selected[0].Tag;
-            try
-            {
-                if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
-                {
-                    Platforms.Manager.GetSender().DoVmForceStop(vm);
-                }
-            }
-            catch (Exception)
-            {
-                Dialogs.ShowMessageBox("An error occurred trying to stop the selected virtual machine.",
-                    MessageType.Error, ButtonsType.Ok, "Error");
-            }
-
-            Sort(ui.sortColumn, ui.sortOrder);
-            CountRefresh();
-        }
-
-        // Changes a VM's name and/or description
-        public static void Edit(string name, string desc)
-        {
-            var ui = Program.Root;
-            var cfgpath = ui.cfgpath;
-
-            var selected = ui.lstVMs.GetSelItems();
-            var vm = selected[0].Tag;
-            var oldname = vm.Name;
-            if (!vm.Name.Equals(name))
+            //Ask the user to confirm
+            var result = await Dialogs.ShowMessageBox(
+                $@"Killing a virtual machine can cause data loss. " +
+                "Only do this if 86Box executable process gets stuck. Do you " +
+                @$"really wish to kill the virtual machine ""{vm.Name}""?",
+                MessageType.Warning, ui, ButtonsType.YesNo, "Warning");
+            if (result == ResponseType.Yes)
             {
                 try
                 {
-                    // Move the actual VM files too. This will invalidate any paths inside the cfg,
-                    // but the user is informed to update those manually.
-                    var sourceDir = Path.Combine(cfgpath, vm.Name);
-                    var destDir = Path.Combine(cfgpath, name);
-                    Directory.Move(sourceDir, destDir);
+                    if (_watch.TryGetValue(vm.Name, out VMWatch w))
+                    {
+                        w.Dispose();
+                        _watch.Remove(vm.Name);
+                    }
+
+                    selected.CommitUptime(DateTime.Now);
+
+                    var p = Process.GetProcessById(vm.Pid);
+                    p.Kill();
                 }
                 catch
                 {
-                    Dialogs.ShowMessageBox("An error has occurred while trying to move the files " +
-                                           "for this virtual machine. Please try to move them manually.",
-                        MessageType.Error, ButtonsType.Ok, "Error");
+                    await Dialogs.ShowMessageBox($@"Could not kill 86Box.exe process for virtual " +
+                                            @"machine ""{vm.Name}"". The process may have already " +
+                                            "ended on its own or access was denied.",
+                        MessageType.Error, ui, ButtonsType.Ok, "Could not kill process");
                 }
-                vm.Name = name;
-                vm.Path = cfgpath + vm.Name;
+
+                // We need to cleanup afterwards to make sure the VM is put back into a valid state
+                vm.Status = VM.STATUS_STOPPED;
+                vm.hWnd = IntPtr.Zero;
+
+                selected.RefreshStatus(vm.Status);
+
+                ui.UpdateState();
             }
-            vm.Desc = desc;
 
-            // Create a new registry value with new info, delete the old one
-            var regkey = Configs.Open86BoxVmKey(true);
-            regkey.DeleteValue(oldname);
+            CountRefresh();
 
-            var data = Serializer.Write(vm);
-            regkey = Configs.Open86BoxVmKey(true);
-            regkey.SetValue(vm.Name, data, RegistryValueKind.Binary);
-            regkey.Close();
+            return true;
+        }
 
-            Dialogs.ShowMessageBox($@"Virtual machine ""{vm.Name}"" was successfully modified." +
-                                   " Please update its configuration so that any absolute paths" +
-                                   " (e.g. for hard disk images) point to the new folder.",
-                MessageType.Info, ButtonsType.Ok, "Success");
-            Sort(ui.sortColumn, ui.sortOrder);
-            ui.LoadVMs();
+        // Sends a running/pause VM a request to stop without asking the user for confirmation
+        private static async Task<int> ForceStop(VMWatch w, frmMain ui)
+        {
+            int clean_stop = 0;
+            var vm = w.Tag;
+            try
+            {
+                Platforms.Manager.GetSender().DoVmForceStop(vm);
+
+                w.Dispose();
+                _watch.Remove(vm.Name);
+
+                clean_stop = 1;
+            }
+            catch (Exception)
+            {
+                await Dialogs.ShowMessageBox("An error occurred trying to stop the selected virtual machine.",
+                    MessageType.Error, ui, ButtonsType.Ok, "Error");
+            }
+
+            w.CommitUptime(DateTime.Now);
+
+            CountRefresh();
+
+            return clean_stop;
+        }
+
+        // Changes a VM's name and/or description
+        public static async Task<bool> Edit(long uid, string name, string desc, string category, string icon, string comment, Window parent)
+        {
+            var m = Program.Root.Model;
+            var current_cat = m.CategoryIndex != 0 ? m.CategoryName : null;
+            var selected = m.Machine;
+            var is_selected = (selected != null) && selected.Tag.UID == uid;
+            VMVisual vm;
+
+            using (var t = Sett.BeginTransaction())
+            {
+                Sett.EditVM(uid, name, category, icon);
+                vm = Sett.RefreshVisual(uid);
+                if (vm == null)
+                    throw new Exception("Failed to refresh database");
+
+
+                vm.Desc = desc;
+                vm.Comment = comment;
+
+                t.Commit();
+            }
+
+            //Since it is possible that the category, icon or name has changed, we ensure the UI is refreshed.
+            Sett.RefreshVMs();
+            Sett.RefreshCats();
+
+            //The Name and IconPath properties are a little special, so we have to manually tell the UI they've updated.
+            vm.RefreshNameAndIcon();
+            
+            //Ensures that the edited machine continues to be displayed
+            if (is_selected && current_cat != null)
+            {
+                m.CategoryName = category;
+                m.Machine = vm;
+            }
+
+            await Dialogs.ShowMessageBox($@"Virtual machine ""{name}"" was successfully modified.",
+                MessageType.Info, parent, ButtonsType.Ok, "Success");
+
+            //Done for async
+            return true;
         }
 
         // Refreshes the VM counter in the status bar
@@ -412,7 +456,7 @@ namespace _86BoxManager.Core
             var waitingVMs = 0;
             var stoppedVMs = 0;
 
-            var vms = ui.lstVMs.GetAllItems();
+            var vms = ui.Model.Machines;
             foreach (var item in vms)
             {
                 var vm = item.Tag;
@@ -439,114 +483,134 @@ namespace _86BoxManager.Core
         }
 
         // Sends the CTRL+ALT+DEL keystroke to the VM, result depends on the guest OS
-        public static void CtrlAltDel(IList<VMRow> selected, frmMain ui)
+        public static void CtrlAltDel(VMVisual selected, frmMain ui)
         {
-            var row = selected[0];
+            var row = selected;
             var vm = row.Tag;
             if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
             {
                 Platforms.Manager.GetSender().DoVmCtrlAltDel(vm);
                 vm.Status = VM.STATUS_RUNNING;
-                row.SetStatus(vm.GetStatusString());
-                ui.btnPause.Content = "Pause";
-                ui.btnPause.SetToolTip("Pause this virtual machine");
-                ui.pauseToolStripMenuItem.Header = "Pause";
-                ui.pauseToolStripMenuItem.SetToolTip("Pause this virtual machine");
+                ui.UpdateState();
             }
             CountRefresh();
         }
 
         // Removes the selected VM. Confirmations for maximum safety
-        public static void Remove(IEnumerable<VMRow> selected, frmMain ui)
+        public static async void Remove(VMVisual vm, frmMain ui)
         {
-            foreach (var lvi in selected)
-            {
-                var vm = lvi.Tag;
-                var result1 = Dialogs.ShowMessageBox($@"Are you sure you want to remove the" +
-                                                     @$" virtual machine ""{vm.Name}""?",
-                    MessageType.Warning, ButtonsType.YesNo, "Remove virtual machine");
+            var result1 = await Dialogs.ShowMessageBox((string)($@"Are you sure you want to remove the" +
+                                                    @$" virtual machine ""{vm.Name}""?"),
+                MessageType.Warning, ui, ButtonsType.YesNo, "Remove virtual machine");
 
-                if (result1 == ResponseType.Yes)
+            if (result1 == ResponseType.Yes)
+            {
+                if (vm.Tag.Status != VM.STATUS_STOPPED)
                 {
-                    if (vm.Status != VM.STATUS_STOPPED)
-                    {
-                        Dialogs.ShowMessageBox($@"Virtual machine ""{vm.Name}"" is currently " +
-                                               "running and cannot be removed. Please stop virtual machines" +
-                                               " before attempting to remove them.",
-                            MessageType.Error, ButtonsType.Ok, "Error");
-                        continue;
+                    await Dialogs.ShowMessageBox((string)($@"Virtual machine ""{vm.Name}"" is currently " +
+                                            "running and cannot be removed. Please stop virtual machines" +
+                                            " before attempting to remove them."),
+                        MessageType.Error, ui, ButtonsType.Ok, "Error");
+                    return;
+                }
+
+                var vm_path = vm.Path;
+                var vm_name = vm.Name;
+
+                try
+                {
+                    var m = Program.Root.Model;
+                    bool is_selected = ReferenceEquals(m.Machine, vm);
+
+                    //Stores away the current category
+                    var cat_name = m.CategoryIndex != 0 ? m.CategoryName : null;
+
+                    using (var t = Sett.BeginTransaction())
+                    { 
+                        //Deletes from the database
+                        Sett.RemoveVM(vm.Tag.UID);
+
+                        //Note, the "vm" object is now dead and should not be accessed anymore.
+                        vm = null;
+
+                        t.Commit();
                     }
+
+                    //Refreshes the cached data
+                    Sett.RefreshVMs();
+                    Sett.RefreshCats(); 
+
+                    if (is_selected)
+                    {
+                        //This will set "All machines" if the category no longer exist
+                        m.CategoryName = cat_name;
+
+                        //We're also no longer viewing a machine.
+                        m.MachineIndex = -1;
+                    }
+                }
+                catch (Exception ex) // Catches "regkey doesn't exist" exceptions and such
+                {
+                    await Dialogs.ShowMessageBox((string)(@$"Virtual machine ""{vm_name}"" could not be removed due to " +
+                                            $"the following error:\n\n{ex.Message}"),
+                        MessageType.Error, ui, ButtonsType.Ok, "Error");
+                    return;
+                }
+
+                var result2 = await Dialogs.ShowMessageBox((string)($@"Virtual machine ""{vm_name}"" was " +
+                                                        "successfully removed. Would you like to delete" +
+                                                        " its files as well?"),
+                    MessageType.Question, ui, ButtonsType.YesNo, "Virtual machine removed");
+                if (result2 == ResponseType.Yes)
+                {
                     try
                     {
-                        ui.lstVMs.RemoveItem(lvi);
-                        var regkey = Configs.Open86BoxVmKey(true);
-                        regkey.DeleteValue(vm.Name);
-                        regkey.Close();
+                        Directory.Delete(vm_path, true);
                     }
-                    catch (Exception ex) // Catches "regkey doesn't exist" exceptions and such
+                    catch (UnauthorizedAccessException) //Files are read-only or protected by privileges
                     {
-                        Dialogs.ShowMessageBox(@$"Virtual machine ""{vm.Name}"" could not be removed due to " +
-                                               $"the following error:\n\n{ex.Message}",
-                            MessageType.Error, ButtonsType.Ok, "Error");
-                        continue;
+                        await Dialogs.ShowMessageBox("86Box Manager was unable to delete the files of this " +
+                                                "virtual machine because they are read-only or you don't " +
+                                                "have sufficient privileges to delete them.\n\nMake sure " +
+                                                "the files are free for deletion, then remove them manually.",
+                            MessageType.Error, ui, ButtonsType.Ok, "Error");
+                        return;
                     }
-
-                    var result2 = Dialogs.ShowMessageBox($@"Virtual machine ""{vm.Name}"" was " +
-                                                         "successfully removed. Would you like to delete" +
-                                                         " its files as well?",
-                        MessageType.Question, ButtonsType.YesNo, "Virtual machine removed");
-                    if (result2 == ResponseType.Yes)
+                    catch (DirectoryNotFoundException) //Directory not found
                     {
-                        try
-                        {
-                            Directory.Delete(vm.Path, true);
-                        }
-                        catch (UnauthorizedAccessException) //Files are read-only or protected by privileges
-                        {
-                            Dialogs.ShowMessageBox("86Box Manager was unable to delete the files of this " +
-                                                   "virtual machine because they are read-only or you don't " +
-                                                   "have sufficient privileges to delete them.\n\nMake sure " +
-                                                   "the files are free for deletion, then remove them manually.",
-                                MessageType.Error, ButtonsType.Ok, "Error");
-                            continue;
-                        }
-                        catch (DirectoryNotFoundException) //Directory not found
-                        {
-                            Dialogs.ShowMessageBox("86Box Manager was unable to delete the files of this " +
-                                                   "virtual machine because they no longer exist.",
-                                MessageType.Error, ButtonsType.Ok, "Error");
-                            continue;
-                        }
-                        catch (IOException) //Files are in use by another process
-                        {
-                            Dialogs.ShowMessageBox("86Box Manager was unable to delete some files of this " +
-                                                   "virtual machine because they are currently in use by " +
-                                                   "another process.\n\nMake sure the files are free for " +
-                                                   "deletion, then remove them manually.",
-                                MessageType.Error, ButtonsType.Ok, "Error");
-                            continue;
-                        }
-                        catch (Exception ex) //Other exceptions
-                        {
-                            Dialogs.ShowMessageBox($"The following error occurred while trying to remove" +
-                                                   $" the files of this virtual machine:\n\n{ex.Message}",
-                                MessageType.Error, ButtonsType.Ok, "Error");
-                            continue;
-                        }
-                        Dialogs.ShowMessageBox($@"Files of virtual machine ""{vm.Name}"" were successfully deleted.",
-                            MessageType.Info, ButtonsType.Ok, "Virtual machine files removed");
+                        await Dialogs.ShowMessageBox("86Box Manager was unable to delete the files of this " +
+                                                "virtual machine because they no longer exist.",
+                            MessageType.Error, ui, ButtonsType.Ok, "Error");
+                        return;
                     }
+                    catch (IOException) //Files are in use by another process
+                    {
+                        await Dialogs.ShowMessageBox("86Box Manager was unable to delete some files of this " +
+                                                "virtual machine because they are currently in use by " +
+                                                "another process.\n\nMake sure the files are free for " +
+                                                "deletion, then remove them manually.",
+                            MessageType.Error, ui, ButtonsType.Ok, "Error");
+                        return;
+                    }
+                    catch (Exception ex) //Other exceptions
+                    {
+                        await Dialogs.ShowMessageBox($"The following error occurred while trying to remove" +
+                                                $" the files of this virtual machine:\n\n{ex.Message}",
+                            MessageType.Error, ui, ButtonsType.Ok, "Error");
+                        return;
+                    }
+                    await Dialogs.ShowMessageBox($@"Files of virtual machine ""{vm_name}"" were successfully deleted.",
+                        MessageType.Info, ui, ButtonsType.Ok, "Virtual machine files removed");
                 }
             }
 
-            Sort(ui.sortColumn, ui.sortOrder);
             CountRefresh();
         }
 
         // Performs a hard reset for the selected VM
-        public static void HardReset(IList<VMRow> selected)
+        public static void HardReset(VMVisual selected)
         {
-            var vm = selected[0].Tag;
+            var vm = selected.Tag;
             if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
             {
                 Platforms.Manager.GetSender().DoVmHardReset(vm);
@@ -556,143 +620,96 @@ namespace _86BoxManager.Core
         }
 
         // Pauses the selected VM
-        public static void Pause(IList<VMRow> selected, frmMain ui)
+        public static void Pause(VMVisual selected, frmMain ui)
         {
-            var row = selected[0];
+            var row = selected;
             var vm = row.Tag;
             Platforms.Manager.GetSender().DoVmPause(vm);
-            row.SetStatus(vm.GetStatusString());
-            row.SetIcon(2);
-            ui.pauseToolStripMenuItem.Header = "Resume";
-            ui.btnPause.Content = "Resume";
-            ui.btnStart.SetToolTip("Stop this virtual machine");
-            ui.btnStart.IsEnabled = true;
-            ui.btnStart.Content = "Stop";
-            ui.startToolStripMenuItem.Header = "Stop";
-            ui.startToolStripMenuItem.SetToolTip("Stop this virtual machine");
-            ui.btnConfigure.IsEnabled = true;
-            ui.pauseToolStripMenuItem.SetToolTip("Resume this virtual machine");
-            ui.btnPause.SetToolTip("Resume this virtual machine");
+            vm.Status = VM.STATUS_PAUSED;
+            row.RefreshStatus(2);
+            ui.UpdateState();
 
-            Sort(ui.sortColumn, ui.sortOrder);
             CountRefresh();
         }
 
         // Resumes the selected VM
-        public static void Resume(IList<VMRow> selected, frmMain ui)
+        public static void Resume(VMVisual selected, frmMain ui)
         {
-            var row = selected[0];
+            var row = selected;
             var vm = row.Tag;
             Platforms.Manager.GetSender().DoVmResume(vm);
             vm.Status = VM.STATUS_RUNNING;
-            row.SetStatus(vm.GetStatusString());
-            row.SetIcon(1);
-            ui.pauseToolStripMenuItem.Header = "Pause";
-            ui.btnPause.Content = "Pause";
-            ui.btnStart.IsEnabled = true;
-            ui.startToolStripMenuItem.Header = "Stop";
-            ui.startToolStripMenuItem.SetToolTip("Stop this virtual machine");
-            ui.btnConfigure.IsEnabled = true;
-            ui.pauseToolStripMenuItem.SetToolTip("Pause this virtual machine");
-            ui.btnStart.SetToolTip("Stop this virtual machine");
-            ui.btnPause.SetToolTip("Pause this virtual machine");
+            row.RefreshStatus(1);
+            ui.UpdateState();
 
-            Sort(ui.sortColumn, ui.sortOrder);
             CountRefresh();
         }
 
-        // Sort the VM list by specified column and order
-        public static void Sort(int column, SortType order)
-        {
-            var ui = Program.Root;
-            var lstVMs = ui.lstVMs;
-
-            // const string ascArrow = " ▲";
-            // const string descArrow = " ▼";
-
-            if (lstVMs.GetSelItems().Count > 1)
-            {
-                // Just in case so we don't end up with weird selection glitches
-                lstVMs.ClearSelect();
-            }
-
-            ui.sortColumn = column;
-            ui.sortOrder = order;
-
-            // Save the new column and order to the registry
-            try
-            {
-                var regkey = Configs.Open86BoxKey(true);
-                regkey.SetValue("SortColumn", ui.sortColumn, RegistryValueKind.DWord);
-                regkey.SetValue("SortOrder", ui.sortOrder, RegistryValueKind.DWord);
-                regkey.Close();
-            }
-            catch
-            {
-                Dialogs.ShowMessageBox("Could not save the column sorting state to the " +
-                                       "registry. Make sure you have the required permissions" +
-                                       " and try again.",
-                    MessageType.Error, ButtonsType.Ok, "Error");
-            }
-        }
-
-        private static IExecVars GetExecArgs(frmMain ui, VM vm, string idString)
+        private static IExecVars GetExecArgs(frmMain ui, VMVisual vm, string idString)
         {
             var hWndHex = ui.hWndHex;
             var vmPath = vm.Path;
-            var exePath = ui.exepath;
+            var exePath = Sett.EXEdir;
             var exeName = Platforms.Env.ExeNames.First();
 
             var vars = new CommonExecVars
             {
                 FileName = IOPath.Combine(exePath, exeName),
                 VmPath = vmPath,
-                Vm = vm,
-                LogFile = ui.logging ? ui.logpath : null,
+                Vm = vm.Tag,
+                LogFile = ui.Settings.EnableLogging ? ui.Settings.LogPath : null,
                 Handle = idString != null ? (idString, hWndHex) : null
             };
             return vars;
         }
 
+        public static void Start(Window parent)
+        {
+            var m = Program.Root.Model;
+            if (m.MachineIndex != -1)
+                Start(m.Machine, parent);
+        }
+
         // Starts the selected VM
-        public static void Start()
+        public static void Start(VMVisual row, Window parent)
         {
             var ui = Program.Root;
-            var lstVMs = ui.lstVMs;
+            var start_time = DateTime.Now;
+            string start_file = "";
 
             try
             {
-                var selected = lstVMs.GetSelItems();
-                var row = selected[0];
                 var vm = row.Tag;
 
-                var id = VMWatch.GetTempId(vm);
+                var id = VMWatch.GetTempId(row);
                 var idString = $"{id:X}".PadLeft(16, '0');
 
                 if (vm.Status == VM.STATUS_STOPPED)
                 {
                     var exec = Platforms.Manager.GetExecutor();
-                    var info = exec.BuildStartInfo(GetExecArgs(ui, vm, idString));
-                    if (!ui.showConsole)
+                    var info = exec.BuildStartInfo(GetExecArgs(ui, row, idString));
+                    if (!ui.Settings.ShowConsole)
                     {
                         info.RedirectStandardOutput = true;
                         info.UseShellExecute = false;
                     }
+                    start_file = info.FileName;
                     var p = Process.Start(info);
                     if (p == null)
                         throw new InvalidOperationException($"Could not start: {info.FileName}");
 
                     vm.Status = VM.STATUS_RUNNING;
                     vm.Pid = p.Id;
+                    row.ClearWaiting();
 
-                    row.SetStatus(vm.GetStatusString());
-                    row.SetIcon(1);
+                    row.RefreshStatus(1);
 
                     // Minimize the main window if the user wants this
-                    if (ui.minimize)
+                    if (ui.Settings.MinimizeOnVMStart)
                     {
                         ui.Iconify();
                     }
+                    row.IsConfig = false;
 
                     // Create a new background worker which will wait for the VM's window to
                     // close, so it can update the UI accordingly
@@ -701,52 +718,47 @@ namespace _86BoxManager.Core
                         WorkerReportsProgress = false,
                         WorkerSupportsCancellation = false
                     };
-                    var watch = new VMWatch(bgw);
-                    _watch?.Dispose();
-                    _watch = watch;
+                    var watch = new VMWatch(bgw, row);
+                    _watch.Add(vm.Name, watch);
                     bgw.RunWorkerAsync(vm);
 
-                    ui.btnStart.IsEnabled = true;
-                    ui.btnStart.Content = "Stop";
-                    ui.btnStart.SetToolTip("Stop this virtual machine");
-                    ui.btnEdit.IsEnabled = false;
-                    ui.btnDelete.IsEnabled = false;
-                    ui.btnPause.IsEnabled = true;
-                    ui.btnPause.Content = "Pause";
-                    ui.btnReset.IsEnabled = true;
-                    ui.btnCtrlAltDel.IsEnabled = true;
-                    ui.btnConfigure.IsEnabled = true;
+                    ui.UpdateState();
 
-                    CountRefresh();
+                    using (var t = Sett.BeginTransaction())
+                    {
+                        row.RunCount++;
+                        row.SetLastRun(start_time);
+
+                        t.Commit();
+                    }
                 }
             }
             catch (InvalidOperationException)
             {
-                Dialogs.ShowMessageBox("The process failed to initialize or its window " +
+                Dialogs.DispatchMSGBox("The process failed to initialize or its window " +
                                        "handle could not be obtained.",
-                    MessageType.Error, ButtonsType.Ok, "Error");
+                    MessageType.Error, parent, ButtonsType.Ok, "Error");
             }
             catch (Win32Exception)
             {
-                Dialogs.ShowMessageBox("Cannot find 86Box executable. Make sure your settings " +
-                                       "are correct and try again.",
-                    MessageType.Error, ButtonsType.Ok, "Error");
+                Dialogs.DispatchMSGBox("Cannot find 86Box executable. Make sure your settings " +
+                                       $"are correct and try again. ({start_file})",
+                    MessageType.Error, parent, ButtonsType.Ok, "Error");
             }
             catch (Exception ex)
             {
-                Dialogs.ShowMessageBox("An error has occurred. Please provide the following " +
+                Dialogs.DispatchMSGBox("An error has occurred. Please provide the following " +
                                        $"information to the developer:\n{ex.Message}\n{ex.StackTrace}",
-                    MessageType.Error, ButtonsType.Ok, "Error");
+                    MessageType.Error, parent, ButtonsType.Ok, "Error");
             }
 
-            Sort(ui.sortColumn, ui.sortOrder);
             CountRefresh();
         }
 
         // Sends a running/paused VM a request to stop and asking the user for confirmation
-        public static void RequestStop(IList<VMRow> selected, frmMain ui)
+        public static void RequestStop(VMVisual selected, frmMain ui)
         {
-            var vm = selected[0].Tag;
+            var vm = selected.Tag;
             try
             {
                 if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
@@ -757,11 +769,10 @@ namespace _86BoxManager.Core
             }
             catch (Exception)
             {
-                Dialogs.ShowMessageBox("An error occurred trying to stop the selected virtual machine.",
-                    MessageType.Error, ButtonsType.Ok, "Error");
+                Dialogs.DispatchMSGBox("An error occurred trying to stop the selected virtual machine.",
+                    MessageType.Error, ui, ButtonsType.Ok, "Error");
             }
 
-            Sort(ui.sortColumn, ui.sortOrder);
             CountRefresh();
         }
 
@@ -770,8 +781,7 @@ namespace _86BoxManager.Core
         {
             var ui = Program.Root;
 
-            var selected = ui.lstVMs.GetSelItems();
-            var row = selected[0];
+            var row = ui.Model.Machine;
             var vm = row.Tag;
 
             // If the VM is already running, only send the message to open the settings window. 
@@ -786,8 +796,8 @@ namespace _86BoxManager.Core
                 try
                 {
                     var exec = Platforms.Manager.GetExecutor();
-                    var info = exec.BuildConfigInfo(GetExecArgs(ui, vm, null));
-                    if (!ui.showConsole)
+                    var info = exec.BuildConfigInfo(GetExecArgs(ui, row, null));
+                    if (!ui.Settings.ShowConsole)
                     {
                         info.RedirectStandardOutput = true;
                         info.UseShellExecute = false;
@@ -800,41 +810,27 @@ namespace _86BoxManager.Core
                     vm.Status = VM.STATUS_WAITING;
                     vm.hWnd = p.MainWindowHandle;
                     vm.Pid = p.Id;
+                    row.CancelUptime();
 
-                    row.SetStatus(vm.GetStatusString());
-                    row.SetIcon(vm.Status);
+                    row.RefreshStatus(vm.Status);
+                    row.IsConfig = true;
 
                     var bgw = new BackgroundWorker
                     {
                         WorkerReportsProgress = false,
                         WorkerSupportsCancellation = false
                     };
-                    var watch = new VMWatch(bgw);
-                    _watch?.Dispose();
-                    _watch = watch;
+                    var watch = new VMWatch(bgw, row);
+                    _watch.Add(vm.Name, watch);
                     bgw.RunWorkerAsync(vm);
 
-                    ui.btnStart.IsEnabled = false;
-                    ui.btnStart.Content = "Stop";
-                    ui.btnStart.SetToolTip("Stop this virtual machine");
-                    ui.startToolStripMenuItem.Header = "Stop";
-                    ui.startToolStripMenuItem.SetToolTip("Stop this virtual machine");
-                    ui.btnEdit.IsEnabled = false;
-                    ui.btnDelete.IsEnabled = false;
-                    ui.btnConfigure.IsEnabled = false;
-                    ui.btnReset.IsEnabled = false;
-                    ui.btnPause.IsEnabled = false;
-                    ui.btnPause.Content = "Pause";
-                    ui.btnPause.SetToolTip("Pause this virtual machine");
-                    ui.pauseToolStripMenuItem.Header = "Pause";
-                    ui.pauseToolStripMenuItem.SetToolTip("Pause this virtual machine");
-                    ui.btnCtrlAltDel.IsEnabled = false;
+                    ui.UpdateState();
                 }
                 catch (Win32Exception)
                 {
-                    Dialogs.ShowMessageBox("Cannot find 86Box executable. Make sure your " +
+                    Dialogs.DispatchMSGBox("Cannot find 86Box executable. Make sure your " +
                                            "settings are correct and try again.",
-                        MessageType.Error, ButtonsType.Ok, "Error");
+                        MessageType.Error, ui, ButtonsType.Ok, "Error");
                 }
                 catch (Exception ex)
                 {
@@ -842,14 +838,13 @@ namespace _86BoxManager.Core
                     vm.Status = VM.STATUS_STOPPED;
                     vm.hWnd = IntPtr.Zero;
                     vm.Pid = -1;
-                    Dialogs.ShowMessageBox("This virtual machine could not be configured. Please " +
+                    Dialogs.DispatchMSGBox("This virtual machine could not be configured. Please " +
                                            "provide the following information to the developer:\n" +
                                            $"{ex.Message}\n{ex.StackTrace}",
-                        MessageType.Error, ButtonsType.Ok, "Error");
+                        MessageType.Error, ui, ButtonsType.Ok, "Error");
                 }
             }
 
-            Sort(ui.sortColumn, ui.sortOrder);
             CountRefresh();
         }
     }
