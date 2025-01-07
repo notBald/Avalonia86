@@ -15,7 +15,7 @@ namespace _86BoxManager.Linux
             var fakeDoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             MyDocuments = Path.Combine(fakeDoc, "Documents");
 
-            ExeNames = new[] { "86Box" };
+            ExeNames = new[] { "86Box.AppImage" };
         }
 
         public string[] ExeNames { get; }
