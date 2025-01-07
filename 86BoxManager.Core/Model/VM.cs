@@ -1,6 +1,5 @@
 ﻿using System;
 using _86BoxManager.API;
-using _86BoxManager.Core;
 
 // ReSharper disable InconsistentNaming
 
