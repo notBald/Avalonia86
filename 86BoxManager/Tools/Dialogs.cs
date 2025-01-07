@@ -5,20 +5,60 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
-using MessageBox.Avalonia;
-using MessageBox.Avalonia.Enums;
-using MessageBox.Avalonia.DTO;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia.Dto;
 using System.Linq;
 using StartLoc = Avalonia.Controls.WindowStartupLocation;
+using Avalonia.Platform.Storage;
+using System.Runtime.CompilerServices;
+using Avalonia.Threading;
 
 namespace _86BoxManager.Tools
 {
     internal static class Dialogs
     {
-        public static ButtonResult ShowMessageBox(string msg, Icon icon,
+        //private static Task<ButtonResult> ShowMessageBox(string msg, Icon icon, Window parent,
+        //    ButtonEnum buttons = ButtonEnum.Ok, string title = "Attention")
+        //{
+        //    var loc = parent == null ? StartLoc.CenterScreen : StartLoc.CenterOwner;
+        //    var opts = new MessageBoxStandardParams
+        //    {
+        //        ButtonDefinitions = buttons,
+        //        ContentTitle = title,
+        //        ContentMessage = msg,
+        //        Icon = icon,
+        //        CanResize = false,
+        //        WindowStartupLocation = loc,
+        //        SizeToContent = SizeToContent.WidthAndHeight
+        //    };
+        //    var window = MessageBoxManager.GetMessageBoxStandard(opts);
+        //    var raw = parent != null ? window.ShowWindowDialogAsync(parent) : window.ShowAsync();
+
+        //    //Todo: This code is key to getting it running
+        //    //if (Application.Current is var app)
+        //    //{
+        //    //    var flags = BindingFlags.NonPublic | BindingFlags.Instance;
+        //    //    var windowField = window.GetType().GetField("_window", flags)!;
+        //    //    var windowObj = (Window)windowField.GetValue(window)!;
+        //    //    if (parent?.Icon is { } wi)
+        //    //        windowObj.Icon = wi;
+        //    //    app.Run(windowObj);
+        //    //}
+
+        //    return raw;
+        //}
+
+        public static void DispatchMSGBox(string msg, Icon icon, Window parent,
             ButtonEnum buttons = ButtonEnum.Ok, string title = "Attention")
         {
-            var parent = Program.Root;
+            var aw = ShowMessageBox(msg, icon, parent, buttons, title);
+            Dispatcher.UIThread.Post(async () => await aw);
+        }
+
+        public static async Task<ButtonResult> ShowMessageBox(string msg, Icon icon, Window parent,
+            ButtonEnum buttons = ButtonEnum.Ok, string title = "Attention")
+        {
             var loc = parent == null ? StartLoc.CenterScreen : StartLoc.CenterOwner;
             var opts = new MessageBoxStandardParams
             {
@@ -30,19 +70,10 @@ namespace _86BoxManager.Tools
                 WindowStartupLocation = loc,
                 SizeToContent = SizeToContent.WidthAndHeight
             };
-            var window = MessageBoxManager.GetMessageBoxStandardWindow(opts);
-            var raw = parent != null ? window.ShowDialog(parent) : window.Show();
-            if (Application.Current is var app)
-            {
-                var flags = BindingFlags.NonPublic | BindingFlags.Instance;
-                var windowField = window.GetType().GetField("_window", flags)!;
-                var windowObj = (Window)windowField.GetValue(window)!;
-                if (parent?.Icon is { } wi)
-                    windowObj.Icon = wi;
-                app.Run(windowObj);
-            }
-            var res = raw.GetAwaiter().GetResult();
-            return res;
+            var window = MessageBoxManager.GetMessageBoxStandard(opts);
+            var raw = parent != null ? window.ShowWindowDialogAsync(parent) : window.ShowAsync();
+
+            return await raw;
         }
 
         [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
@@ -57,50 +88,67 @@ namespace _86BoxManager.Tools
             (dialog as IDisposable)?.Dispose();
         }
 
-        public static async Task<string> SelectFolder(string title, string dir, Window parent)
+        public static async Task<string> SelectFolder(string dir, string title, Window parent)
         {
-            var dialog = new OpenFolderDialog
+            Uri.TryCreate("file://" + dir, UriKind.Absolute, out var uri);
+            var tl = TopLevel.GetTopLevel(parent);
+            var folder = await tl.StorageProvider.TryGetFolderFromPathAsync(uri);
+            var res = await tl.StorageProvider.OpenFolderPickerAsync(new Avalonia.Platform.Storage.FolderPickerOpenOptions
             {
-                Title = title, Directory = dir
-            };
+                Title = title,
+                SuggestedStartLocation = folder
+            });
 
-            string result = null;
-            var raw = dialog.ShowAsync(parent);
-            var res = await raw;
+            string fld = null;
 
-            if (!string.IsNullOrWhiteSpace(res))
+            foreach(var s in res)
             {
-                result = res;
+                try { fld = s.Path.LocalPath; }
+                catch { fld = s.Path.ToString(); }
             }
-            return result;
+
+            if (string.IsNullOrWhiteSpace(fld))
+                return null;
+            return fld;
         }
 
         public static async Task<string> SaveFile(string title, string dir, string filter,
             Window parent, string ext = null)
         {
-            var dialog = new SaveFileDialog
-            {
-                Title = title, Directory = dir, DefaultExtension = ext
-            };
+            //Todo: figure out how the file type filtering is supposed to work. This is a get it to compile impl:
+            FilePickerFileType[] fpft = ext == null ? Array.Empty<FilePickerFileType>() : new FilePickerFileType[] { new FilePickerFileType(ext) };
 
-            if (filter != null)
+            Uri.TryCreate("file://" + dir, UriKind.Absolute, out var uri);
+            var tl = TopLevel.GetTopLevel(parent);
+            var folder = await tl.StorageProvider.TryGetFolderFromPathAsync(uri);
+            var res = await tl.StorageProvider.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions
             {
-                var tmp = filter.Split('|', 2);
-                dialog.Filters = new List<FileDialogFilter>
-                {
-                    new() { Name = tmp.First(), Extensions = new List<string> { tmp.Last() } }
-                };
+                Title = title,
+                SuggestedStartLocation = folder,
+                FileTypeFilter = fpft
+            });
+
+            //if (filter != null)
+            //{
+            //    var tmp = filter.Split('|', 2);
+            //    dialog.Filters = new List<FileDialogFilter>
+            //    {
+            //        new() { Name = tmp.First(), Extensions = new List<string> { tmp.Last() } }
+            //    };
+            //}
+
+            string fld = null;
+
+            foreach (var s in res)
+            {
+                fld = s.Path.AbsolutePath;
             }
 
-            string result = null;
-            var raw = dialog.ShowAsync(parent);
-            var res = await raw;
-
-            if (!string.IsNullOrWhiteSpace(res))
-            {
-                result = res;
-            }
-            return result;
+            if (string.IsNullOrWhiteSpace(fld))
+                return null;
+            return fld;
         }
     }
+
+
 }

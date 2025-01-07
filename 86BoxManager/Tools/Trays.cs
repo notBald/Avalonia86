@@ -12,7 +12,8 @@ namespace _86BoxManager.Tools
 
         public static void MakeVisible(this TrayIcon trayIcon, bool value)
         {
-            trayIcon.IsVisible = value;
+            if (trayIcon != null)
+                trayIcon.IsVisible = value;
         }
     }
 }

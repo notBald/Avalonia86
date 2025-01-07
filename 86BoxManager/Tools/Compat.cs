@@ -23,13 +23,6 @@ namespace _86BoxManager.Tools
             window.WindowState = WindowState.Minimized;
         }
 
-        public static void EnableGridLines(this DataGrid view, bool value)
-        {
-            view.GridLinesVisibility = value
-                ? DataGridGridLinesVisibility.All
-                : DataGridGridLinesVisibility.None;
-        }
-
         public static void SetColorTxt(this ContentControl label, ISolidColorBrush color,
             FontWeight weight, string text)
         {
