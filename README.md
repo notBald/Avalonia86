@@ -24,6 +24,10 @@ System requirements are the same as for 86Box. Additionally, the following is re
 3. Go to Settings, choose the folder where `86Box.exe` is located (along with the roms folder) and a folder where your virtual machines will be located (for configs, nvr folders, etc.)
 4. Start creating new virtual machines and enjoy
 
+## Using in Linux
+
+See the [Linux Guide](Linux.md)
+
 ## How to build
 1. Clone the repo
 2. Open `Avalonia86.sln` solution file in Visual Studio
