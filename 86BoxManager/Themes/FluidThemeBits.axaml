@@ -1,0 +1,724 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- Theming taken from Fluid. Note that it is put here, as otherwise the Preview plugin for Avalonia crashes (Can't merge dictionaries). I'm sure this can be worked around by making this a proper theme. -->
+	<CornerRadius x:Key="OverlayCornerRadius">5</CornerRadius>
+	<Color x:Key="SystemAccentColor">#0078d7</Color>
+	<Color x:Key="SystemBaseLowColor">#33000000</Color>
+	<Color x:Key="SystemChromeMediumColor">#FFE6E6E6</Color>
+	<SolidColorBrush x:Key="SystemControlHighlightTransparentBrush" Color="Transparent" />
+	<SolidColorBrush x:Key="SystemControlHighlightAltBaseMediumHighBrush"
+                       Color="{StaticResource SystemBaseMediumHighColor}" />
+
+	<!-- Resources for ToolTip.xaml -->
+	<x:Double x:Key="ToolTipContentThemeFontSize">12</x:Double>
+	<Thickness x:Key="ToolTipBorderThemeThickness">1</Thickness>
+	<StaticResource x:Key="ToolTipForeground" ResourceKey="SystemControlForegroundBaseHighBrush" />
+	<StaticResource x:Key="ToolTipBackground" ResourceKey="SystemControlBackgroundChromeMediumLowBrush" />
+	<StaticResource x:Key="ToolTipBorderBrush" ResourceKey="SystemControlTransientBorderBrush" />
+	<Thickness x:Key="ToolTipBorderThemePadding">8,5,8,7</Thickness>
+	<SolidColorBrush x:Key="SystemControlBackgroundChromeMediumLowBrush"
+				   Color="{StaticResource SystemChromeMediumLowColor}" />
+
+	<!-- Colors used by the ScrollBar -->
+	<Color x:Key="SystemChromeDisabledLowColor">#FF7A7A7A</Color>
+	<Color x:Key="SystemAltHighColor">#FFFFFFFF</Color>
+	<SolidColorBrush x:Key="SystemControlForegroundAltHighBrush" Color="{StaticResource SystemAltHighColor}" />
+	<SolidColorBrush x:Key="SystemControlForegroundBaseLowBrush" Color="{StaticResource SystemBaseLowColor}" />
+	<SolidColorBrush x:Key="SystemControlBackgroundBaseMediumLowBrush"
+				   Color="{StaticResource SystemBaseMediumLowColor}" />
+	<SolidColorBrush x:Key="SystemControlBackgroundBaseMediumBrush" Color="{StaticResource SystemBaseMediumColor}" />
+	<SolidColorBrush x:Key="SystemControlDisabledTransparentBrush" Color="Transparent" />
+	<SolidColorBrush x:Key="SystemControlForegroundTransparentBrush" Color="Transparent" />
+	<SolidColorBrush x:Key="SystemControlBackgroundListLowBrush" Color="{StaticResource SystemListLowColor}" />
+
+	<!-- Colors used by the Combobox -->
+	<Color x:Key="SystemBaseMediumHighColor">#CC000000</Color>
+	<Color x:Key="SystemBaseHighColor">#FF000000</Color>
+	<Color x:Key="SystemBaseMediumColor">#99000000</Color>
+	<Color x:Key="SystemBaseMediumLowColor">#66000000</Color>
+	<Color x:Key="SystemChromeMediumLowColor">#FFF2F2F2</Color>
+	<Color x:Key="SystemAltMediumColor">#99FFFFFF</Color>
+	<Color x:Key="SystemListMediumColor">#33000000</Color>
+	<Color x:Key="SystemListLowColor">#19000000</Color>
+	<Color x:Key="SystemErrorTextColor">#C50500</Color>
+	<SolidColorBrush x:Key="SystemControlForegroundBaseHighBrush" Color="{StaticResource SystemBaseHighColor}" />
+	<SolidColorBrush x:Key="SystemControlForegroundBaseMediumBrush" Color="{StaticResource SystemBaseMediumColor}" />
+	<SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Color="{DynamicResource SystemAccentColor}"
+				   Opacity="0.4" />
+	<SolidColorBrush x:Key="SystemControlPageTextBaseHighBrush" Color="{StaticResource SystemBaseHighColor}" />
+	<SolidColorBrush x:Key="SystemControlHighlightBaseMediumLowBrush"
+				   Color="{StaticResource SystemBaseMediumLowColor}" />
+	<SolidColorBrush x:Key="SystemControlForegroundBaseMediumHighBrush"
+				   Color="{StaticResource SystemBaseMediumHighColor}" />
+	<SolidColorBrush x:Key="SystemControlTransientBackgroundBrush"
+				   Color="{StaticResource SystemChromeMediumLowColor}" />
+	<SolidColorBrush x:Key="SystemControlTransientBorderBrush" Color="#000000" Opacity="0.36" />
+	<SolidColorBrush x:Key="SystemControlPageBackgroundAltMediumBrush" Color="{StaticResource SystemAltMediumColor}" />
+	<SolidColorBrush x:Key="SystemControlHighlightBaseMediumHighBrush"
+				   Color="{StaticResource SystemBaseMediumHighColor}" />
+	<SolidColorBrush x:Key="SystemControlBackgroundListMediumBrush" Color="{StaticResource SystemListMediumColor}" />
+	<SolidColorBrush x:Key="SystemControlHighlightBaseMediumBrush" Color="{StaticResource SystemBaseMediumColor}" />
+	<SolidColorBrush x:Key="SystemControlTransparentBrush" Color="Transparent" />
+	<SolidColorBrush x:Key="SystemControlHighlightAltBaseHighBrush" Color="{StaticResource SystemBaseHighColor}" />
+	<SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="{DynamicResource SystemAccentColor}"
+				   Opacity="0.6" />
+	<SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="{StaticResource SystemListLowColor}" />
+	<SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="{DynamicResource SystemAccentColor}"
+				   Opacity="0.9" />
+	<SolidColorBrush x:Key="SystemControlHighlightListMediumBrush" Color="{StaticResource SystemListMediumColor}" />
+	<SolidColorBrush x:Key="SystemControlErrorTextForegroundBrush" Color="{StaticResource SystemErrorTextColor}" />
+
+	<!-- Resources for ScrollBar.xaml -->
+	<x:Double x:Key="ScrollBarTrackBorderThemeThickness">0</x:Double>
+	<StaticResource x:Key="ScrollBarBackground" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ScrollBarBackgroundPointerOver" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ScrollBarForeground" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ScrollBarBorderBrush" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ScrollBarButtonBackground" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ScrollBarButtonBackgroundPointerOver" ResourceKey="SystemControlBackgroundListLowBrush" />
+	<StaticResource x:Key="ScrollBarButtonBackgroundPressed" ResourceKey="SystemControlBackgroundBaseMediumBrush" />
+	<StaticResource x:Key="ScrollBarButtonBorderBrush" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ScrollBarButtonBorderBrushPointerOver" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ScrollBarButtonBorderBrushPressed" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ScrollBarButtonBorderBrushDisabled" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ScrollBarButtonArrowForeground" ResourceKey="SystemControlForegroundBaseHighBrush" />
+	<StaticResource x:Key="ScrollBarButtonArrowForegroundPointerOver"
+					ResourceKey="SystemControlForegroundBaseHighBrush" />
+	<StaticResource x:Key="ScrollBarButtonArrowForegroundPressed" ResourceKey="SystemControlForegroundAltHighBrush" />
+	<StaticResource x:Key="ScrollBarButtonArrowForegroundDisabled" ResourceKey="SystemControlForegroundBaseLowBrush" />
+	<StaticResource x:Key="ScrollBarThumbFillPointerOver" ResourceKey="SystemControlBackgroundBaseMediumLowBrush" />
+	<StaticResource x:Key="ScrollBarThumbFillPressed" ResourceKey="SystemControlBackgroundBaseMediumBrush" />
+	<StaticResource x:Key="ScrollBarThumbFillDisabled" ResourceKey="SystemControlDisabledTransparentBrush" />
+	<SolidColorBrush x:Key="ScrollBarTrackFill" Color="{StaticResource SystemChromeMediumColor}" Opacity="0.9" />
+	<SolidColorBrush x:Key="ScrollBarTrackFillPointerOver" Color="{StaticResource SystemChromeMediumColor}"
+					 Opacity="0.9" />
+	<StaticResource x:Key="ScrollBarTrackStroke" ResourceKey="SystemControlForegroundTransparentBrush" />
+	<StaticResource x:Key="ScrollBarTrackStrokePointerOver" ResourceKey="SystemControlForegroundTransparentBrush" />
+	<StaticResource x:Key="ScrollBarThumbBackgroundColor" ResourceKey="SystemBaseLowColor" />
+	<StaticResource x:Key="ScrollBarPanningThumbBackgroundColor" ResourceKey="SystemChromeDisabledLowColor" />
+	<SolidColorBrush x:Key="ScrollBarPanningThumbBackground"
+					 Color="{StaticResource ScrollBarPanningThumbBackgroundColor}" />
+	<x:Double x:Key="ScrollBarSize">16</x:Double>
+	<x:Double x:Key="ScrollBarButtonArrowIconFontSize">8</x:Double>
+
+	<!-- Resources for ComboBox.xaml -->
+	<x:Double x:Key="ComboBoxThemeMinWidth">64</x:Double>
+	<Thickness x:Key="ComboBoxBorderThemeThickness">1</Thickness>
+	<Thickness x:Key="ComboBoxDropdownBorderThickness">1</Thickness>
+	<Thickness x:Key="ComboBoxItemThemePadding">11,5,11,7</Thickness>
+	<FontWeight x:Key="ComboBoxHeaderThemeFontWeight">Normal</FontWeight>
+	<StaticResource x:Key="ComboBoxItemForeground" ResourceKey="SystemControlForegroundBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxItemForegroundPressed" ResourceKey="SystemControlHighlightAltBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxItemForegroundPointerOver" ResourceKey="SystemControlHighlightAltBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxItemForegroundDisabled" ResourceKey="SystemControlDisabledBaseMediumLowBrush" />
+	<StaticResource x:Key="ComboBoxItemForegroundSelected" ResourceKey="SystemControlHighlightAltBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxItemForegroundSelectedPressed"
+					ResourceKey="SystemControlHighlightAltBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxItemForegroundSelectedPointerOver"
+					ResourceKey="SystemControlHighlightAltBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxItemForegroundSelectedDisabled"
+					ResourceKey="SystemControlDisabledBaseMediumLowBrush" />
+	<StaticResource x:Key="ComboBoxItemBackground" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ComboBoxItemBackgroundPressed" ResourceKey="SystemControlHighlightListMediumBrush" />
+	<StaticResource x:Key="ComboBoxItemBackgroundPointerOver" ResourceKey="SystemControlHighlightListLowBrush" />
+	<StaticResource x:Key="ComboBoxItemBackgroundDisabled" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ComboBoxItemBackgroundSelected" ResourceKey="SystemControlHighlightListAccentLowBrush" />
+	<StaticResource x:Key="ComboBoxItemBackgroundSelectedPressed"
+					ResourceKey="SystemControlHighlightListAccentHighBrush" />
+	<StaticResource x:Key="ComboBoxItemBackgroundSelectedPointerOver"
+					ResourceKey="SystemControlHighlightListAccentMediumBrush" />
+	<StaticResource x:Key="ComboBoxItemBackgroundSelectedDisabled" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ComboBoxItemBorderBrushPressed" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ComboBoxItemBorderBrushPointerOver" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ComboBoxItemBorderBrushDisabled" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ComboBoxItemBorderBrushSelected" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ComboBoxItemBorderBrushSelectedPressed" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ComboBoxItemBorderBrushSelectedPointerOver" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ComboBoxItemBorderBrushSelectedDisabled" ResourceKey="SystemControlTransparentBrush" />
+	<StaticResource x:Key="ComboBoxBackground" ResourceKey="SystemControlBackgroundAltMediumLowBrush" />
+	<StaticResource x:Key="ComboBoxBackgroundPointerOver" ResourceKey="SystemControlPageBackgroundAltMediumBrush" />
+	<StaticResource x:Key="ComboBoxBackgroundPressed" ResourceKey="SystemControlBackgroundListMediumBrush" />
+	<StaticResource x:Key="ComboBoxBackgroundDisabled" ResourceKey="SystemControlBackgroundBaseLowBrush" />
+	<StaticResource x:Key="ComboBoxBackgroundUnfocused" ResourceKey="SystemControlHighlightListAccentLowBrush" />
+	<StaticResource x:Key="ComboBoxBackgroundBorderBrushFocused" ResourceKey="SystemControlHighlightTransparentBrush" />
+	<StaticResource x:Key="ComboBoxBackgroundBorderBrushUnfocused"
+					ResourceKey="SystemControlHighlightBaseMediumLowBrush" />
+	<StaticResource x:Key="ComboBoxForeground" ResourceKey="SystemControlForegroundBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxForegroundDisabled" ResourceKey="SystemControlDisabledBaseMediumLowBrush" />
+	<StaticResource x:Key="ComboBoxForegroundFocused" ResourceKey="SystemControlHighlightAltBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxForegroundFocusedPressed" ResourceKey="SystemControlHighlightAltBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxPlaceHolderForeground" ResourceKey="SystemControlPageTextBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxPlaceHolderForegroundFocusedPressed"
+					ResourceKey="SystemControlHighlightAltBaseHighBrush" />
+	<StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="SystemControlForegroundBaseMediumBrush" />
+	<StaticResource x:Key="ComboBoxBorderBrushPointerOver" ResourceKey="SystemControlHighlightBaseMediumHighBrush" />
+	<StaticResource x:Key="ComboBoxBorderBrushPressed" ResourceKey="SystemControlHighlightBaseMediumBrush" />
+	<StaticResource x:Key="ComboBoxBorderBrushDisabled" ResourceKey="SystemControlDisabledBaseLowBrush" />
+	<StaticResource x:Key="ComboBoxDropDownGlyphForeground" ResourceKey="SystemControlForegroundBaseMediumHighBrush" />
+	<StaticResource x:Key="ComboBoxDropDownGlyphForegroundDisabled"
+					ResourceKey="SystemControlDisabledBaseMediumLowBrush" />
+	<StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocused"
+					ResourceKey="SystemControlHighlightAltBaseMediumHighBrush" />
+	<StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocusedPressed"
+					ResourceKey="SystemControlHighlightAltBaseMediumHighBrush" />
+	<StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="SystemControlTransientBackgroundBrush" />
+	<StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="SystemControlTransientBorderBrush" />
+	<Thickness x:Key="ComboBoxDropdownBorderPadding">0</Thickness>
+	<Thickness x:Key="ComboBoxDropdownContentMargin">0,4,0,4</Thickness>
+
+	<Thickness x:Key="ComboBoxTopHeaderMargin">0,0,0,4</Thickness>
+	<x:Int32 x:Key="ComboBoxPopupMaxNumberOfItems">15</x:Int32>
+	<x:Int32 x:Key="ComboBoxPopupMaxNumberOfItemsThatCanBeShownOnOneSide">7</x:Int32>
+
+	<Thickness x:Key="ComboBoxPadding">12,5,0,7</Thickness>
+	<Thickness x:Key="ComboBoxEditableTextPadding">11,5,32,6</Thickness>
+	<x:Double x:Key="ComboBoxMinHeight">32</x:Double>
+
+	<!-- Combobox styling -->
+	<ControlTheme x:Key="{x:Type ComboBox}" TargetType="ComboBox">
+		<Setter Property="Padding" Value="{DynamicResource ComboBoxPadding}" />
+		<Setter Property="FocusAdorner" Value="{x:Null}" />
+		<Setter Property="MaxDropDownHeight" Value="504" />
+		<Setter Property="Foreground" Value="{DynamicResource ComboBoxForeground}" />
+		<Setter Property="Background" Value="{DynamicResource ComboBoxBackground}" />
+		<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
+		<Setter Property="BorderThickness" Value="{DynamicResource ComboBoxBorderThemeThickness}" />
+		<Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+		<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+		<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+		<Setter Property="MinHeight" Value="{DynamicResource ComboBoxMinHeight}" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+		<Setter Property="HorizontalAlignment" Value="Left" />
+		<Setter Property="VerticalAlignment" Value="Top" />
+		<Setter Property="PlaceholderForeground" Value="{DynamicResource ComboBoxPlaceHolderForeground}" />
+		<Setter Property="Template">
+			<ControlTemplate>
+				<DataValidationErrors>
+					<Grid ColumnDefinitions="*,32">
+						<Border x:Name="Background"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								CornerRadius="{TemplateBinding CornerRadius}"
+								MinWidth="{DynamicResource ComboBoxThemeMinWidth}" />
+						<Border x:Name="HighlightBackground"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								Background="{DynamicResource ComboBoxBackgroundUnfocused}"
+								BorderBrush="{DynamicResource ComboBoxBackgroundBorderBrushUnfocused}"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								CornerRadius="{TemplateBinding CornerRadius}"
+								IsVisible="False"/>
+						<TextBlock x:Name="PlaceholderTextBlock"
+								   Grid.Column="0"
+								   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+								   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+								   Margin="{TemplateBinding Padding}"
+								   Text="{TemplateBinding PlaceholderText}"
+								   Foreground="{TemplateBinding PlaceholderForeground}"
+								   IsVisible="{TemplateBinding SelectionBoxItem, Converter={x:Static ObjectConverters.IsNull}}" />
+						<ContentControl x:Name="ContentPresenter"
+										Content="{TemplateBinding SelectionBoxItem}"
+										Grid.Column="0"
+										Margin="{TemplateBinding Padding}"
+										HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+										ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+										VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+						</ContentControl>
+
+						<Border x:Name="DropDownOverlay"
+								Grid.Column="1"
+								Background="Transparent"
+								Margin="0,1,1,1"
+								Width="30"
+								IsVisible="False"
+								HorizontalAlignment="Right" />
+
+						<PathIcon x:Name="DropDownGlyph"
+								  Grid.Column="1"
+								  UseLayoutRounding="False"
+								  IsHitTestVisible="False"
+								  Height="12"
+								  Width="12"
+								  Margin="0,0,10,0"
+								  HorizontalAlignment="Right"
+								  VerticalAlignment="Center"
+								  Foreground="{DynamicResource ComboBoxDropDownGlyphForeground}"
+								  Data="M1939 486L2029 576L1024 1581L19 576L109 486L1024 1401L1939 486Z"/>
+
+						<Popup Name="PART_Popup"
+							   WindowManagerAddShadowHint="False"
+							   IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+							   MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+							   MaxHeight="{TemplateBinding MaxDropDownHeight}"
+							   PlacementTarget="Background"
+							   IsLightDismissEnabled="True"
+							   InheritsTransform="True">
+							<Border x:Name="PopupBorder"
+									Background="{DynamicResource ComboBoxDropDownBackground}"
+									BorderBrush="{DynamicResource ComboBoxDropDownBorderBrush}"
+									BorderThickness="{DynamicResource ComboBoxDropdownBorderThickness}"
+									Padding="{DynamicResource ComboBoxDropdownBorderPadding}"
+									HorizontalAlignment="Stretch"
+									CornerRadius="{DynamicResource OverlayCornerRadius}">
+								<ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+											  VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+											  IsDeferredScrollingEnabled="{TemplateBinding (ScrollViewer.IsDeferredScrollingEnabled)}">
+									<ItemsPresenter Name="PART_ItemsPresenter"
+													Margin="{DynamicResource ComboBoxDropdownContentMargin}"
+													ItemsPanel="{TemplateBinding ItemsPanel}" />
+								</ScrollViewer>
+							</Border>
+						</Popup>
+					</Grid>
+				</DataValidationErrors>
+			</ControlTemplate>
+		</Setter>
+
+		<!--  PointerOver State  -->
+		<Style Selector="^:pointerover /template/ Border#Background">
+			<Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundPointerOver}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrushPointerOver}" />
+		</Style>
+
+		<!--  Pressed State  -->
+		<Style Selector="^:pressed /template/ Border#Background">
+			<Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundPressed}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrushPressed}" />
+		</Style>
+
+		<!-- Error State -->
+		<Style Selector="^:error /template/ Border#Background">
+			<Setter Property="BorderBrush" Value="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+		</Style>
+
+		<!--  Focus Pressed State  -->
+		<Style Selector="^:focused:pressed">
+			<Style Selector="^ /template/ ContentControl#ContentPresenter">
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxForegroundFocusedPressed}" />
+			</Style>
+			<Style Selector="^ /template/ TextBlock#PlaceholderTextBlock">
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxPlaceHolderForegroundFocusedPressed}" />
+			</Style>
+			<Style Selector="^ /template/ PathIcon#DropDownGlyph">
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxDropDownGlyphForegroundFocusedPressed}" />
+			</Style>
+		</Style>
+
+		<!--  Focused State  -->
+		<Style Selector="^:focus-visible">
+			<Style Selector="^ /template/ Border#HighlightBackground">
+				<Setter Property="IsVisible" Value="True" />
+				<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBackgroundBorderBrushFocused}" />
+			</Style>
+			<Style Selector="^ /template/ ContentControl#ContentPresenter">
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxForegroundFocused}" />
+			</Style>
+			<Style Selector="^ /template/ TextBlock#PlaceholderTextBlock">
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxForegroundFocused}" />
+			</Style>
+			<Style Selector="^ /template/ PathIcon#DropDownGlyph">
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxDropDownGlyphForegroundFocused}" />
+			</Style>
+		</Style>
+
+		<!--  Disabled State  -->
+		<Style Selector="^:disabled">
+			<Style Selector="^ /template/ Border#Background">
+				<Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundDisabled}" />
+				<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrushDisabled}" />
+			</Style>
+			<Style Selector="^ /template/ ContentControl#ContentPresenter">
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxForegroundDisabled}" />
+			</Style>
+			<Style Selector="^ /template/ TextBlock#PlaceholderTextBlock">
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxForegroundDisabled}" />
+			</Style>
+			<Style Selector="^ /template/ PathIcon#DropDownGlyph">
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxDropDownGlyphForegroundDisabled}" />
+			</Style>
+		</Style>
+	</ControlTheme>
+
+	<ControlTheme x:Key="{x:Type ComboBoxItem}" TargetType="ComboBoxItem">
+		<Setter Property="Foreground" Value="{DynamicResource ComboBoxItemForeground}" />
+		<Setter Property="Background" Value="{DynamicResource ComboBoxItemBackground}" />
+		<Setter Property="Padding" Value="{DynamicResource ComboBoxItemThemePadding}" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="Template">
+			<ControlTemplate>
+				<ContentPresenter Name="PART_ContentPresenter"
+								  Foreground="{TemplateBinding Foreground}"
+								  Background="{TemplateBinding Background}"
+								  BorderBrush="{TemplateBinding BorderBrush}"
+								  BorderThickness="{TemplateBinding BorderThickness}"
+								  CornerRadius="{TemplateBinding CornerRadius}"
+								  ContentTemplate="{TemplateBinding ContentTemplate}"
+								  Content="{TemplateBinding Content}"
+								  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+								  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+								  Padding="{TemplateBinding Padding}" />
+			</ControlTemplate>
+		</Setter>
+
+		<!--  PointerOver state  -->
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundPointerOver}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxItemBorderBrushPointerOver}" />
+			<Setter Property="Foreground" Value="{DynamicResource ComboBoxItemForegroundPointerOver}" />
+		</Style>
+
+		<!--  Disabled state  -->
+		<Style Selector="^:disabled /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundDisabled}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxItemBorderBrushDisabled}" />
+			<Setter Property="Foreground" Value="{DynamicResource ComboBoxItemForegroundDisabled}" />
+		</Style>
+
+		<!--  Pressed state  -->
+		<Style Selector="^:pressed /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundPressed}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxItemBorderBrushPressed}" />
+			<Setter Property="Foreground" Value="{DynamicResource ComboBoxItemForegroundPressed}" />
+		</Style>
+
+		<!--  Selected state  -->
+		<Style Selector="^:selected">
+			<Style Selector="^ /template/ ContentPresenter">
+				<Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundSelected}" />
+				<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxItemBorderBrushSelected}" />
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxItemForegroundSelected}" />
+			</Style>
+			<!--  Selected Disabled state  -->
+			<Style Selector="^:disabled /template/ ContentPresenter">
+				<Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundSelectedDisabled}" />
+				<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxItemBorderBrushSelectedDisabled}" />
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxItemForegroundSelectedDisabled}" />
+			</Style>
+			<!--  Selected PointerOver state  -->
+			<Style Selector="^:pointerover /template/ ContentPresenter">
+				<Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundSelectedPointerOver}" />
+				<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxItemBorderBrushSelectedPointerOver}" />
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxItemForegroundSelectedPointerOver}" />
+			</Style>
+			<!--  Selected Pressed state  -->
+			<Style Selector="^:pressed /template/ ContentPresenter">
+				<Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundSelectedPressed}" />
+				<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxItemBorderBrushSelectedPressed}" />
+				<Setter Property="Foreground" Value="{DynamicResource ComboBoxItemForegroundSelectedPressed}" />
+			</Style>
+		</Style>
+	</ControlTheme>
+
+	<!-- Tooltip Styling -->
+	<ControlTheme x:Key="{x:Type ToolTip}" TargetType="ToolTip">
+		<Setter Property="Foreground" Value="{DynamicResource ToolTipForeground}" />
+		<Setter Property="Background" Value="{DynamicResource ToolTipBackground}" />
+		<Setter Property="BorderBrush" Value="{DynamicResource ToolTipBorderBrush}" />
+		<Setter Property="BorderThickness" Value="{DynamicResource ToolTipBorderThemeThickness}" />
+		<Setter Property="FontSize" Value="{DynamicResource ToolTipContentThemeFontSize}" />
+		<Setter Property="Padding" Value="{DynamicResource ToolTipBorderThemePadding}" />
+		<Setter Property="MaxWidth" Value="{DynamicResource ToolTipContentMaxWidth}" />
+		<Setter Property="CornerRadius" Value="{DynamicResource OverlayCornerRadius}" />
+		<Setter Property="Opacity" Value="0" />
+		<Setter Property="Transitions">
+			<Transitions>
+				<DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+			</Transitions>
+		</Setter>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Border Name="PART_LayoutRoot"
+						BorderThickness="{TemplateBinding BorderThickness}"
+						Background="{TemplateBinding Background}"
+						BorderBrush="{TemplateBinding BorderBrush}"
+						Padding="{TemplateBinding Padding}"
+						CornerRadius="{TemplateBinding CornerRadius}">
+					<ContentPresenter Name="PART_ContentPresenter"
+									  MaxWidth="{TemplateBinding MaxWidth}"
+									  Content="{TemplateBinding Content}"
+									  ContentTemplate="{TemplateBinding ContentTemplate}"
+									  TextBlock.TextWrapping="Wrap"/>
+				</Border>
+			</ControlTemplate>
+		</Setter>
+
+		<Style Selector="^:open">
+			<Setter Property="Opacity" Value="1" />
+		</Style>
+	</ControlTheme>
+
+	<!-- Scrollbar Styling -->
+	<ControlTheme x:Key="FluentScrollBarThumb" TargetType="Thumb">
+		<Setter Property="Background" Value="{DynamicResource ScrollBarPanningThumbBackground}"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate>
+					<Border Background="{TemplateBinding Background}"
+							CornerRadius="{TemplateBinding CornerRadius}"/>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+		<Setter Property="Transitions">
+			<Transitions>
+				<CornerRadiusTransition Property="CornerRadius" Duration="0:0:0.1" />
+				<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" />
+			</Transitions>
+		</Setter>
+
+		<Style Selector="^:pointerover /template/ Border">
+			<Setter Property="Background" Value="{DynamicResource ScrollBarThumbFillPointerOver}" />
+		</Style>
+		<Style Selector="^:pressed  /template/ Border">
+			<Setter Property="Background" Value="{DynamicResource ScrollBarThumbFillPressed}" />
+		</Style>
+		<Style Selector="^:disabled  /template/ Border">
+			<Setter Property="Background" Value="{DynamicResource ScrollBarThumbFillDisabled}" />
+		</Style>
+	</ControlTheme>
+
+	<ControlTheme x:Key="FluentScrollBarPageButton" TargetType="RepeatButton">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="VerticalAlignment" Value="Stretch" />
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+		<Setter Property="Opacity" Value="0" />
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Border Background="{TemplateBinding Background}" />
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+
+	<ControlTheme x:Key="FluentScrollBarLineButton" TargetType="RepeatButton">
+		<Setter Property="Opacity" Value="0" />
+		<Setter Property="TextElement.Foreground" Value="{DynamicResource ScrollBarButtonArrowForeground}"/>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<ContentPresenter x:Name="PART_ContentPresenter"
+								  Background="{DynamicResource ScrollBarButtonBackground}"
+								  BorderBrush="{DynamicResource ScrollBarButtonBorderBrush}"
+								  Content="{TemplateBinding Content}"/>
+			</ControlTemplate>
+		</Setter>
+		<Setter Property="Transitions">
+			<Transitions>
+				<DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+			</Transitions>
+		</Setter>
+
+		<Style Selector="^:pointerover">
+			<Setter Property="TextElement.Foreground" Value="{DynamicResource ScrollBarButtonArrowForegroundPointerOver}"/>
+
+			<Style Selector="^ /template/ ContentPresenter" >
+				<Setter Property="Background" Value="{DynamicResource ScrollBarButtonBackgroundPointerOver}" />
+				<Setter Property="BorderBrush" Value="{DynamicResource ScrollBarButtonBorderBrushPointerOver}" />
+			</Style>
+		</Style>
+
+		<Style Selector="^:pressed">
+			<Setter Property="TextElement.Foreground" Value="{DynamicResource ScrollBarButtonArrowForegroundPressed}"/>
+
+			<Style Selector="^ /template/ ContentPresenter" >
+				<Setter Property="Background" Value="{DynamicResource ScrollBarButtonBackgroundPressed}" />
+				<Setter Property="BorderBrush" Value="{DynamicResource ScrollBarButtonBorderBrushPressed}" />
+			</Style>
+		</Style>
+
+		<Style Selector="^:disabled">
+			<Setter Property="TextElement.Foreground" Value="{DynamicResource ScrollBarButtonArrowForegroundDisabled}"/>
+
+			<Style Selector="^ /template/ ContentPresenter" >
+				<Setter Property="Background" Value="{DynamicResource ScrollBarButtonBackgroundDisabled}" />
+				<Setter Property="BorderBrush" Value="{DynamicResource ScrollBarButtonBorderBrushDisabled}" />
+			</Style>
+		</Style>
+	</ControlTheme>
+
+	<!-- ScrollBar animation -->
+	<TransformOperations x:Key="VerticalSmallScrollThumbScaleTransform">scaleX(0.125) translateX(-2px)</TransformOperations>
+	<TransformOperations x:Key="HorizontalSmallScrollThumbScaleTransform">scaleY(0.125) translateY(-2px)</TransformOperations>
+
+	<ControlTheme x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
+		<Setter Property="MinWidth" Value="{DynamicResource ScrollBarSize}" />
+		<Setter Property="MinHeight" Value="{DynamicResource ScrollBarSize}" />
+		<Setter Property="Background" Value="{DynamicResource ScrollBarBackground}" />
+		<Setter Property="Foreground" Value="{DynamicResource ScrollBarForeground}" />
+		<Setter Property="BorderBrush" Value="{DynamicResource ScrollBarBorderBrush}" />
+
+		<Style Selector="^:vertical">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Grid x:Name="Root">
+						<Border x:Name="VerticalRoot"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}">
+							<Grid RowDefinitions="Auto,*,Auto">
+								<Rectangle x:Name="TrackRect"
+										   Fill="{DynamicResource ScrollBarTrackFill}"
+										   Stroke="{DynamicResource ScrollBarTrackStroke}"
+										   StrokeThickness="{DynamicResource ScrollBarTrackBorderThemeThickness}"
+										   Opacity="0"
+										   Grid.RowSpan="3">
+									<Rectangle.Transitions>
+										<Transitions>
+											<DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+										</Transitions>
+									</Rectangle.Transitions>
+								</Rectangle>
+
+								<RepeatButton Name="PART_LineUpButton"
+											  HorizontalAlignment="Center"
+											  Theme="{StaticResource FluentScrollBarLineButton}"
+											  Grid.Row="0"
+											  Focusable="False"
+											  MinWidth="{DynamicResource ScrollBarSize}"
+											  Height="{DynamicResource ScrollBarSize}">
+									<PathIcon Data="M 19.091797 14.970703 L 10 5.888672 L 0.908203 14.970703 L 0.029297 14.091797 L 10 4.111328 L 19.970703 14.091797 Z"
+											  Width="{DynamicResource ScrollBarButtonArrowIconFontSize}"
+											  Height="{DynamicResource ScrollBarButtonArrowIconFontSize}"/>
+								</RepeatButton>
+
+								<Track Grid.Row="1"
+									   Minimum="{TemplateBinding Minimum}"
+									   Maximum="{TemplateBinding Maximum}"
+									   Value="{TemplateBinding Value, Mode=TwoWay}"
+									   DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+									   ViewportSize="{TemplateBinding ViewportSize}"
+									   Orientation="{TemplateBinding Orientation}"
+									   IsDirectionReversed="True">
+									<Track.DecreaseButton>
+										<RepeatButton Name="PART_PageUpButton"
+													  Classes="largeIncrease"
+													  Theme="{StaticResource FluentScrollBarPageButton}"
+													  Focusable="False" />
+									</Track.DecreaseButton>
+									<Track.IncreaseButton>
+										<RepeatButton Name="PART_PageDownButton"
+													  Classes="largeIncrease"
+													  Theme="{StaticResource FluentScrollBarPageButton}"
+													  Focusable="False" />
+									</Track.IncreaseButton>
+									<Thumb Theme="{StaticResource FluentScrollBarThumb}"
+										   Width="{DynamicResource ScrollBarSize}"
+										   MinHeight="{DynamicResource ScrollBarSize}"
+										   RenderTransform="{DynamicResource VerticalSmallScrollThumbScaleTransform}"
+										   RenderTransformOrigin="100%,50%" />
+								</Track>
+
+								<RepeatButton Name="PART_LineDownButton"
+											  HorizontalAlignment="Center"
+											  Theme="{StaticResource FluentScrollBarLineButton}"
+											  Grid.Row="2"
+											  Focusable="False"
+											  MinWidth="{DynamicResource ScrollBarSize}"
+											  Height="{DynamicResource ScrollBarSize}">
+									<PathIcon Data="M 18.935547 4.560547 L 19.814453 5.439453 L 10 15.253906 L 0.185547 5.439453 L 1.064453 4.560547 L 10 13.496094 Z"
+											  Width="{DynamicResource ScrollBarButtonArrowIconFontSize}"
+											  Height="{DynamicResource ScrollBarButtonArrowIconFontSize}"/>
+								</RepeatButton>
+							</Grid>
+						</Border>
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="^:horizontal">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Grid x:Name="Root">
+						<Border x:Name="HorizontalRoot"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}">
+							<Grid ColumnDefinitions="Auto,*,Auto">
+								<Rectangle x:Name="TrackRect"
+										   Fill="{DynamicResource ScrollBarTrackFill}"
+										   Stroke="{DynamicResource ScrollBarTrackStroke}"
+										   StrokeThickness="{DynamicResource ScrollBarTrackBorderThemeThickness}"
+										   Opacity="0"
+										   Grid.ColumnSpan="3">
+									<Rectangle.Transitions>
+										<Transitions>
+											<DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+										</Transitions>
+									</Rectangle.Transitions>
+								</Rectangle>
+
+								<RepeatButton Name="PART_LineUpButton"
+											  Theme="{StaticResource FluentScrollBarLineButton}"
+											  VerticalAlignment="Center"
+											  Grid.Column="0"
+											  Focusable="False"
+											  MinHeight="{DynamicResource ScrollBarSize}"
+											  Width="{DynamicResource ScrollBarSize}">
+									<PathIcon Data="M 14.091797 19.970703 L 4.111328 10 L 14.091797 0.029297 L 14.970703 0.908203 L 5.888672 10 L 14.970703 19.091797 Z"
+											  Width="{DynamicResource ScrollBarButtonArrowIconFontSize}"
+											  Height="{DynamicResource ScrollBarButtonArrowIconFontSize}"/>
+								</RepeatButton>
+
+								<Track Grid.Column="1"
+									   Minimum="{TemplateBinding Minimum}"
+									   Maximum="{TemplateBinding Maximum}"
+									   Value="{TemplateBinding Value, Mode=TwoWay}"
+									   DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+									   ViewportSize="{TemplateBinding ViewportSize}"
+									   Orientation="{TemplateBinding Orientation}">
+									<Track.DecreaseButton>
+										<RepeatButton Name="PART_PageUpButton"
+													  Classes="largeIncrease"
+													  Theme="{StaticResource FluentScrollBarPageButton}"
+													  Focusable="False" />
+									</Track.DecreaseButton>
+									<Track.IncreaseButton>
+										<RepeatButton Name="PART_PageDownButton"
+													  Classes="largeIncrease"
+													  Theme="{StaticResource FluentScrollBarPageButton}"
+													  Focusable="False" />
+									</Track.IncreaseButton>
+									<Thumb Theme="{StaticResource FluentScrollBarThumb}"
+										   Height="{DynamicResource ScrollBarSize}"
+										   MinWidth="{DynamicResource ScrollBarSize}"
+										   RenderTransform="{DynamicResource HorizontalSmallScrollThumbScaleTransform}"
+										   RenderTransformOrigin="50%,100%" />
+								</Track>
+
+								<RepeatButton Name="PART_LineDownButton"
+											  Theme="{StaticResource FluentScrollBarLineButton}"
+											  VerticalAlignment="Center"
+											  Grid.Column="2"
+											  Focusable="False"
+											  MinHeight="{DynamicResource ScrollBarSize}"
+											  Width="{DynamicResource ScrollBarSize}">
+									<PathIcon Data="M 5.029297 19.091797 L 14.111328 10 L 5.029297 0.908203 L 5.908203 0.029297 L 15.888672 10 L 5.908203 19.970703 Z"
+											  Width="{DynamicResource ScrollBarButtonArrowIconFontSize}"
+											  Height="{DynamicResource ScrollBarButtonArrowIconFontSize}"/>
+								</RepeatButton>
+							</Grid>
+						</Border>
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="^[IsExpanded=true]">
+			<Style Selector="^ /template/ Grid#Root">
+				<Setter Property="Background" Value="{DynamicResource ScrollBarBackgroundPointerOver}" />
+			</Style>
+			<Style Selector="^ /template/ Rectangle#TrackRect">
+				<Setter Property="Fill" Value="{DynamicResource ScrollBarTrackFillPointerOver}" />
+				<Setter Property="Stroke" Value="{DynamicResource ScrollBarTrackStrokePointerOver}" />
+				<Setter Property="Opacity" Value="1" />
+			</Style>
+			<Style Selector="^ /template/ Thumb">
+				<Setter Property="Background" Value="{DynamicResource ScrollBarThumbBackgroundColor}" />
+				<Setter Property="RenderTransform" Value="none" />
+			</Style>
+			<Style Selector="^ /template/ RepeatButton">
+				<Setter Property="Opacity" Value="1" />
+			</Style>
+		</Style>
+	</ControlTheme>
+</ResourceDictionary>
