@@ -1,45 +1,102 @@
 ﻿using System;
 using _86BoxManager.API;
+using _86BoxManager.Core;
 
 // ReSharper disable InconsistentNaming
 
 namespace _86BoxManager.Models
 {
-    [Serializable] //For serializing VMs so they can be stored in the registry
     public class VM : IVm
     {
-        public IntPtr hWnd { get; set; } //Window handle for the VM once it's started
-        public string Name { get; set; } //Name of the virtual machine
-        public string Desc { get; set; } //Description
-        public string Path { get; set; } //Path to config, nvr, etc.
-        public int Status { get; set; } //Status
-        public int Pid { get; set; } //Process ID of 86box executable running the VM
+        private int _status;
+
+        /// <summary>
+        /// Unique ID for this VM. Used by the database.
+        /// </summary>
+        public long UID { get; private set; }
+
+        /// <summary>
+        /// Window handle for the VM once it's started
+        /// </summary>
+        public IntPtr hWnd { get; set; }
+        /// <summary>
+        /// Name of the virtual machine
+        /// </summary>
+        public string Name;
+
+        /// <summary>
+        /// Title of the 86Box window
+        /// </summary>
+        public string Title => Name;
+        /// <summary>
+        /// Description
+        /// </summary>
+        public string Desc { get; set; }
+        /// <summary>
+        /// Comment
+        /// </summary>
+        public string Comment { get; set; }
+        /// <summary>
+        /// What sort of machine to categorize this as
+        /// </summary>
+        public string Category;
+        /// <summary>
+        /// Path to icon used to represent the VM
+        /// </summary>
+        public string IconPath;
+
+        public int Status 
+        { 
+            get => _status; 
+            set
+            {
+                if (value == STATUS_PAUSED)
+                    IsPaused = true;
+                else if (value != STATUS_WAITING)
+                    IsPaused = false;
+
+                _status = value;
+            }
+        } //Status
+
+        /// <summary>
+        /// For cases where the VM is both paused and waiting
+        /// </summary>
+        public bool IsPaused { get; private set; }
+
+        /// <summary>
+        /// Process ID of 86box executable running the VM
+        /// </summary>
+        public int Pid { get; set; }
 
         public const int STATUS_STOPPED = 0; //VM is not running
         public const int STATUS_RUNNING = 1; //VM is running
         public const int STATUS_WAITING = 2; //VM is waiting for user response
         public const int STATUS_PAUSED = 3; //VM is paused
 
-        public VM(){
+        public VM(long uid = 0){
             Name = "defaultName";
             Desc = "defaultDesc";
-            Path = "defaultPath";
+            Category = "defaultCat";
             Status = STATUS_STOPPED;
             hWnd = IntPtr.Zero;
+            UID = uid;
         }
 
-        public VM(string name, string desc, string path)
+        public VM(string name, string desc, string cat, string icon = null, string comment = null)
         {
             Name = name;
             Desc = desc;
-            Path = path;
+            Category = cat;
+            IconPath = icon;
+            Comment = comment;
             Status = STATUS_STOPPED;
             hWnd = IntPtr.Zero;
         }
 
         public override string ToString()
         {
-            return $"Name: {Name}, description: {Desc}, path: {Path}, status: {Status}";
+            return $"Name: {Name}, status: {Status}";
         }
 
         //Returns a lovely status string for use in UI

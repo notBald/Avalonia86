@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -6,6 +7,17 @@ namespace _86BoxManager.Xplat
     public static class CurrentApp
     {
         public static string ProductVersion { get; } = ReadVersion();
+        public static string VersionString
+        {
+            get
+            {
+                var txt = CurrentApp.ProductVersion.Substring(0, CurrentApp.ProductVersion.Length - 2);
+#if DEBUG
+                txt += " (Debug)";
+#endif
+                return txt;
+            }
+        }
 
         public static string StartupPath { get; } = ReadStartup();
 
@@ -16,10 +28,10 @@ namespace _86BoxManager.Xplat
 
         private static string ReadStartup()
         {
-            var ass = GetEntryAss();
-            var path = Path.GetFullPath(ass.Location);
-            var dir = Path.GetDirectoryName(path);
-            return dir;
+            //var ass = GetEntryAss();
+            //var path = Path.GetFullPath(ass.Location);
+            //var dir = Path.GetDirectoryName(path);
+            return AppDomain.CurrentDomain.BaseDirectory;
         }
 
         private static string ReadVersion()
