@@ -5,7 +5,6 @@ using Avalonia;
 using Avalonia.ReactiveUI;
 using System;
 using _86BoxManager.Tools;
-using System.Reflection.Metadata.Ecma335;
 
 namespace _86BoxManager
 {

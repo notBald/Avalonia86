@@ -15,11 +15,11 @@ namespace _86BoxManager.Tools
         public static bool IsLinux { get => RuntimeInformation.IsOSPlatform(OSPlatform.Linux); }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern int W32MessageBox(IntPtr hWnd, String text, String caption, uint type);
+        private static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
 
 
         [DllImport("libmessagebox.so", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void GtkMessageBox(string message, string title);
+        private static extern void show_message_box(string message, string title);
 
 #if DEBUG
 
@@ -34,9 +34,9 @@ namespace _86BoxManager.Tools
         public static void Msg(string message, string title)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                W32MessageBox(IntPtr.Zero, message, title, 0);
+                MessageBox(IntPtr.Zero, message, title, 0);
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                GtkMessageBox(message, title);
+                show_message_box(message, title);
         }
     }
 }
