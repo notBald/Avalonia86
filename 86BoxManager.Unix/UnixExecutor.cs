@@ -35,7 +35,7 @@ namespace _86BoxManager.Unix
         {
             var info = base.BuildStartInfo(args);
 
-            var name = args.Vm.Name;
+            var name = args.Vm.Title;
             var socketName = name + Environment.ProcessId;
 
             var server = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
@@ -71,7 +71,7 @@ namespace _86BoxManager.Unix
 
         private void OnVmExit(IVm vm)
         {
-            var name = vm.Name;
+            var name = vm.Title;
             if (!_runningVm.TryGetValue(name, out var info))
                 return;
             info.Dispose();
