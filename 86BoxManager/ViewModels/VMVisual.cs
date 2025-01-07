@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using ReactiveUI;
+﻿using _86BoxManager.Core;
 using _86BoxManager.Models;
-using _86BoxManager.Core;
-using Avalonia.Media.Imaging;
 using _86BoxManager.Tools;
-using MsBox.Avalonia.Enums;
-using System.Diagnostics;
+using Avalonia.Media.Imaging;
+using ReactiveUI;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json.Linq;
 
 namespace _86BoxManager.ViewModels
 {
