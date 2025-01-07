@@ -2,21 +2,113 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+		xmlns:gb="using:GroupBox.Avalonia.Controls"
+		xmlns:conv="clr-namespace:_86BoxManager.Converters"
+		xmlns:vm="clr-namespace:_86BoxManager.ViewModels"
+		xmlns:v="clr-namespace:_86BoxManager.Views"
         mc:Ignorable="d" 
-        d:DesignWidth="320" d:DesignHeight="245"
-        Width="320" Height="245"
+        d:DesignWidth="520" d:DesignHeight="640"
+        Width="550" Height="640"
         x:Class="_86BoxManager.Views.dlgEditVM"
+		x:DataType="v:dlgEditModel"
         Title="Edit a virtual machine"
-        Opened="dlgEditVM_Load">
-	<StackPanel Margin="12">
-		<TextBlock Text="Name:"/>
-		<TextBox Name="txtName" Watermark="Enter name" Margin="0,10,0,0" />
-		<TextBlock Text="Description:" Margin="0,10,0,0"/>
-		<TextBox Name="txtDesc" Watermark="Enter description" Margin="0,10,0,0"/>
-		<TextBlock Name="lblPath1" Text="Path: &lt;path goes here&gt;" Margin="0,20,0,0"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-            <Button Name="btnApply" Content="Apply" HorizontalAlignment="Stretch" Click="btnApply_Click" />
-            <Button Name="btnCancel" Content="Cancel" HorizontalAlignment="Stretch" Click="btnCancel_Click" IsDefault="True"/>
-        </StackPanel>
-	</StackPanel>
+        Opened="dlgEditVM_Load"
+		Background="#f0f0f0">
+	<Window.Resources>
+		<!-- Imports the custom tab control theme -->
+		<!--<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<MergeResourceInclude Source="/Themes/CustomCtrls.axaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>-->
+		
+		<conv:BitmapAssetValueConverter x:Key="variableImage"/>
+	</Window.Resources>
+	<Window.Styles>
+		<Style Selector="Button">
+			<Setter Property="Background" Value="#e1e1e1"/>
+			<Setter Property="BorderBrush" Value="#adadad"/>
+			<Setter Property="BorderThickness" Value="1"/>
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="BorderBrush" Value="{StaticResource CustomTextBoxBrush}"/>
+		</Style>
+	</Window.Styles>
+	<Grid>
+		<DockPanel Margin="12">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
+				<Button Name="btnApply" Content="Apply" HorizontalAlignment="Stretch" Click="btnApply_Click" Margin="0,0,20,0"/>
+				<Button Name="btnCancel" Content="Cancel" HorizontalAlignment="Stretch" Click="btnCancel_Click" Margin="0,0,20,0" IsDefault="True"/>
+			</StackPanel>
+			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10">
+				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
+					<StackPanel>
+						<gb:GroupBox Header="Fundamentals"
+									 Theme="{StaticResource GroupBoxClassic}"
+									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+							<DockPanel Margin="20, 10, 20, 0">
+								<DockPanel DockPanel.Dock="Left" Height="100" VerticalAlignment="Top">
+									<DockPanel DockPanel.Dock="Bottom">
+										<Button Click="btnLeftImg_Click" FontFamily="Wingdings" DockPanel.Dock="Left" Padding="7, 2">ç</Button>
+										<Button Click="btnRightImg_Click" FontFamily="Wingdings" DockPanel.Dock="Right" Padding="7, 2">è</Button>
+										<Grid></Grid>
+									</DockPanel>
+									<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0">
+										<Image Width="64" Height="64" RenderOptions.BitmapInterpolationMode="HighQuality"
+											Source="{Binding VMIcon, Converter={StaticResource variableImage}}" />
+									</Border>
+								</DockPanel>
+								<Border Padding="20, 0, 0, 0">
+									<Grid ColumnDefinitions="Auto, 5, *" RowDefinitions="Auto, 20, Auto, 10, Auto, 10">
+										<Border VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">
+											<TextBlock Text="Name:"/>
+										</Border>
+										<TextBox Name="txtName" Watermark="Enter name" Grid.Row="0" Grid.Column="2" />
+										<!-- Spacer row 1 -->
+										<Border VerticalAlignment="Center" Grid.Row="2" Grid.Column="0">
+											<TextBlock Text="Category:"/>
+										</Border>
+										<AutoCompleteBox Grid.Column="2" Grid.Row="2"
+												IsTextCompletionEnabled="True"
+												FilterMode="Contains"
+												Watermark="{Binding DefaultCategory}"
+												ItemsSource="{Binding Categories}"
+												Text="{Binding Category}">
+												<i:Interaction.Behaviors>
+													<vm:AutoCompleteBehavior/>
+												</i:Interaction.Behaviors>
+										</AutoCompleteBox>
+										<!-- Spacer row 3 -->
+										<TextBlock Text="VM Path:"  Grid.Row="4" Grid.Column="0" FontSize="10" />
+										<TextBlock Name="lblPath1" Text="Path: &lt;path goes here&gt;" Grid.Row="4" Grid.Column="2" FontSize="10" FontStyle="Italic" />
+										<!-- Spacer row 5 -->
+									</Grid>
+								</Border>
+							</DockPanel>
+						</gb:GroupBox>
+						<gb:GroupBox Header="Description" Theme="{StaticResource GroupBoxClassic}">
+							<Border Padding="20, 10">
+								<TextBox Name="txtDesc" Watermark="Enter description" Height="120" AcceptsReturn="True" TextWrapping="Wrap"/>
+							</Border>
+						</gb:GroupBox>
+						<gb:GroupBox Header="Comment" Theme="{StaticResource GroupBoxClassic}">
+							<Border Padding="20, 10">
+								<TextBox Name="txtComment" Watermark="Enter comment" Height="120" AcceptsReturn="True" TextWrapping="Wrap"/>
+							</Border>
+						</gb:GroupBox>
+					</StackPanel>
+				</TabItem>
+			</TabControl>
+		</DockPanel>
+		<Canvas>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="2"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="2"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="8" Canvas.Bottom="2"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="5"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="5"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="8"/>
+		</Canvas>
+	</Grid>
 </Window>

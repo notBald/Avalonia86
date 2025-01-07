@@ -3,106 +3,170 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:HyperText.Avalonia.Controls;assembly=HyperText.Avalonia"
+		xmlns:gb="using:GroupBox.Avalonia.Controls"
+		xmlns:v="clr-namespace:_86BoxManager.Views"
         mc:Ignorable="d" 
-        d:DesignWidth="620" d:DesignHeight="490"
-        Width="620" Height="490"
+        d:DesignWidth="620" d:DesignHeight="495"
+        Width="620" Height="495"
         x:Class="_86BoxManager.Views.dlgSettings"
+		x:DataType="v:dlgSettingsModel"
         Title="Settings"
         Opened="dlgSettings_Load"
-        Closing="dlgSettings_FormClosing">
-	<StackPanel Orientation="Vertical" Spacing="2">
-		<TabControl SelectedIndex="0">
-			<TabItem Header="General">
-				<StackPanel Orientation="Vertical">
-					<Border BorderThickness="1" BorderBrush="Black" Margin="9">
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="Paths" FontWeight="Bold" Margin="5"/>
-							<StackPanel Orientation="Horizontal" Margin="5" Spacing="5">
-								<Label Margin="9" Content="86Box path:"/>
-								<TextBox Width="360" Name="txtEXEdir" Margin="0,0,10,0" />
-								<Button Click="btnBrowse1_Click" Name="btnBrowse1">Browse...</Button>
-							</StackPanel>
-							<StackPanel Orientation="Horizontal" Margin="5" Spacing="5">
-								<Label Margin="9" Content="86Box version:"/>
-								<Label Name="lbl86BoxVer1" Margin="9"
-									   Content="&lt;status string goes here&gt;"/>
-							</StackPanel>
-							<StackPanel Orientation="Horizontal" Margin="5,5,5,25" Spacing="5">
-								<Label Margin="9" Content="VM path:"/>
-								<TextBox Width="360" Name="txtCFGdir" Margin="0,0,10,0" />
-								<Button Click="btnBrowse2_Click" Name="btnBrowse2">Browse...</Button>
-							</StackPanel>
-						</StackPanel>
-					</Border>
-					<Border BorderThickness="1" BorderBrush="Black" Margin="9">
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="Behaviour" FontWeight="Bold" Margin="5"/>
-							<StackPanel Orientation="Horizontal">
-								<CheckBox Name="cbxMinimizeTray" Content="Minimize 86Box Manager to tray icon" Margin="12" Click="cbx_CheckedChanged" />
-								<CheckBox Name="cbxCloseTray" Content="Close 86Box Manager to tray icon" Margin="12" Click="cbx_CheckedChanged" />
-							</StackPanel>
-							<StackPanel Orientation="Horizontal">
-								<CheckBox Name="cbxMinimize" Content="Minimize 86Box Manager when a VM is started" Margin="12" Click="cbx_CheckedChanged" />
-							</StackPanel>
-						</StackPanel>
-					</Border>
-				</StackPanel>
-			</TabItem>
-			<TabItem Header="Advanced">
-				<StackPanel Margin="0,0,0,110">
-					<Border BorderThickness="1" BorderBrush="Black" Margin="9">
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="Logging" FontWeight="Bold" Margin="5"/>
-							<StackPanel Orientation="Vertical">
-								<CheckBox Name="cbxLogging" Content="Enable 86Box logging to file" Margin="12,12,12,5" Click="cbxLogging_CheckedChanged" />
-								<StackPanel Orientation="Horizontal" Margin="12,1,12,32">
-									<TextBox Name="txtLogPath" VerticalAlignment="Center" Width="460" Margin="0,0,10,0" />
-									<Button Name="btnBrowse3" Content="Browse..." Click="btnBrowse3_Click" />
+		Background="#f0f0f0">
+	<Window.Resources>
+		<!-- Imports the custom tab control theme -->
+		<!--<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<MergeResourceInclude Source="/Themes/CustomCtrls.axaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>-->
+	</Window.Resources>
+	<Window.Styles>
+		<Style Selector="Button">
+			<Setter Property="Background" Value="#e1e1e1"/>
+			<Setter Property="BorderBrush" Value="#adadad"/>
+			<Setter Property="BorderThickness" Value="1"/>
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="BorderBrush" Value="{StaticResource CustomTextBoxBrush}"/>
+		</Style>
+
+		<Style Selector="SelectableTextBlock.version">
+			<Setter Property="Foreground" Value="Gray" />
+			<Setter Property="FontWeight" Value="Bold" />
+			<Setter Property="FontSize" Value="14" />
+			
+			<Style Selector="^.error">
+				<Setter Property="Foreground" Value="Red" />
+			</Style>
+			<Style Selector="^.warn">
+				<Setter Property="Foreground" Value="Orange" />
+			</Style>
+			<Style Selector="^.valid">
+				<Setter Property="Foreground" Value="Green" />
+			</Style>
+		</Style>
+	</Window.Styles>
+	<Grid>
+		<DockPanel Margin="12">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0" Spacing="4" DockPanel.Dock="Bottom">
+				<Button Content="Defaults"
+						HorizontalAlignment="Stretch" VerticalAlignment="Center"
+						IsDefault="False" Margin="0,0,40,0"
+						Click="btnDefaults_Click"/>
+				<Button Content="OK" IsEnabled="{Binding HasChanges}"
+						HorizontalAlignment="Stretch" VerticalAlignment="Center"
+						IsDefault="False" Click="btnOK_Click"/>
+				<Button Content="Cancel"
+						HorizontalAlignment="Stretch" VerticalAlignment="Center"
+						IsDefault="True" Click="btnCancel_Click"/>
+				<Button Content="Apply" IsEnabled="{Binding HasChanges}"
+						HorizontalAlignment="Stretch" VerticalAlignment="Center"
+						IsDefault="False" Click="btnApply_Click"/>
+			</StackPanel>
+			<TabControl SelectedIndex="0" Theme="{StaticResource CustomTabCtrl}" >
+				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
+					<StackPanel Orientation="Vertical">
+						<gb:GroupBox Header="Paths"
+									 Theme="{StaticResource GroupBoxClassic}"
+									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+							<Border Margin="9">
+								<StackPanel Orientation="Vertical">
+									<StackPanel Orientation="Horizontal" Margin="5" Spacing="5">
+										<Label Margin="9" Content="86Box path:"/>
+										<TextBox Width="360" Text="{Binding ExeDir}" Margin="0,0,10,0" />
+										<Button Click="btnBrowse1_Click" Name="btnBrowse1">Browse...</Button>
+									</StackPanel>
+									<StackPanel Orientation="Horizontal" Margin="5" Spacing="5">
+										<Label Margin="9" Content="86Box version:"/>
+										<SelectableTextBlock Margin="9" Classes="version" Classes.error="{Binding ExeError}"
+											   Classes.warn="{Binding ExeWarn}" Classes.valid="{Binding ExeValid}"
+											   Text="{Binding ExePath, Mode=OneWay, TargetNullValue='&lt;status string goes here&gt;'}"/>
+									</StackPanel>
+									<StackPanel Orientation="Horizontal" Margin="5,5,5,25" Spacing="5">
+										<Label Margin="9" Content="VM path:"/>
+										<TextBox Width="360" Text="{Binding CFGDir}" Margin="0,0,10,0" />
+										<Button Click="btnBrowse2_Click" Name="btnBrowse2">Browse...</Button>
+									</StackPanel>
 								</StackPanel>
-							</StackPanel>
-						</StackPanel>
-					</Border>
-					<Border BorderThickness="1" BorderBrush="Black" Margin="9">
-						<StackPanel Orientation="Vertical">
-							<TextBlock Text="Miscellaneous" FontWeight="Bold" Margin="5"/>
-							<StackPanel Orientation="Horizontal">
-								<CheckBox Name="cbxGrid" Content="Enable grid lines in virtual machines list" Margin="12" Click="cbx_CheckedChanged" />
-								<CheckBox Name="cbxShowConsole" Content="Enable 86Box console window" Margin="12" Click="cbx_CheckedChanged" />
-							</StackPanel>
-						</StackPanel>
-					</Border>
-				</StackPanel>
-			</TabItem>
-			<TabItem Header="About">
-				<StackPanel Margin="0,0,0,50">
-					<StackPanel Orientation="Horizontal">
-						<Image Name="aboutImg" Margin="8" Source="/Assets/86Box-gray.sm.png" Width="48" Height="48" />
-						<TextBlock Margin="8,8,8,8" VerticalAlignment="Center" FontSize="18" FontWeight="Bold">86Box Manager</TextBlock>
+							</Border>
+						</gb:GroupBox>
+						<gb:GroupBox Header="Behaviour"
+									 Theme="{StaticResource GroupBoxClassic}"
+									 BorderBrush="{StaticResource TabCtrlBorderBrush}">						
+							<Border Margin="9">
+								<StackPanel Orientation="Vertical">
+									<StackPanel Orientation="Horizontal">
+										<CheckBox IsChecked="{Binding MinToTray}" Content="Minimize Avalonia86 to tray icon" Margin="12" />
+										<CheckBox IsChecked="{Binding CloseToTray}" Content="Close Avalonia86 to tray icon" Margin="12" />
+									</StackPanel>
+									<StackPanel Orientation="Horizontal">
+										<CheckBox IsChecked="{Binding MinOnStart}" Content="Minimize Avalonia86 when a VM is started" Margin="12" />
+									</StackPanel>
+								</StackPanel>
+							</Border>
+						</gb:GroupBox>
 					</StackPanel>
-					<TextBlock Margin="11" Text="A configuration manager for the 86Box emulator" />
-					<TextBlock Name="lblVersion1" Margin="11,13,11,2" Text="Version: &lt;version goes here&gt;" />
-					<TextBlock Margin="11,28,8,4" Text="Copyright © 2018-2022 David Simunič" />
-					<TextBlock Margin="11,4,8,4" Text="Licensed under the MIT License. See the LICENSE file for" />
-					<TextBlock Margin="11,4,8,28" Text="license information and AUTHORS for a list of contributors." />
-					<controls:Hyperlink Name="lnkGithub" Margin="11" Url="https://github.com/86Box/86Box" />
-					<controls:Hyperlink Name="lnkGithub2" Margin="11,4,11,11" Url="https://github.com/RetBox/86BoxManagerX" />
-				</StackPanel>
-			</TabItem>
-		</TabControl>
-		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0" Spacing="4">
-			<Button Name="btnDefaults" Content="Defaults"
-					HorizontalAlignment="Stretch" VerticalAlignment="Center"
-					IsDefault="False" Margin="0,0,40,0" 
-                    Click="btnDefaults_Click"/>
-			<Button Name="btnOK" Content="OK"
-					HorizontalAlignment="Stretch" VerticalAlignment="Center"
-					IsDefault="False" Click="btnOK_Click"/>
-			<Button Name="btnCancel" Content="Cancel"
-					HorizontalAlignment="Stretch" VerticalAlignment="Center"
-					IsDefault="True" Click="btnCancel_Click"/>
-			<Button Name="btnApply" Content="Apply"
-					HorizontalAlignment="Stretch" VerticalAlignment="Center"
-					IsDefault="False" Click="btnApply_Click"/>
-		</StackPanel>
-	</StackPanel>
+				</TabItem>
+				<TabItem Header="Advanced" Theme="{StaticResource CustomTabItm}">
+					<StackPanel Margin="0,0,0,110">
+						<gb:GroupBox Header="Logging"
+									 Theme="{StaticResource GroupBoxClassic}"
+									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+							<Border Margin="9">
+								<StackPanel Orientation="Vertical">
+									<StackPanel Orientation="Vertical">
+										<CheckBox IsChecked="{Binding EnableLogging}" Content="Enable 86Box logging to file" Margin="12,12,12,5" />
+										<StackPanel Orientation="Horizontal" Margin="12,1,12,32">
+											<TextBox Text="{Binding LogPath}" VerticalAlignment="Center" Width="460" Margin="0,0,10,0" IsEnabled="{Binding EnableLogging}" />
+											<Button Content="Browse..." Click="btnBrowse3_Click" IsEnabled="{Binding EnableLogging}" />
+										</StackPanel>
+									</StackPanel>
+								</StackPanel>
+							</Border>
+						</gb:GroupBox>
+						<gb:GroupBox Header="Miscellaneous"
+									 Theme="{StaticResource GroupBoxClassic}"
+									 BorderBrush="{StaticResource TabCtrlBorderBrush}">						
+							<Border Margin="9">
+								<StackPanel Orientation="Vertical">
+									<StackPanel Orientation="Horizontal">
+										<CheckBox IsChecked="{Binding AllowInstances}" Content="Allow multiple instances of Avalonia86" Margin="12" />
+										<CheckBox IsChecked="{Binding EnableConsole}" Content="Enable 86Box console window" Margin="12" />
+									</StackPanel>
+								</StackPanel>
+							</Border>
+						</gb:GroupBox>
+					</StackPanel>
+				</TabItem>
+				<TabItem Header="About" Theme="{StaticResource CustomTabItm}">
+					<StackPanel Margin="0,0,0,50">
+						<StackPanel Orientation="Horizontal">
+							<Image Name="aboutImg" Margin="8" Source="/Assets/86Box-gray.sm.png" Width="48" Height="48" />
+							<TextBlock Margin="8,8,8,8" VerticalAlignment="Center" FontSize="18" FontWeight="Bold">Avalonia 86</TextBlock>
+						</StackPanel>
+						<TextBlock Margin="11" Text="A configuration manager for the 86Box emulator" />
+						<TextBlock Margin="11,13,11,2">
+							Version: <Run Text="{Binding Version}" />
+						</TextBlock>
+						<TextBlock Margin="11,28,8,4" Text="Copyright © 2018-2022 David Simunič" />
+						<TextBlock Margin="11,4,8,4" Text="Licensed under the MIT License. See the LICENSE file for" />
+						<TextBlock Margin="11,4,8,28" Text="license information and AUTHORS for a list of contributors." />
+						<controls:Hyperlink Name="lnkGithub" Margin="11" Url="https://github.com/86Box/86Box" />
+						<controls:Hyperlink Name="lnkGithub2" Margin="11,4,11,11" Url="https://github.com/RetBox/86BoxManagerX" />
+						<controls:Hyperlink Margin="11,4,11,11" Url="https://github.com/notBald/Avalonia86" />
+					</StackPanel>
+				</TabItem>
+			</TabControl>
+	</DockPanel>
+	<Canvas>
+		<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="2"/>
+		<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="2"/>
+		<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="8" Canvas.Bottom="2"/>
+		<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="5"/>
+		<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="5"/>
+		<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="8"/>
+	</Canvas>
+	</Grid>
 </Window>

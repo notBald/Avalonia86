@@ -2,28 +2,220 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+		xmlns:gb="using:GroupBox.Avalonia.Controls"
+		xmlns:vm="clr-namespace:_86BoxManager.ViewModels"
+		xmlns:v="clr-namespace:_86BoxManager.Views"
+		xmlns:conv="clr-namespace:_86BoxManager.Converters"
         mc:Ignorable="d" 
-        d:DesignWidth="330" d:DesignHeight="395"
-        Width="330" Height="395"
+        d:DesignWidth="360" d:DesignHeight="455"
+        Width="360" Height="455" MinHeight="415" MinWidth="260"
         x:Class="_86BoxManager.Views.dlgAddVM"
+		x:DataType="v:dlgAddVMModel"
         Title="Add a virtual machine"
-        Opened="dlgAddVM_Load">
-	<StackPanel Margin="12">
-		<CheckBox Name="cbxImport" Content="Import VM files from:" Click="cbxImport_CheckedChanged" />
-		<StackPanel Orientation="Horizontal" Margin="0,0,0,30">
-			<TextBox Name="txtImportPath" Watermark="Enter path" Width="230" />
-			<Button Name="btnBrowse" Content="Browse..." Click="btnBrowse_Click" />
-		</StackPanel>
-		<TextBlock Text="Name:" Margin="2" />
-		<TextBox Name="txtName" Watermark="Enter name" />
-		<TextBlock Text="Description:" Margin="2" />
-		<TextBox Name="txtDescription" Watermark="Enter description" />
-		<TextBlock Name="lblPath1" Margin="3" Text="Path: &lt;path goes here&gt;" />
-		<CheckBox Name="cbxStartVM" Content="Start this virtual machine now" Margin="0,20,0,0" />
-		<CheckBox Name="cbxOpenCFG" Content="Configure this virtual machine now" Margin="0,0,0,10" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12">
-            <Button Name="btnAdd" Content="Add" Click="btnAdd_Click" />
-            <Button Name="btnCancel" Content="Cancel" Click="btnCancel_OnClick" />
-        </StackPanel>
-	</StackPanel>
+		Background="#f0f0f0">
+	<Window.Resources>
+		<!-- Imports the custom tab control theme -->
+		<!--<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<MergeResourceInclude Source="/Themes/CustomCtrls.axaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>-->
+		<conv:BitmapAssetValueConverter x:Key="variableImage"/>
+
+		<PathGeometry x:Key="Acorn" Figures="F1 M 16.6309,18.6563C 17.1309,
+									8.15625 29.8809,14.1563 29.8809,
+									14.1563C 30.8809,11.1563 34.1308,
+									11.4063 34.1308,11.4063C 33.5,12 
+									34.6309,13.1563 34.6309,13.1563C 
+									32.1309,13.1562 31.1309,14.9062 
+									31.1309,14.9062C 41.1309,23.9062
+									32.6309,27.9063 32.6309,27.9062C 
+									24.6309,24.9063 21.1309,22.1562 
+									16.6309,18.6563 Z M 16.6309,19.9063C
+									21.6309,24.1563 25.1309,26.1562 
+									31.6309,28.6562C 31.6309,28.6562
+									26.3809,39.1562 18.3809,36.1563C
+									18.3809,36.1563 18,38 16.3809,36.9063C 
+									15,36 16.3809,34.9063 16.3809,34.9063C
+									16.3809,34.9063 10.1309,30.9062 16.6309,19.9063 Z" />
+	</Window.Resources>
+	<Window.Styles>
+		<Style Selector="Button">
+			<Setter Property="Background" Value="#e1e1e1"/>
+			<Setter Property="BorderBrush" Value="#adadad"/>
+			<Setter Property="BorderThickness" Value="1"/>
+		</Style>
+
+		<Style Selector="Border#Acorn">
+			<Setter Property="Background" Value="#e1e1e1"/>
+			<Setter Property="BorderBrush" Value="#adadad"/>
+			<Setter Property="BorderThickness" Value="1"/>
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="BorderBrush" Value="{StaticResource CustomTextBoxBrush}"/>
+		</Style>
+
+		<!-- https://github.com/AvaloniaUI/Avalonia/blob/master/samples/RenderDemo/Pages/AnimationsPage.xaml -->
+		<Style Selector="Path.Working">
+			<Style.Animations>
+				<Animation Duration="0:0:6" IterationCount="INFINITE">
+					<KeyFrame Cue="0%">
+						<Setter Property="RotateTransform.Angle" Value="-40"/>
+						<Setter Property="Opacity" Value="0.4"/>
+					</KeyFrame>
+					<KeyFrame Cue="25%">
+						<Setter Property="RotateTransform.Angle" Value="-30"/>
+					</KeyFrame>
+					<KeyFrame Cue="50%">
+						<Setter Property="RotateTransform.Angle" Value="-50"/>
+						<Setter Property="Opacity" Value="1.0"/>
+					</KeyFrame>
+					<KeyFrame Cue="75%">
+						<Setter Property="RotateTransform.Angle" Value="-30"/>
+					</KeyFrame>
+					<KeyFrame Cue="100%">
+						<Setter Property="RotateTransform.Angle" Value="-40"/>
+						<Setter Property="Opacity" Value="0.4"/>
+					</KeyFrame>
+				</Animation>
+			</Style.Animations>
+		</Style>
+	</Window.Styles>
+	<Grid>
+		<DockPanel Margin="12">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0" Spacing="4" DockPanel.Dock="Bottom">
+				<Button Content="Add" Click="btnAdd_Click" IsEnabled="{Binding CanAdd}" />
+				<Button Name="btnCancel" Content="Cancel" Click="btnCancel_OnClick" />
+			</StackPanel>
+			<TabControl Name="tbc" SelectedIndex="{Binding TabIndex}" Theme="{StaticResource CustomTabCtrl}" >
+				<TabItem Name="tbiNew" Header="Register" Theme="{StaticResource CustomTabItm}">
+					<DockPanel>
+						<StackPanel Orientation="Vertical" DockPanel.Dock="Bottom" Margin="0,0,0,10">
+							<gb:GroupBox Header="Location for new or existing files"
+											 Theme="{StaticResource GroupBoxClassic}"
+											 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+								<DockPanel Margin="12">
+									<Button DockPanel.Dock="Right" Click="btnSelFld_OnClick">Browse</Button>
+									<SelectableTextBlock Text="{Binding InstallPath, Mode=OneWay}"></SelectableTextBlock>
+								</DockPanel>						
+							</gb:GroupBox>
+							<gb:GroupBox Header="After registering the VM"
+											 Theme="{StaticResource GroupBoxClassic}"
+											 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+								<StackPanel Spacing="5" Margin="12">
+									<RadioButton Name="cbxStartVM" GroupName="Startup"
+											  Content="Start the virtual machine"/>
+									<RadioButton Name="cbxOpenCFG" GroupName="Startup"
+											  Content="Configure the virtual machine"/>
+									<RadioButton IsChecked="True"
+											  GroupName="Startup"
+											  Content="Do nothing"/>
+								</StackPanel>
+							</gb:GroupBox>
+						</StackPanel>
+						<gb:GroupBox Header="Fundamentals"
+										 Theme="{StaticResource GroupBoxClassic}"
+										 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+							<DockPanel Margin="10, 5">
+								<DockPanel DockPanel.Dock="Top">
+									<DockPanel DockPanel.Dock="Left" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+										<DockPanel DockPanel.Dock="Bottom">
+											<Button Click="btnLeftImg_Click" FontFamily="Wingdings" DockPanel.Dock="Left" Padding="7, 2">ç</Button>
+											<Button Click="btnRightImg_Click" FontFamily="Wingdings" DockPanel.Dock="Right" Padding="7, 2">è</Button>
+											<Grid></Grid>
+										</DockPanel>
+										<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" MaxHeight="52">
+											<Image Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+												   RenderOptions.BitmapInterpolationMode="HighQuality"
+											   Source="{Binding VMIcon, Converter={StaticResource variableImage}}" />
+										</Border>
+									</DockPanel>
+									<Grid Margin="12, 6, 0, 4"
+										  ColumnDefinitions="auto, 5, *" RowDefinitions="auto, 5, auto">
+										<TextBlock Text="Name:" Margin="2, 0, 2, 2" Grid.Column="0" Grid.Row="0" />
+										<TextBox Watermark="Enter name" Grid.Column="2" Grid.Row="0" Text="{Binding VMName}" />
+										<TextBlock Text="Category:" Margin="2" Grid.Column="0" Grid.Row="2" />
+										<AutoCompleteBox Grid.Column="2" Grid.Row="2"
+											 IsTextCompletionEnabled="True"
+											 FilterMode="Contains"
+											 Watermark="{Binding DefaultCategory}"
+											 ItemsSource="{Binding Categories}"
+											 Text="{Binding Category, Mode=OneWayToSource}">
+											<i:Interaction.Behaviors>
+												<vm:AutoCompleteBehavior/>
+											</i:Interaction.Behaviors>
+										</AutoCompleteBox>
+									</Grid>
+								</DockPanel>
+								<DockPanel>
+									<TextBlock Text="Description:" Margin="2" DockPanel.Dock="Top" />
+									<TextBox Name="txtDescription" Watermark="Enter description"
+										 AcceptsReturn="True" TextWrapping="Wrap" />
+								</DockPanel>
+							</DockPanel>
+						</gb:GroupBox>
+					</DockPanel>
+				</TabItem>
+				<TabItem Name="tbiImport" Header="Mass Import" Theme="{StaticResource CustomTabItm}">
+					<DockPanel Margin="12">
+						<StackPanel DockPanel.Dock="Top">
+							<TextBlock>Import VM files from:</TextBlock>
+							<StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+								<TextBox Name="txtImportPath" Watermark="Enter path" Width="230" IsEnabled="{Binding !IsWorking}" />
+								<Grid>
+									<Button Name="btnBrowse" Content="Browse..." Click="btnBrowse_Click" />
+									<Border Name="Acorn" IsVisible="{Binding IsWorking}">
+										<Path Fill="Brown" Classes="Working" Stroke="Black" StrokeThickness="2"
+										RenderTransformOrigin="50%,50%" Stretch="Uniform" Width="20" Height="20"
+										Data="{StaticResource Acorn}" >
+											<Path.RenderTransform>
+												<RotateTransform Angle="-40" />
+											</Path.RenderTransform>
+										</Path>
+									</Border>
+								</Grid>
+							</StackPanel>
+							<TextBlock>VMs to import:</TextBlock>
+						</StackPanel>
+						<!--<ListBox ItemsSource="{Binding Imports}">
+							<ListBox.ItemTemplate>
+								<DataTemplate>
+									<Grid>
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition SharedSizeGroup="A" />
+											<ColumnDefinition SharedSizeGroup="B" />
+										</Grid.ColumnDefinitions>
+										<TextBox Width="100" DockPanel.Dock="Left" Text="{Binding Name}" />
+										<SelectableTextBlock Text="{Binding Path}" Grid.Column="1" />
+									</Grid>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+						</ListBox>-->
+						<DataGrid ItemsSource="{Binding Imports}" RowBackground="White">
+							<DataGrid.Styles>
+								<Style Selector="ScrollBar">
+									<Setter Property="AllowAutoHide" Value="False"/>
+								</Style>
+							</DataGrid.Styles>
+							<DataGrid.Columns>
+								<DataGridCheckBoxColumn Header="Import" Binding="{Binding Import}" />
+								<DataGridTextColumn Header="Name"  Binding="{Binding Name}"/>
+								<DataGridTextColumn Header="Folder" Binding="{Binding Path}" IsReadOnly="True" />
+							</DataGrid.Columns>
+						</DataGrid>
+					</DockPanel>
+				</TabItem>
+			</TabControl>
+			</DockPanel>
+		<Canvas>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="2"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="2"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="8" Canvas.Bottom="2"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="5"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="5"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="8"/>
+		</Canvas>
+	</Grid>	
 </Window>

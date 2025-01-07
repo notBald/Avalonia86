@@ -2,73 +2,568 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
+		xmlns:conv="clr-namespace:_86BoxManager.Converters"
         mc:Ignorable="d"
         xmlns:vm="clr-namespace:_86BoxManager.ViewModels"
+		xmlns:view="clr-namespace:_86BoxManager.Views"
         x:DataType="vm:MainModel"
         d:DesignWidth="700" d:DesignHeight="450"
         Width="700" Height="450"
         x:Class="_86BoxManager.Views.frmMain"
         Icon="/Assets/86Box-gray.ico"
-        Title="86Box Manager"
-        Opened="Main_OnOpened"
+        Opened="Main_OnOpened" 
         Closing="Window_OnClosing">
 	<Design.DataContext>
 		<vm:MainModel/>
 	</Design.DataContext>
+	<Window.Resources>
+		<ControlTheme x:Key="VerticalGridSplitter" TargetType="GridSplitter">
+			<Setter Property="Focusable" Value="True" />
+			<Setter Property="MinWidth" Value="6" />
+			<Setter Property="MinHeight" Value="6" />
+			<Setter Property="Background" Value="White" />
+			<Setter Property="PreviewContent">
+				<Template>
+					<Rectangle Fill="{DynamicResource SystemAccentColor}" />
+				</Template>
+			</Setter>
+			<Setter Property="Template">
+				<ControlTemplate>
+					<StackPanel Orientation="Horizontal">
+						<Rectangle Width="1" VerticalAlignment="Stretch" Fill="#a0a0a0"></Rectangle>
+						<Rectangle Width="1" VerticalAlignment="Stretch" Fill="#f0f0f0"></Rectangle>
+					</StackPanel>
+				</ControlTemplate>
+			</Setter>
+		</ControlTheme>
+
+		<conv:BitmapAssetValueConverter x:Key="variableImage"/>
+	</Window.Resources>
+	<!--
+	UI Structur
+	 stackpanel Dock.Top
+	   Meny
+	   Toolbar
+	 Grid Doc.Bottom
+	   Statusbar
+	 <Main Content>
+	  Gid with 3 colums, middle is splitter
+	   Col 1 is the list of VMs
+	   Col 2 is the information / welcome page
+	     DockPanel has the main content
+		   Button Doc.Top is the title of the VM
+		   Border with docpanel is the bottoms, showing last run time
+		   <Main Content> of docpanel is a grid with 3 colums, middle is splitter
+		     Right colum is system information
+			 Left colum is screenshot and VM stats (also a Dockpanel)
+			   Top is the buttons to change image
+			   Bottom is the stats
+			   <main content> is the screenshot
+	
+	-->
 	<DockPanel>
-		<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="12" Spacing="3">
-			<Button Name="btnAdd" Click="btnAdd_Click">Add</Button>
-			<Button Name="btnEdit" Click="btnEdit_Click">Edit</Button>
-			<Button Name="btnDelete" Click="btnDelete_Click">Remove</Button>
-			<Button Name="btnStart" Click="btnStart_Click" Margin="20,0,0,0">Start</Button>
-			<Button Name="btnConfigure" Click="btnConfigure_Click">Configure</Button>
-			<Button Name="btnPause" Click="btnPause_Click">Pause</Button>
-			<Button Name="btnCtrlAltDel" Click="btnCtrlAltDel_Click">C+A+D</Button>
-			<Button Name="btnReset" Click="btnReset_Click">Reset</Button>
-			<Button Name="btnSettings" Click="btnSettings_Click" Margin="50,0,0,0">Settings</Button>
+		<StackPanel DockPanel.Dock="Top">
+			<Menu Height="20">
+				<Menu.Styles>
+					<Style Selector="MenuItem.Head">
+						<Setter Property="FontSize" Value="14"></Setter>
+					</Style>
+				</Menu.Styles>
+				<MenuItem Classes="Head" Header="_File">
+					<MenuItem Header="New Virtual Machine" Command="{Binding AddVMCmd}">
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/14 - new.png" />
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Delete Virtual Machine" Command="{Binding DelVMCmd}">
+						<MenuItem.IsEnabled>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="VmIsSelected"/>
+								<Binding Path="!SelVmRunning"/>
+							</MultiBinding>
+						</MenuItem.IsEnabled>
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/6 - delete.png" />
+						</MenuItem.Icon>
+					</MenuItem>
+					<Separator/>
+					<MenuItem Header="Exit" Command="{Binding ExitApplicationCmd}">
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/4 - close2.png" />
+						</MenuItem.Icon>
+					</MenuItem>
+				</MenuItem>
+				<MenuItem Classes="Head" Header="_Machine">
+					<MenuItem Name="MenuItmStart" Header="Start Machine" Command="{Binding StartVMCmd}">
+						<MenuItem.IsEnabled>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="VmIsSelected"/>
+								<Binding Path="!SelVmRunning"/>
+								<Binding Path="!SelVmWating"/>
+								<Binding Path="!SelVmPaused"/>
+							</MultiBinding>
+						</MenuItem.IsEnabled>
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/18 - start 32x32.png" />
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Stop Machine" Command="{Binding StartVMCmd}">
+						<MenuItem.IsEnabled>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="VmIsSelected"/>
+								<Binding Path="SelVmRunning"/>
+								<Binding Path="!SelVmWating"/>
+								<Binding Path="!SelVmPaused"/>
+							</MultiBinding>
+						</MenuItem.IsEnabled>
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/19 - stop 32x32.png" />
+						</MenuItem.Icon>
+					</MenuItem>
+					<Separator/>
+					<MenuItem Header="Send Ctrl-Alt-Del" Command="{Binding SoftResetVMCmd}">
+						<MenuItem.IsEnabled>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="VmIsSelected"/>
+								<Binding Path="SelVmRunning"/>
+								<Binding Path="!SelVmWating"/>
+								<Binding Path="!SelVmPaused"/>
+							</MultiBinding>
+						</MenuItem.IsEnabled>
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/2 - cad.png" />
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Reset Machine" Command="{Binding ResetVMCmd}">
+						<MenuItem.IsEnabled>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="VmIsSelected"/>
+								<Binding Path="SelVmRunning"/>
+								<Binding Path="!SelVmWating"/>
+								<Binding Path="!SelVmPaused"/>
+							</MultiBinding>
+						</MenuItem.IsEnabled>
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/25 - hwreset.png" />
+						</MenuItem.Icon>
+					</MenuItem>
+					<Separator/>
+					<MenuItem Header="Configure" Command="{Binding ConfigVMCmd}">
+						<MenuItem.IsEnabled>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="VmIsSelected"/>
+								<Binding Path="!SelVmWating"/>
+							</MultiBinding>
+						</MenuItem.IsEnabled>
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/9 - gears.png" />
+						</MenuItem.Icon>
+					</MenuItem>
+				</MenuItem>
+				<MenuItem  Classes="Head" Header="_Tools">
+					<MenuItem Header="Program Settings" Command="{Binding ConfigAppCmd}">
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/29 - gears2.png" />
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Edit VM Settings" IsEnabled="{Binding VmIsSelected}" Command="{Binding EditVMCmd}">
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/32 - tools.png" />
+						</MenuItem.Icon>
+					</MenuItem>
+				</MenuItem>
+			</Menu>
+			<Rectangle Fill="#f0f0f0" Height="2"/>
+			<StackPanel Orientation="Horizontal" Spacing="0" Margin="0, 2, 0, 0">
+				<StackPanel.Styles>
+					<!-- Applies animations to the Background and BorderBrush properties of all buttons within this StackPanel -->
+					<Style Selector=":is(Button)">
+						<!-- In Avalonia, handling "Transparent" colors differs from XAML. In XAML, transparent colors are handled with special casing, but in Avalonia, we must manually account for it. 
+							 That's why we have the same start and end colors. The start color might need adjustment once we finalize the color scheme. 
+							 #see: https://github.com/AvaloniaUI/Avalonia/issues/15419 -->
+						<Setter Property="Background" Value="#000692F0"/>
+						<Setter Property="BorderBrush" Value="#000692F0"/>
+						<Setter Property="BorderThickness" Value="2"/>
+						<Setter Property="Width" Value="78"/>
+						<Setter Property="Height" Value="52"/>
+						<Setter Property="Padding" Value="0"/>
+
+						<!-- https://stackoverflow.com/a/78910480  -->
+						<!-- This selector targets the ContentPresenter of the button, ensuring the styles are applied to the button's content and border. Without this, 
+							 Avalonia's default theme will override the custom styles applied here. -->
+						<Style Selector="^ /template/ ContentPresenter">
+							<Setter Property="Transitions">
+								<Transitions>
+									<BrushTransition Property="Background" Duration="0:0:0.3"/>
+									<BrushTransition Property="BorderBrush" Duration="0:0:0.3"/>
+								</Transitions>
+							</Setter>
+						</Style>
+
+						<!-- https://docs.avaloniaui.net/docs/guides/styles-and-resources/troubleshooting#selector-with-a-pseudoclass-doesnt-override-the-default  -->
+						<!-- This style targets the ContentPresenter during the pointer-over state. 
+							 The #PART_ContentPresenter identifier is not strictly necessary but makes the selector more specific, giving it higher precedence 
+							 over less specific ones (similar to CSS). -->
+						<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+							<Setter Property="Background" Value="LightBlue"/>
+							<Setter Property="BorderBrush" Value="#0692F0"/>
+						</Style>
+
+						<Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
+							<Setter Property="Background" Value="Transparent"/>
+							<Setter Property="Opacity" Value="0.7"/>
+							<Setter Property="BorderBrush" Value="Transparent"/>
+						</Style>
+
+						<!-- Hides/Shows the start and stop graphics for the start button. 
+						
+						     Uses a scheme similar to what is reccomended in: https://docs.avaloniaui.net/docs/reference/controls/buttons/togglebutton -->
+						<Style Selector="^#btnStart.stop StackPanel.start, ^#btnStart.resume StackPanel.start">
+							<Setter Property="IsVisible" Value="False"/>
+						</Style>
+						<Style Selector="^#btnStart StackPanel.stop, ^#btnStart StackPanel.resume">
+							<Setter Property="IsVisible" Value="False"/>
+						</Style>
+						<Style Selector="^#btnStart.stop StackPanel.stop, ^#btnStart.resume StackPanel.resume">
+							<Setter Property="IsVisible" Value="True"/>
+						</Style>
+					</Style>
+					<Style Selector="TextBlock">
+						<Setter Property="Margin" Value="0, -2, 0, 0"/>
+						<Setter Property="FontSize" Value="12"/>
+						<Setter Property="FontFamily" Value="Tahoma"/>
+						<Setter Property="TextAlignment" Value="Center"/>
+					</Style>
+				</StackPanel.Styles>
+				<StackPanel.Background>
+					<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+						<GradientStop Color="#FFFFFF" Offset="0.0"/>
+						<GradientStop Color="#D6D6D6" Offset="1.0"/>
+					</LinearGradientBrush>
+				</StackPanel.Background>
+				<Button Name="btnStart"  Click="btnStart_Click">
+					<!-- Note, uses Multibinding in backend code to set "stop" class -->
+					<Button.IsEnabled>
+						<MultiBinding Converter="{x:Static BoolConverters.And}">
+							<Binding Path="VmIsSelected"/>
+							<Binding Path="!SelVmWating"/>
+						</MultiBinding>
+					</Button.IsEnabled>
+					<Grid>
+						<!-- These are set to visible/invisible based on the class of the parent button. This class is added and removed in backend code. 
+							 I experimented with using a toggle button and a custom control, but both approaches resulted in more code and style complexity.
+     
+							 With this method, there is some additional backend code, but considering this is the only button that will behave this way,
+							 it ends up being less of a hassle. -->
+						<StackPanel Classes="start">
+							<Image Height="32" Width="32" Source="/Assets/Actions/18 - start 32x32.png" />
+							<TextBlock Text="Start" />
+						</StackPanel>
+						<StackPanel Classes="stop">
+							<Image Height="32" Width="32" Source="/Assets/Actions/19 - stop 32x32.png" />
+							<TextBlock Text="Stop" />
+						</StackPanel>
+						<StackPanel Classes="resume">
+							<Image Height="32" Width="32" Source="/Assets/Actions/30 - Resume 32x32.png" />
+							<TextBlock Text="Resume" />
+						</StackPanel>
+					</Grid>
+				</Button>
+				<!--<Button Name="btnCtrlAltDel" Click="btnCtrlAltDel_Click">
+					<Button.IsEnabled>
+						<MultiBinding Converter="{x:Static BoolConverters.And}">
+							<Binding Path="VmIsSelected"/>
+							<Binding Path="SelVmRunning"/>
+							<Binding Path="!SelVmWating"/>
+							<Binding Path="!SelVmPaused"/>
+						</MultiBinding>
+					</Button.IsEnabled>
+					<StackPanel Classes="start">
+						<Image Height="32" Width="32" Source="/Assets/Actions/2 - cad 32x32.png" />
+						<TextBlock Text="Soft Reset" />
+					</StackPanel>
+				</Button>-->
+				<Button Name="btnSettings" Click="btnConfigure_Click">
+					<Button.IsEnabled>
+						<MultiBinding Converter="{x:Static BoolConverters.And}">
+							<Binding Path="VmIsSelected"/>
+							<Binding Path="!SelVmWating"/>
+						</MultiBinding>
+					</Button.IsEnabled>
+					<StackPanel Classes="start">
+						<Image Height="32" Width="32" Source="/Assets/Actions/9 - gears 32x32.png" />
+						<TextBlock Text="Settings" />
+					</StackPanel>
+				</Button>
+				<Rectangle Fill="#8a8a8a" Width="1" Margin="1,2,0,2"/>
+				<Rectangle Fill="#FFFFFF" Opacity=".3" Width="1" Margin="0,2,1,2"/>
+				<ComboBox SelectedIndex="{Binding CategoryIndex}" Background="transparent" Width="150" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Center" ItemsSource="{Binding Categories}" />
 		</StackPanel>
-		<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Background="#f0f0f0">
-			<Label Name="lblVMCount" Margin="10" Content="{Binding Path=VmCount}" />
 		</StackPanel>
-		<StackPanel Margin="10,0,10,0">
-			<DataGrid Name="lstVMs" Items="{Binding Path=Machines}" AutoGenerateColumns="False" 
-                      SelectionChanged="lstVMs_SelectedIndexChanged" KeyDown="lstVMs_KeyDown"
-                      CellPointerPressed="lstVMs_MouseDoubleClick" PointerReleased="OnTreeButtonRelease">
-				<DataGrid.Columns>
-                    <DataGridTemplateColumn Header="">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate DataType="vm:VMRow">
-								<StackPanel Orientation="Horizontal">
-                                    <Image Source="{Binding Icon}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Width="2*" Header="Name" Binding="{Binding Name}" />
-                    <DataGridTextColumn Width="2*" Header="Status" Binding="{Binding Status}" />
-					<DataGridTextColumn Width="2*" Header="Description" Binding="{Binding Desc}" />
-					<DataGridTextColumn Width="2*" Header="Path" Binding="{Binding Path}" />
-                </DataGrid.Columns>
-				<DataGrid.ContextMenu>
-                    <ContextMenu Name="lstVMpop">
-                        <MenuItem Name="startToolStripMenuItem" Header="Start" Click="startToolStripMenuItem_Click" IsEnabled="True" />
-						<MenuItem Name="configureToolStripMenuItem" Header="Configure" Click="configureToolStripMenuItem_Click" IsEnabled="True" />
-						<MenuItem Name="pauseToolStripMenuItem" Header="Pause" Click="pauseToolStripMenuItem_Click" IsEnabled="True" />
-						<MenuItem Name="resetCTRLALTDELETEToolStripMenuItem" Header="Send CTRL+ALT+DEL" Click="resetCTRLALTDELETEToolStripMenuItem_Click" IsEnabled="True" />
-						<MenuItem Name="hardResetToolStripMenuItem" Header="Hard reset" Click="hardResetToolStripMenuItem_Click" IsEnabled="True" />
-						<Separator />
-						<MenuItem Name="killToolStripMenuItem" Header="Kill" Click="killToolStripMenuItem_Click" IsEnabled="True" />
-						<MenuItem Name="wipeToolStripMenuItem" Header="Wipe" Click="wipeToolStripMenuItem_Click" IsEnabled="True" />
-						<Separator />
-						<MenuItem Name="editToolStripMenuItem" Header="Edit" Click="editToolStripMenuItem_Click" IsEnabled="True" />
-						<MenuItem Name="cloneToolStripMenuItem" Header="Clone" Click="cloneToolStripMenuItem_Click" IsEnabled="True" />
-						<MenuItem Name="deleteToolStripMenuItem" Header="Remove" Click="deleteToolStripMenuItem_Click" IsEnabled="True" />
-						<MenuItem Name="openFolderToolStripMenuItem" Header="Open folder in Explorer" Click="openFolderToolStripMenuItem_Click" IsEnabled="True" />
-						<MenuItem Name="openConfigFileToolStripMenuItem" Header="Open config file" Click="openConfigFileToolStripMenuItem_Click" IsEnabled="True" />
-						<MenuItem Name="createADesktopShortcutToolStripMenuItem" Header="Create a desktop shortcut" Click="createADesktopShortcutToolStripMenuItem_Click" IsEnabled="True" />
-                    </ContextMenu>
-                </DataGrid.ContextMenu>
-			</DataGrid>
-		</StackPanel>
+		<Grid DockPanel.Dock="Bottom" Background="#f0f0f0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"></ColumnDefinition>
+				<ColumnDefinition Width="10"><!-- Where we put the "Grip resizer" dots --></ColumnDefinition>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="1"><!-- Used to create a thin boarder over the status bar --></RowDefinition>
+				<RowDefinition Height="18"></RowDefinition>
+			</Grid.RowDefinitions>
+			<Rectangle Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Height="1" Fill="#d7d7d7"/>
+			<Label Grid.Column="0" Grid.Row="1" Name="lblVMCount" Margin="1, 0" Padding="3, 1, 3, 0" Content="{Binding Path=VmCount}" FontSize="10" />
+			
+			<!-- Instead of using a PNG or SVG, we paint the dots directly. Note, we have not implemented any rezise logic. I was planning to use <actipro:WindowResizeGrip /> but it does not work. -->
+			<Canvas Grid.Column="1" Grid.Row="1" Width="10">
+				<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="2"/>
+				<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="2"/>
+				<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="8" Canvas.Bottom="2"/>
+				<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="5"/>
+				<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="5"/>
+				<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="8"/>
+			</Canvas>
+		</Grid>
+		<Border Padding="2">
+			<Grid ColumnDefinitions="200, 3, *">
+				<Border Grid.Column="0" BorderThickness="1" BorderBrush="#828790">
+					<ListBox BorderThickness="1" BorderBrush="White" Padding="0"
+							 x:Name="lstVMs" SelectedIndex="{Binding MachineIndex}" ItemsSource="{Binding Path=Machines}" 
+							 KeyDown="lstVMs_KeyDown" Background="White" 
+							 ScrollViewer.AllowAutoHide="False">
+						<ListBox.Styles>
+							<Style Selector="ListBoxItem">
+								<Setter Property="Padding" Value="0"/>
+
+								<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+									<Setter Property="Background" Value="Transparent"/>
+								</Style>
+
+								<Style Selector="^:selected">
+									<Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter, ^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+										<Setter Property="Background">
+											<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+												<GradientStop Color="#0D93FF" Offset="0.0"/>
+												<GradientStop Color="#0078D7" Offset="1.0"/>
+											</LinearGradientBrush>
+										</Setter>
+										<Setter Property="Foreground" Value="White"/>
+									</Style>
+								</Style>
+							</Style>
+						</ListBox.Styles>
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<DockPanel Height="48">
+									<Panel DockPanel.Dock="Left" Width="48" Height="48">
+										<Image Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+												 Source="{Binding VMIcon, Converter={StaticResource variableImage}}" Margin="6"
+										   RenderOptions.BitmapInterpolationMode="MediumQuality" />
+									</Panel>
+									<Grid RowDefinitions="5, Auto, Auto" Height="48" >
+										<TextBlock Grid.Row="1" Text="{Binding Name, Mode=OneWay}" FontWeight="Bold"  FontSize="11" Margin="0" Padding="0"/>
+										<TextBlock Grid.Row="2" Text="{Binding Status, Mode=OneWay}" FontSize="11" Margin="0" Padding="0"/>
+									</Grid>
+								</DockPanel>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+						<ListBox.ContextMenu>
+							<ContextMenu Name="lstVMpop">
+								<MenuItem Header="Start" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}" IsVisible="{Binding !SelVmRunning}">
+									<MenuItem.Icon>
+										<Image Source="/Assets/Actions/18 - start 32x32.png" />
+									</MenuItem.Icon>
+								</MenuItem>
+								<MenuItem Header="Stop" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}" IsVisible="{Binding SelVmRunning}">
+									<MenuItem.Icon>
+										<Image Source="/Assets/Actions/19 - stop 32x32.png" />
+									</MenuItem.Icon>
+								</MenuItem>
+								<MenuItem Header="Configure" Click="configureToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}">
+									<MenuItem.Icon>
+										<Image Source="/Assets/Actions/9 - gears.png" />
+									</MenuItem.Icon>
+								</MenuItem>
+								<MenuItem Header="Pause" Click="pauseToolStripMenuItem_Click" IsVisible="{Binding !SelVmPaused}">
+									<MenuItem.IsEnabled>
+										<MultiBinding Converter="{x:Static BoolConverters.And}">
+											<Binding Path="SelVmRunning"/>
+											<Binding Path="!SelVmWating"/>
+										</MultiBinding>
+									</MenuItem.IsEnabled>
+								</MenuItem>
+								<MenuItem Header="Resume" Click="pauseToolStripMenuItem_Click" IsVisible="{Binding SelVmPaused}">
+									<MenuItem.IsEnabled>
+										<MultiBinding Converter="{x:Static BoolConverters.And}">
+											<Binding Path="SelVmRunning"/>
+											<Binding Path="!SelVmWating"/>
+										</MultiBinding>
+									</MenuItem.IsEnabled>
+								</MenuItem>
+								<MenuItem Header="Send CTRL+ALT+DEL" Click="resetCTRLALTDELETEToolStripMenuItem_Click">
+									<MenuItem.IsEnabled>
+										<MultiBinding Converter="{x:Static BoolConverters.And}">
+											<Binding Path="SelVmRunning"/>
+											<Binding Path="!SelVmWating"/>
+										</MultiBinding>
+									</MenuItem.IsEnabled>
+									<MenuItem.Icon>
+										<Image Source="/Assets/Actions/2 - cad 32x32.png" />
+									</MenuItem.Icon>
+								</MenuItem>
+								<MenuItem Header="Hard reset" Click="hardResetToolStripMenuItem_Click" IsEnabled="True">
+									<MenuItem.IsEnabled>
+										<MultiBinding Converter="{x:Static BoolConverters.And}">
+											<Binding Path="SelVmRunning"/>
+											<Binding Path="!SelVmWating"/>
+										</MultiBinding>
+									</MenuItem.IsEnabled>
+									<MenuItem.Icon>
+										<Image Source="/Assets/Actions/25 - hwreset.png" />
+									</MenuItem.Icon>
+								</MenuItem>
+								<Separator />
+								<MenuItem Header="Kill" Click="killToolStripMenuItem_Click" IsEnabled="{Binding SelVmRunning}"/>
+								<MenuItem Header="Wipe config" Click="wipeToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}"/>
+								<Separator />
+								<MenuItem Header="Edit" Click="editToolStripMenuItem_Click" IsEnabled="True">
+									<MenuItem.Icon>
+										<Image Source="/Assets/Actions/32 - tools.png" />
+									</MenuItem.Icon>
+								</MenuItem>
+								<MenuItem Header="Clone" Click="cloneToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}">
+									<MenuItem.Icon>
+										<Image Source="/Assets/Actions/3 - clone 32x32.png" />
+									</MenuItem.Icon>
+								</MenuItem>
+								<MenuItem Header="Remove" Click="deleteToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}">
+									<MenuItem.Icon>
+										<Image Source="/Assets/Actions/6 - delete.png" />
+									</MenuItem.Icon>
+								</MenuItem>
+								<MenuItem Header="Open folder in Explorer" Click="openFolderToolStripMenuItem_Click" IsEnabled="True" />
+								<MenuItem Header="Open config file" Click="openConfigFileToolStripMenuItem_Click" IsEnabled="True" />
+								<MenuItem Header="Create a desktop shortcut" Click="createADesktopShortcutToolStripMenuItem_Click" IsEnabled="True" />
+							</ContextMenu>
+						</ListBox.ContextMenu>
+					</ListBox>
+				</Border>
+				<GridSplitter Grid.Column="1" Background="Transparent" ResizeDirection="Columns"/>
+				<Border Grid.Column="2" BorderThickness="1" BorderBrush="#d9d9d9" Background="White" >
+					<Grid>
+						<view:ctrlWelcome IsVisible="{Binding !VmIsSelected}"></view:ctrlWelcome>
+						<DockPanel IsVisible="{Binding VmIsSelected}" Margin="2">
+							<!-- Caption -->
+							<Button HorizontalAlignment="Stretch" Padding="20,10,10,10" Margin="0, 0, 0, 3" DockPanel.Dock="Top" CornerRadius="0" 
+									Background="#E2EAF1" FontSize="14" FontWeight="Bold" Click="openFolderToolStripMenuItem_Click"
+									Content="{Binding Machine.Name}" BorderThickness="0" >
+								<Button.Styles>
+									<Style Selector="Button:pointerover /template/ ContentPresenter">
+										<Setter Property="Background" Value="#E5EDF4"/>
+									</Style>
+									<Style Selector="Button:pressed">
+										<Setter Property="RenderTransform" Value="scale(0.995)" />
+									</Style>
+								</Button.Styles>
+							</Button>
+							<!-- Status -->
+							<Border DockPanel.Dock="Bottom" Margin="3, 4, 3, 0" BorderBrush="#a0a0a0" BorderThickness="0, 1, 0, 0">
+								<DockPanel>
+									<StackPanel DockPanel.Dock="Left" Orientation="Horizontal" ToolTip.Placement="Top">
+										<ToolTip.Tip>
+											<StackPanel Orientation="Horizontal">
+												<TextBlock>Total uptime: </TextBlock>
+												<TextBlock Margin="5, 0, 0, 0" Text="{Binding Machine.Uptime.Full}" />
+											</StackPanel>
+										</ToolTip.Tip>
+										<TextBlock Margin="12, 8, 12, 8" FontSize="12" IsVisible="{Binding !SelVmRunning}">Was last run:</TextBlock>
+										<TextBlock Margin="12, 8, 12, 8" FontSize="12" IsVisible="{Binding SelVmRunning}">Was started:</TextBlock>
+										<TextBlock Margin="0, 8, 0, 8" FontSize="12" FontWeight="Bold" Text="{Binding Machine.SinceRun, TargetNullValue='Never', Mode=OneWay}" />
+									</StackPanel>
+									<Button DockPanel.Dock="Right" Height="21" Margin="0, 0, 15, 0" CornerRadius="0" BorderThickness="1" BorderBrush="#bfbfbf" Padding="10, 0"
+											VerticalAlignment="Center" VerticalContentAlignment="Stretch" Click="btnTray_Click" IsEnabled="{Binding Machine.HasPrintTray}">
+										<TextBlock Margin="0, 0, 0, 0"  FontSize="12">Printer Tray</TextBlock>
+									</Button>
+									<Rectangle />
+								</DockPanel>
+							</Border>
+							<Grid>
+								<Grid IsVisible="{Binding Machine.HasValidPath}">
+									<Grid.ColumnDefinitions>
+										<!-- Column 1: Machine configuration -->
+										<ColumnDefinition Width="*"></ColumnDefinition>
+										<ColumnDefinition Width="3"></ColumnDefinition>
+										<!-- Column 3: Screenshots and VM info -->
+										<ColumnDefinition Width="200" MinWidth="150"></ColumnDefinition>
+									</Grid.ColumnDefinitions>
+									<Grid.Styles>
+										<Style Selector="Button">
+											<Setter Property="CornerRadius" Value="0"/>
+											<Setter Property="BorderThickness" Value="1"/>
+											<Setter Property="BorderBrush" Value="#bfbfbf"/>
+											<Setter Property="Padding" Value="7, 0, 7, 5"/>
+											<Setter Property="Height" Value="21"/>
+										</Style>
+									</Grid.Styles>
+									<Border Margin="3, 0, 0, 0" BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0">
+										<view:ctrlMachineInfo DataContext="{Binding VMConfig}" />
+									</Border>
+									<GridSplitter Grid.Column="1" ResizeDirection="Columns" Theme="{StaticResource VerticalGridSplitter}" Margin="7, 2, 8, 2" />
+									<DockPanel Grid.Column="2" Margin="0, 0, 18, 0">
+										<DockPanel DockPanel.Dock="Top" Background="White" Height="35">
+											<TextBlock DockPanel.Dock="Left" Text="Screenshots:" VerticalAlignment="Center" FontSize="12" TextDecorations="Underline" Foreground="#0066cc" Margin="0, 0, 0, 1" 
+													   PointerPressed="Screenshots_PointerPressed">
+												<TextBlock.Styles>
+													<Style Selector="TextBlock:pointerover">
+														<Setter Property="Cursor" Value="Hand" />
+													</Style>
+												</TextBlock.Styles>
+											</TextBlock>
+											<StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+												<Button Margin="0, 7" IsEnabled="{Binding Machine.HasMultipleImages}" Click="btnPrevImg_Click">
+													<TextBlock Margin="0, -1, 0, 1" FontSize="14">&lt;</TextBlock>
+												</Button>
+												<Button Margin="3, 7, 0, 7" IsEnabled="{Binding Machine.HasMultipleImages}" Click="btnNextImg_Click">
+													<TextBlock Margin="0, -1, 0, 1" FontSize="14">&gt;</TextBlock>
+												</Button>
+											</StackPanel>
+											<Rectangle Fill="Transparent" />
+										</DockPanel>
+										<Grid DockPanel.Dock="Bottom" ColumnDefinitions="*, *" RowDefinitions="*, *, *, *">
+											<TextBlock Grid.Row="0" Grid.Column="0" Text="VM Age"/>
+											<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Machine.SinceCreated, TargetNullValue='Unknown', Mode=OneWay}" HorizontalAlignment="Right"/>
+											<TextBlock Grid.Row="1" Grid.Column="0" Text="Uptime"/>
+											<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Machine.Uptime.Short, Mode=OneWay}" HorizontalAlignment="Right" ToolTip.Placement="Top">
+												<ToolTip.Tip>
+													<StackPanel Orientation="Horizontal">
+														<TextBlock>Total uptime: </TextBlock>
+														<TextBlock Margin="5, 0, 0, 0" Text="{Binding Machine.Uptime.Full, Mode=OneWay}" />
+													</StackPanel>
+												</ToolTip.Tip>
+											</TextBlock>
+											<TextBlock Grid.Row="2" Grid.Column="0" Text="Play count"/>
+											<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Machine.RunCount, Mode=OneWay}" HorizontalAlignment="Right"/>
+											<TextBlock Grid.Row="3" Grid.Column="0" Text="Disk usage"/>
+											<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Machine.VMSize, TargetNullValue='Calculating...', Mode=OneWay}" HorizontalAlignment="Right"/>
+										</Grid>
+										<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" Margin="0, 0, 0, 10">
+											<Grid>
+												<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="(None)" />
+												<Image Source="{Binding Machine.SelectedImage}" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+													   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+											</Grid>
+										</Border>
+									</DockPanel>
+								</Grid>
+								<StackPanel IsVisible="{Binding !Machine.HasValidPath}" HorizontalAlignment="Center" VerticalAlignment="Center">
+									<TextBlock Text="Failed to find the VM's folder" HorizontalAlignment="Stretch" TextAlignment="Center"
+											   FontSize="24" Foreground="DarkRed"/>
+									<Button Margin="0, 25, 0, 0" HorizontalAlignment="Center" Click="btnBrowse_Click">Give me a helping hand</Button>
+								</StackPanel>
+							</Grid>
+						</DockPanel>
+					</Grid>
+				</Border>
+			</Grid>
+		</Border>
 	</DockPanel>
 </Window>

@@ -8,71 +8,94 @@ using Avalonia.Interactivity;
 using System.IO;
 using System.Linq;
 using _86BoxManager.Core;
-using _86BoxManager.Registry;
 using Avalonia.Media;
-using ButtonsType = MessageBox.Avalonia.Enums.ButtonEnum;
-using MessageType = MessageBox.Avalonia.Enums.Icon;
-using ResponseType = MessageBox.Avalonia.Enums.ButtonResult;
+using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
+using MessageType = MsBox.Avalonia.Enums.Icon;
+using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 using IOPath = System.IO.Path;
-using RegistryValueKind = _86BoxManager.Registry.ValueKind;
+using System.Threading.Tasks;
+using ReactiveUI;
+using System.Reflection.Metadata.Ecma335;
 
 namespace _86BoxManager.Views
 {
     public partial class dlgSettings : Window
     {
+        private readonly dlgSettingsModel _m;
+
         public dlgSettings()
         {
             InitializeComponent();
-            txtEXEdir.OnTextChanged(txt_TextChanged);
-            txtCFGdir.OnTextChanged(txt_TextChanged);
+            Closing += dlgSettings_FormClosing;
+
+            _m = new dlgSettingsModel();
+            DataContext = _m;
+
+            _m.PropertyChanged += _m_PropertyChanged;
         }
 
-        private bool settingsChanged = false; // Keeps track of unsaved changes
-
-        private void dlgSettings_Load(object sender, EventArgs e)
+        private void _m_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            LoadSettings();
-            Get86BoxVersion();
-
-            var txt = CurrentApp.ProductVersion.Substring(0, CurrentApp.ProductVersion.Length - 2);
-            lblVersion1.Text = $"Version: {txt}";
-
-            #if DEBUG
-            lblVersion1.Text += " (Debug)";
-            #endif
+            if (e.PropertyName == nameof(dlgSettingsModel.ExeDir))
+            {
+                Get86BoxVersion();
+            }
         }
 
-        private void dlgSettings_FormClosing(object sender, CancelEventArgs e)
+        private async void dlgSettings_Load(object sender, EventArgs e)
         {
-            if (!settingsChanged)
+#if DEBUG
+            if (Design.IsDesignMode)
                 return;
+#endif
+
+            try
+            {
+                LoadSettings();
+                Get86BoxVersion();
+            }
+            catch 
+            {
+                await Dialogs.ShowMessageBox("Settings could not be loaded, sorry.",
+                         MessageType.Error, this, ButtonsType.Ok, "Failure");
+
+                Close();
+            }
+        }
+
+        private async void dlgSettings_FormClosing(object sender, WindowClosingEventArgs e)
+        {
+            if (!_m.HasChanges)
+                return;
+
+            e.Cancel = true;
 
             // Unsaved changes, ask the user to confirm
-            var result = Dialogs.ShowMessageBox(
+            var result = await Dialogs.ShowMessageBox(
                 "Would you like to save the changes you've made to the settings?",
-                MessageType.Question, ButtonsType.YesNo, "Unsaved changes");
+                MessageType.Question, this, ButtonsType.YesNo, "Unsaved changes");
             if (result == ResponseType.Yes)
             {
-                SaveSettings();
+                await SaveSettings();
+            }
+
+            if (result != ResponseType.None)
+            {
+                Closing -= dlgSettings_FormClosing;
+                Close();
             }
         }
 
-        private void btnApply_Click(object sender, RoutedEventArgs e)
+        private async void btnApply_Click(object sender, RoutedEventArgs e)
         {
-            var success = SaveSettings();
-            if (!success)
-            {
-                return;
-            }
-            settingsChanged = CheckForChanges();
-            btnApply.IsEnabled = settingsChanged;
+            var success = await SaveSettings();
         }
 
-        private void btnOK_Click(object sender, RoutedEventArgs e)
+        private async void btnOK_Click(object sender, RoutedEventArgs e)
         {
-            if (settingsChanged)
+            if (_m.HasChanges)
             {
-                SaveSettings();
+                await SaveSettings();
             }
             Close(ResponseType.Ok);
         }
@@ -87,15 +110,15 @@ namespace _86BoxManager.Views
 
             if (!string.IsNullOrWhiteSpace(fileName))
             {
-                txtLogPath.Text = fileName;
+                _m.LogPath = fileName;
             }
         }
 
-        private void btnDefaults_Click(object sender, RoutedEventArgs e)
+        private async void btnDefaults_Click(object sender, RoutedEventArgs e)
         {
-            var result = Dialogs.ShowMessageBox("All settings will be reset to their default values. " +
+            var result = await Dialogs.ShowMessageBox("All settings will be reset to their default values. " +
                                                 "Do you wish to continue?",
-                MessageType.Warning, ButtonsType.YesNo, "Settings will be reset");
+                MessageType.Warning, this, ButtonsType.YesNo, "Settings will be reset");
             if (result == ResponseType.Yes)
             {
                 ResetSettings();
@@ -105,131 +128,90 @@ namespace _86BoxManager.Views
         // Resets the settings to their default values
         private void ResetSettings()
         {
-            var regkey = Configs.Open86BoxKey(true);
-            if (regkey == null)
-            {
-                Configs.Create86BoxKey();
-                regkey = Configs.Open86BoxKey(true);
-                Configs.Create86BoxVmKey();
-            }
-            regkey.Close();
-
             var (cfgPath, exePath) = VMCenter.FindPaths();
-            txtCFGdir.Text = cfgPath;
-            txtEXEdir.Text = exePath;
-            cbxMinimize.IsChecked = false;
-            cbxShowConsole.IsChecked = true;
-            cbxMinimizeTray.IsChecked = false;
-            cbxCloseTray.IsChecked = false;
-            cbxLogging.IsChecked = false;
-            txtLogPath.Text = "";
-            cbxGrid.IsChecked = false;
-            txtLogPath.IsEditable(false);
-            btnBrowse3.IsEnabled = false;
-
-            settingsChanged = CheckForChanges();
+            _m.CFGDir = cfgPath;
+            _m.ExeDir = exePath;
+            _m.MinOnStart = false;
+            _m.EnableConsole = true;
+            _m.MinToTray = false;
+            _m.CloseToTray = false;
+            _m.EnableLogging = false;
+            _m.LogPath = "";
+            _m.AllowInstances = false;
+            _m.RaisePropertyChanged(nameof(dlgSettingsModel.HasChanges));
         }
 
         private async void btnBrowse1_Click(object sender, RoutedEventArgs e)
         {
-            var initDir = Platforms.Env.MyComputer;
             var text = "Select a folder where 86Box program files and the roms folder are located";
 
-            var fileName = await Dialogs.SelectFolder(initDir, text, parent: this);
+            var fldName = await Dialogs.SelectFolder(_m.ExeDir, text, parent: this);
 
-            if (!string.IsNullOrWhiteSpace(fileName))
+            if (!string.IsNullOrWhiteSpace(fldName))
             {
-                txtEXEdir.Text = fileName;
-                if (!txtEXEdir.Text.EndsWith(IOPath.DirectorySeparatorChar)) //Just in case
-                {
-                    txtEXEdir.Text += IOPath.DirectorySeparatorChar;
-                }
+                _m.ExeDir = fldName.CheckTrail();
             }
         }
 
         private async void btnBrowse2_Click(object sender, RoutedEventArgs e)
         {
-            var initDir = Platforms.Env.MyComputer;
             var text = "Select a folder where your virtual machines (configs, nvr folders, etc.) will be located";
 
-            var fileName = await Dialogs.SelectFolder(initDir, text, parent: this);
+            var fileName = await Dialogs.SelectFolder(_m.CFGDir, text, parent: this);
 
             if (!string.IsNullOrWhiteSpace(fileName))
             {
-                txtCFGdir.Text = fileName;
-                if (!txtCFGdir.Text.EndsWith(IOPath.DirectorySeparatorChar)) //Just in case
-                {
-                    txtCFGdir.Text += IOPath.DirectorySeparatorChar;
-                }
+                _m.CFGDir = fileName.CheckTrail();
             }
-        }
-
-        private void txt_TextChanged(object sender, TextInputEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtEXEdir.Text) || string.IsNullOrWhiteSpace(txtCFGdir.Text))
-            {
-                btnApply.IsEnabled = false;
-                return;
-            }
-
-            settingsChanged = CheckForChanges();
-            btnApply.IsEnabled = settingsChanged;
-        }
-
-        private void cbx_CheckedChanged(object sender, RoutedEventArgs e)
-        {
-            settingsChanged = CheckForChanges();
-        }
-
-        private void cbxLogging_CheckedChanged(object sender, RoutedEventArgs e)
-        {
-            settingsChanged = CheckForChanges();
-            // Needed so the Apply button doesn't get enabled on an empty
-            // logpath textbox. Too lazy to write a duplicated empty check...
-            txt_TextChanged(sender, null);
-            txtLogPath.IsEditable(cbxLogging.IsActive());
-            btnBrowse3.IsEnabled = cbxLogging.IsActive();
         }
 
         // Obtains the 86Box version from 86Box executable
         private void Get86BoxVersion()
         {
+            _m.ExeValid = false;
+            _m.ExeError = false;
+            _m.ExeWarn = false;
+            _m.ExePath = "86Box executable not found!";
+
             try
             {
-                var vi = Platforms.Manager.GetBoxVersion(txtEXEdir.Text);
-                if (vi.FilePrivatePart >= 3541) //Officially supported builds
+                var vi = Platforms.Manager.GetBoxVersion(_m.ExeDir);
+                if (vi != null)
                 {
-                    var vText = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - fully compatible";
-                    lbl86BoxVer1.SetColorTxt(Brushes.ForestGreen, FontWeight.Bold, vText);
-                }
-                else if (vi.FilePrivatePart >= 3333 && vi.FilePrivatePart < 3541) //Should mostly work...
-                {
-                    var vText = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - partially compatible";
-                    lbl86BoxVer1.SetColorTxt(Brushes.Orange, FontWeight.Bold, vText);
-                }
-                else //Completely unsupported, since version info can't be obtained anyway
-                {
-                    var vText = "Unknown - may not be compatible";
-                    lbl86BoxVer1.SetColorTxt(Brushes.Red, FontWeight.Bold, vText);
+                    if (vi.FilePrivatePart >= 3541) //Officially supported builds
+                    {
+                        _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - fully compatible";
+                        _m.ExeValid = true;
+                    }
+                    else if (vi.FilePrivatePart >= 3333 && vi.FilePrivatePart < 3541) //Should mostly work...
+                    {
+                        _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - partially compatible";
+                        _m.ExeWarn = true;
+                    }
+                    else //Completely unsupported, since version info can't be obtained anyway
+                    {
+                        _m.ExePath = "Unknown - may not be compatible";
+                        _m.ExeError = true;
+                    }
                 }
             }
-            catch
-            {
-                var vText = "86Box executable not found!";
-                lbl86BoxVer1.SetColorTxt(Brushes.Gray, FontWeight.Bold, vText);
-            }
+            catch { }
+
+            _m.RaisePropertyChanged(nameof(dlgSettingsModel.ExeError));
+            _m.RaisePropertyChanged(nameof(dlgSettingsModel.ExeWarn));
+            _m.RaisePropertyChanged(nameof(dlgSettingsModel.ExeValid));
         }
 
         // Save the settings to the registry
-        private bool SaveSettings()
+        private async Task<bool> SaveSettings()
         {
-            if (cbxLogging.IsActive() && string.IsNullOrWhiteSpace(txtLogPath.Text))
+            if (_m.EnableLogging && string.IsNullOrWhiteSpace(_m.LogPath))
             {
-                var result = Dialogs.ShowMessageBox(
+                var result = await Dialogs.ShowMessageBox(
                     "Using an empty or whitespace string for the log path will " +
                     "prevent 86Box from logging anything. Are you sure you want to use" +
                     " this path?",
-                    MessageType.Warning, ButtonsType.YesNo, "Warning");
+                    MessageType.Warning, this, ButtonsType.YesNo, "Warning");
                 if (result == ResponseType.No)
                 {
                     return false;
@@ -237,14 +219,14 @@ namespace _86BoxManager.Views
             }
 
             var exeName = Platforms.Env.ExeNames.First();
-            var boxExe = IOPath.Combine(txtEXEdir.Text, exeName);
-            if (!File.Exists(boxExe))
+            var boxExe = IOPath.Combine(_m.ExeDir, exeName);
+            if (!File.Exists(boxExe) && _m.ExeDirChanged)
             {
-                var result = (ResponseType)Dialogs.ShowMessageBox(
+                var result = await Dialogs.ShowMessageBox(
                     "86Box executable could not be found in the directory you specified, so " +
                     "you won't be able to use any virtual machines. Are you sure you want " +
                     "to use this path?",
-                    MessageType.Warning, ButtonsType.YesNo, "Warning");
+                    MessageType.Warning, this, ButtonsType.YesNo, "Warning");
                 if (result == ResponseType.No)
                 {
                     return false;
@@ -253,36 +235,36 @@ namespace _86BoxManager.Views
 
             try
             {
-                //Try to open the key first (in read-write mode) to see if it already exists
-                var regkey = Configs.Open86BoxKey(true);
-
-                //Regkey doesn't exist yet, must be created first and then reopened
-                if (regkey == null)
+                //Store the new values, close the key, changes are saved
+                var s = Program.Root.Settings;
+                using (var t = s.BeginTransaction())
                 {
-                    Configs.Create86BoxKey();
-                    regkey = Configs.Open86BoxKey(true);
-                    Configs.Create86BoxVmKey();
+                    string dir = _m.ExeDir;
+                    if (dir != null)
+                        dir = dir.CheckTrail();
+                    s.EXEdir = dir;
+                    dir = _m.CFGDir;
+                    if (dir != null)
+                        dir = dir.CheckTrail();
+                    s.CFGdir = dir;
+                    s.MinimizeOnVMStart = _m.MinOnStart;
+                    s.ShowConsole = _m.EnableConsole;
+                    s.MinimizeToTray = _m.MinToTray;
+                    s.CloseTray = _m.CloseToTray;
+                    s.EnableLogging = _m.EnableLogging;
+                    s.LogPath = _m.LogPath;
+                    s.AllowInstances = _m.AllowInstances;
+
+                    t.Commit();
                 }
 
-                //Store the new values, close the key, changes are saved
-                regkey.SetValue("EXEdir", txtEXEdir.Text, RegistryValueKind.String);
-                regkey.SetValue("CFGdir", txtCFGdir.Text, RegistryValueKind.String);
-                regkey.SetValue("MinimizeOnVMStart", cbxMinimize.IsActive(), RegistryValueKind.DWord);
-                regkey.SetValue("ShowConsole", cbxShowConsole.IsActive(), RegistryValueKind.DWord);
-                regkey.SetValue("MinimizeToTray", cbxMinimizeTray.IsActive(), RegistryValueKind.DWord);
-                regkey.SetValue("CloseToTray", cbxCloseTray.IsActive(), RegistryValueKind.DWord);
-                regkey.SetValue("EnableLogging", cbxLogging.IsActive(), RegistryValueKind.DWord);
-                regkey.SetValue("LogPath", txtLogPath.Text, RegistryValueKind.String);
-                regkey.SetValue("EnableGridLines", cbxGrid.IsActive(), RegistryValueKind.DWord);
-                regkey.Close();
-
-                settingsChanged = CheckForChanges();
+                _m.Commit();
             }
             catch (Exception ex)
             {
-                Dialogs.ShowMessageBox("An error has occurred. Please provide the following information" +
+                await Dialogs.ShowMessageBox("An error has occurred. Please provide the following information" +
                                        $" to the developer:\n{ex.Message}\n{ex.StackTrace}",
-                    MessageType.Error, ButtonsType.Ok, "Error");
+                    MessageType.Error, this, ButtonsType.Ok, "Error");
                 return false;
             }
             finally
@@ -291,116 +273,224 @@ namespace _86BoxManager.Views
             }
             return true;
         }
-        
-        // Read the settings from the registry
+
+        /// <summary>
+        /// Read the settings from the database
+        /// </summary>
         private void LoadSettings()
         {
-            try
-            {
-                var regkey = Configs.Open86BoxKey(false); //Open the key as read only
+            var s = Program.Root.Settings;
 
-                //If the key doesn't exist yet, fallback to defaults
-                if (regkey == null)
+            _m.ExeDir = s.EXEdir;
+            _m.CFGDir = s.CFGdir;
+            _m.LogPath = s.LogPath;
+            _m.MinOnStart = s.MinimizeOnVMStart;
+            _m.EnableConsole = s.ShowConsole;
+            _m.MinToTray = s.MinimizeToTray;
+            _m.CloseToTray = s.CloseTray;
+            _m.EnableLogging = s.EnableLogging;
+            _m.AllowInstances = s.AllowInstances;
+
+            if (string.IsNullOrWhiteSpace(_m.ExeDir) || string.IsNullOrWhiteSpace(_m.CFGDir))
+            {
+                var (cfgPath, exePath) = VMCenter.FindPaths();
+                if (string.IsNullOrWhiteSpace(_m.ExeDir))
                 {
-                    Dialogs.ShowMessageBox("86Box Manager settings could not be loaded. This " +
-                                           "is normal if you're running 86Box Manager for the first " +
-                                           "time. Default values will be used.",
-                        MessageType.Warning, ButtonsType.Ok, "Warning");
-
-                    //Create the key and reopen it for write access
-                    Configs.Create86BoxKey();
-                    regkey = Configs.Open86BoxKey(true);
-                    Configs.Create86BoxVmKey();
-
-                    var (cfgPath, exePath) = VMCenter.FindPaths();
-                    txtCFGdir.Text = cfgPath;
-                    txtEXEdir.Text = exePath;
-                    cbxMinimize.IsChecked = false;
-                    cbxShowConsole.IsChecked = true;
-                    cbxMinimizeTray.IsChecked = false;
-                    cbxCloseTray.IsChecked = false;
-                    cbxLogging.IsChecked = false;
-                    txtLogPath.Text = "";
-                    cbxGrid.IsChecked = false;
-                    btnBrowse3.IsEnabled = false;
-                    txtLogPath.IsEnabled = false;
-
-                    SaveSettings(); //This will write the default values to the registry
+                    _m.ExeDir = exePath;
                 }
-                else
+                if (string.IsNullOrWhiteSpace(_m.CFGDir))
                 {
-                    txtEXEdir.Text = regkey.GetValue("EXEdir").ToString();
-                    txtCFGdir.Text = regkey.GetValue("CFGdir").ToString();
-                    txtLogPath.Text = regkey.GetValue("LogPath").ToString();
-                    cbxMinimize.IsChecked = Convert.ToBoolean(regkey.GetValue("MinimizeOnVMStart"));
-                    cbxShowConsole.IsChecked = Convert.ToBoolean(regkey.GetValue("ShowConsole"));
-                    cbxMinimizeTray.IsChecked = Convert.ToBoolean(regkey.GetValue("MinimizeToTray"));
-                    cbxCloseTray.IsChecked = Convert.ToBoolean(regkey.GetValue("CloseToTray"));
-                    cbxLogging.IsChecked = Convert.ToBoolean(regkey.GetValue("EnableLogging"));
-                    cbxGrid.IsChecked = Convert.ToBoolean(regkey.GetValue("EnableGridLines"));
-                    txtLogPath.IsEditable(cbxLogging.IsActive());
-                    btnBrowse3.IsEnabled = cbxLogging.IsActive();
+                    _m.CFGDir = cfgPath;
                 }
-
-                regkey.Close();
+            
             }
-            catch
-            {
-                Dialogs.ShowMessageBox("86Box Manager settings could not be loaded, because an " +
-                                       "error occured trying to load the registry keys and/or values. " +
-                                       "Make sure you have the required permissions and try again. " +
-                                       "Default values will be used now.",
-                    MessageType.Warning, ButtonsType.Ok, "Warning");
 
-                var (_, exePath) = VMCenter.FindPaths();
-                txtCFGdir.Text = IOPath.Combine(Platforms.Env.MyDocuments, "86Box VMs");
-                txtEXEdir.Text = exePath;
-                cbxMinimize.IsChecked = false;
-                cbxShowConsole.IsChecked = true;
-                cbxMinimizeTray.IsChecked = false;
-                cbxCloseTray.IsChecked = false;
-                cbxLogging.IsChecked = false;
-                txtLogPath.Text = "";
-                cbxGrid.IsChecked = false;
-                txtLogPath.IsEditable(false);
-                btnBrowse3.IsEnabled = false;
-            }
-        }
-
-        // Checks if all controls match the currently saved settings to determine if any changes were made
-        private bool CheckForChanges()
-        {
-            var regkey = Configs.Open86BoxKey();
-
-            try
-            {
-                btnApply.IsEnabled = (
-                    txtEXEdir.Text != regkey.GetValue("EXEdir").ToString() ||
-                    txtCFGdir.Text != regkey.GetValue("CFGdir").ToString() ||
-                    txtLogPath.Text != regkey.GetValue("LogPath").ToString() ||
-                    cbxMinimize.IsActive() != Convert.ToBoolean(regkey.GetValue("MinimizeOnVMStart")) ||
-                    cbxShowConsole.IsActive() != Convert.ToBoolean(regkey.GetValue("ShowConsole")) ||
-                    cbxMinimizeTray.IsActive() != Convert.ToBoolean(regkey.GetValue("MinimizeToTray")) ||
-                    cbxCloseTray.IsActive() != Convert.ToBoolean(regkey.GetValue("CloseToTray")) ||
-                    cbxLogging.IsActive() != Convert.ToBoolean(regkey.GetValue("EnableLogging")) ||
-                    cbxGrid.IsActive() != Convert.ToBoolean(regkey.GetValue("EnableGridLines")));
-
-                return btnApply.IsEnabled;
-            }
-            catch (Exception ex)
-            {
-                Dialogs.ShowMessageBox($"Error: {ex.Message}", MessageType.Error);
-                return true; //For now let's just return true if anything goes wrong
-            }
-            finally
-            {
-                regkey.Close();
-            }
+            _m.Commit();
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             Close(ResponseType.Cancel);
+        }
+    }
+
+    internal class dlgSettingsModel : ReactiveObject
+    {
+        private string _exe_dir, _exe_path, _cfg_dir;
+        private bool _min_start, _min_tray, _close_tray;
+        private bool _enable_logging;
+        private string _log_path;
+        private bool _allow_instances, _enable_console;
+
+        dlgSettingsModel _me;
+
+        public bool ExeValid { get; set; }
+        public bool ExeWarn { get; set; }
+        public bool ExeError { get; set; }
+
+        public string Version { get => CurrentApp.VersionString; }
+
+        public bool HasChanges
+        {
+            get 
+            {
+                if (_me == null)
+                    return false;
+
+                return _me.ExeDir != ExeDir ||
+                       _me.CFGDir != CFGDir ||
+                       _me.MinToTray != MinToTray ||
+                       _me.MinOnStart != MinOnStart ||
+                       _me.EnableLogging != EnableLogging ||
+                       _me.EnableConsole != EnableConsole ||
+                       _me.AllowInstances != AllowInstances ||
+                       _me.LogPath != LogPath;
+            }
+        }
+
+        public bool ExeDirChanged
+        {
+            get
+            {
+                return _me.ExeDir != ExeDir || _me.ExePath != ExePath;
+            }
+        }
+
+        public string ExeDir
+        {
+            get => _exe_dir;
+            set
+            {
+                if (_exe_dir != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _exe_dir, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public string ExePath
+        {
+            get => _exe_path;
+            set
+            {
+                if (_exe_path != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _exe_path, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public string CFGDir
+        {
+            get => _cfg_dir;
+            set
+            {
+                if (_cfg_dir != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _cfg_dir, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public bool MinToTray
+        {
+            get => _min_tray;
+            set
+            {
+                if (_min_tray != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _min_tray, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public bool MinOnStart
+        {
+            get => _min_start;
+            set
+            {
+                if (_min_start != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _min_start, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public bool CloseToTray
+        {
+            get => _close_tray;
+            set
+            {
+                if (_close_tray != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _close_tray, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public bool EnableLogging
+        {
+            get => _enable_logging;
+            set
+            {
+                if (_enable_logging != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _enable_logging, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public bool AllowInstances
+        {
+            get => _allow_instances;
+            set
+            {
+                if (_allow_instances != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _allow_instances, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public bool EnableConsole
+        {
+            get => _enable_console;
+            set
+            {
+                if (_enable_console != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _enable_console, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public string LogPath
+        {
+            get => _log_path;
+            set
+            {
+                if (_log_path != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _log_path, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public void Commit()
+        {
+            _me = (dlgSettingsModel) MemberwiseClone();
+
+            this.RaisePropertyChanged(nameof(HasChanges));
         }
     }
 }

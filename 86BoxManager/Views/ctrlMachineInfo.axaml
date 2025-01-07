@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="clr-namespace:_86BoxManager.ViewModels"
+			 x:DataType="vm:VMConfig"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
+             x:Class="_86BoxManager.Views.ctrlMachineInfo"
+			 BorderBrush="#e3e3e3" BorderThickness="0, 0, 1, 1">
+	<Design.DataContext>
+		<vm:VMConfig/>
+	</Design.DataContext>
+	<UserControl.Styles>
+		<Style Selector="Grid">
+			<Setter Property="Margin" Value="2, 0, 0, 0" />
+		</Style>
+	</UserControl.Styles>
+	<Border BorderBrush="#696969" BorderThickness="1, 1, 0, 0">
+		<ScrollViewer VerticalAlignment="Stretch">
+			<StackPanel VerticalAlignment="Stretch" Spacing="10">
+				<Expander HorizontalAlignment="Stretch" Header="System" IsExpanded="True">
+					<Grid ColumnDefinitions="Auto, 5, Auto" RowDefinitions="*, *, *, *">
+						<TextBlock Grid.Row="0" Grid.Column="0">Machine:</TextBlock>
+						<SelectableTextBlock Grid.Row="0" Grid.Column="2" Text="{Binding SystemMachine, Mode=OneWay}" />
+						<TextBlock Grid.Row="1" Grid.Column="0">Type:</TextBlock>
+						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SystemType, Mode=OneWay}" />
+						<TextBlock Grid.Row="2" Grid.Column="0">Memory:</TextBlock>
+						<SelectableTextBlock Grid.Row="2" Grid.Column="2" Text="{Binding SystemMemory, Mode=OneWay}" />
+						<TextBlock Grid.Row="3" Grid.Column="0">CPU:</TextBlock>
+						<SelectableTextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CPUandMHz, Mode=OneWay}" />
+					</Grid>
+				</Expander>
+				<Expander HorizontalAlignment="Stretch" Header="Display" IsExpanded="True">
+					<Grid ColumnDefinitions="Auto, 5, Auto" RowDefinitions="*, *">
+						<TextBlock Grid.Row="0" Grid.Column="0">Graphics:</TextBlock>
+						<SelectableTextBlock Grid.Row="0" Grid.Column="2" Text="{Binding System2D, Mode=OneWay}" />
+						<TextBlock Grid.Row="1" Grid.Column="0">Accelerator:</TextBlock>
+						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding System3D, Mode=OneWay}" />
+					</Grid>
+				</Expander>
+				<Expander HorizontalAlignment="Stretch" Header="Audio" IsExpanded="True">
+					<Grid ColumnDefinitions="Auto, 5, Auto" RowDefinitions="*, *">
+						<TextBlock Grid.Row="0" Grid.Column="0">Sound:</TextBlock>
+						<SelectableTextBlock Grid.Row="0" Grid.Column="2" Text="{Binding SystemAud, Mode=OneWay}" />
+						<TextBlock Grid.Row="1" Grid.Column="0">MIDI:</TextBlock>
+						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SystemMidi, Mode=OneWay}" />
+					</Grid>
+				</Expander>
+				<Expander HorizontalAlignment="Stretch" Header="Storage" IsExpanded="True">
+					<Grid ColumnDefinitions="Auto, 5, Auto" RowDefinitions="*, *, *">
+						<TextBlock Grid.Row="0" Grid.Column="0">Floppy:</TextBlock>
+						<SelectableTextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Floppy, Mode=OneWay}" />
+						<TextBlock Grid.Row="1" Grid.Column="0">Hard Disk:</TextBlock>
+						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding HardDisk, Mode=OneWay}" />
+						<TextBlock Grid.Row="2" Grid.Column="0">CD-drive:</TextBlock>
+						<SelectableTextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CDROM, Mode=OneWay}" />
+					</Grid>
+				</Expander>
+				<Expander HorizontalAlignment="Stretch" Header="Input Devices" IsExpanded="True">
+					<Grid ColumnDefinitions="Auto, 5, Auto" RowDefinitions="*, *">
+						<TextBlock Grid.Row="0" Grid.Column="0">Mouse:</TextBlock>
+						<SelectableTextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Mouse, Mode=OneWay}" />
+						<TextBlock Grid.Row="1" Grid.Column="0">Joystick:</TextBlock>
+						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Joystick, Mode=OneWay}" />
+					</Grid>
+				</Expander>
+			</StackPanel>
+		</ScrollViewer>
+	</Border>
+</UserControl>

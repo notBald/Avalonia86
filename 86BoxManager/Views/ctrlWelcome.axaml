@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
+             x:Class="_86BoxManager.Views.ctrlWelcome" MaxWidth="800"
+			 HorizontalAlignment="Left">
+	<ScrollViewer>
+		<DockPanel Margin="20, 20, 20, 0">
+			<Image Margin="25, 0, 0, 0" VerticalAlignment="Top" Height="128" Width="128" 
+				   DockPanel.Dock="Right" Source="/Assets/Computers/welcome.png" 
+				   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+			<TextBlock TextWrapping="Wrap">
+				<Run FontSize="16" FontWeight="Bold">Welcome to Avalonia 86</Run>
+				<LineBreak />
+				<Run FontStyle="Italic">Avalonia 86 is based on work by David Simunič and Laci bá'.</Run>
+				<LineBreak />
+				<LineBreak />
+				<Run>
+					Code is from a port of Manager to Avalonia, and the look and feel are heavily
+					inspired by WinBox.	No code was taken from WinBox, as it was written in Pascal
+					and GPL licensed. This version of Manager is MIT licensed, same as the original code.
+				</Run>
+				<LineBreak />
+				<LineBreak />
+				<Run FontWeight="Bold">Quickstart</Run>
+				<LineBreak />
+				<LineBreak />
+				<Run xml:space="preserve"> 1. Go to Tools -> Program Settings</Run>
+				<LineBreak />
+				<Run xml:space="preserve"> 2. Select an 86Box executable and a VM folder</Run>
+				<LineBreak />
+				<Run xml:space="preserve"> 3. Save settings</Run>
+				<LineBreak />
+				<Run xml:space="preserve"> 4. Go to Files -> New Virtual Machine</Run>
+				<LineBreak />
+				<Run xml:space="preserve"> 5. Write "IBM PC" as the name</Run>
+				<LineBreak />
+				<Run xml:space="preserve"> 6. Click the "Add" button</Run>
+				<LineBreak />
+				<Run xml:space="preserve"> 7. Start the VM</Run>
+				<LineBreak />
+				<LineBreak />
+				<Run FontWeight="Bold">Questions</Run>
+				<LineBreak />
+				<LineBreak />
+				<Run xml:space="preserve"> Q. Must all virtual machines recide in the VM folder?</Run>
+				<LineBreak />
+				<Run xml:space="preserve" FontStyle="Italic"> A. No, it's just for convinience.</Run>
+				<LineBreak />
+				<LineBreak />
+				<Run xml:space="preserve"> Q. How do I edit a virtual machine?</Run>
+				<LineBreak />
+				<Run xml:space="preserve" FontStyle="Italic"> A. Right click on the VM and pick "Edit".</Run>
+				<LineBreak />
+				<LineBreak />
+				<Run xml:space="preserve"> Q. How do I add an existing machine?</Run>
+				<LineBreak />
+				<Run xml:space="preserve" FontStyle="Italic"> A. Use "New Virtual Machine", but set the location to an existing VM folder.</Run>
+				<LineBreak />
+				<LineBreak />
+				<Run xml:space="preserve"> Q. Can I move a VM's folder to a different disk?</Run>
+				<LineBreak />
+				<Run xml:space="preserve" FontStyle="Italic"> A. Go right ahead. Avalonia 86 will ask you where the VM is now located, that's all.</Run>
+			</TextBlock>
+		</DockPanel>
+	</ScrollViewer>
+</UserControl>

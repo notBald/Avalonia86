@@ -5,9 +5,11 @@ using Avalonia.Interactivity;
 using _86BoxManager.Core;
 using _86BoxManager.Tools;
 using IOPath = System.IO.Path;
-using ButtonsType = MessageBox.Avalonia.Enums.ButtonEnum;
-using MessageType = MessageBox.Avalonia.Enums.Icon;
-using ResponseType = MessageBox.Avalonia.Enums.ButtonResult;
+using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
+using MessageType = MsBox.Avalonia.Enums.Icon;
+using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
+using ReactiveUI;
+using System.Xml.Linq;
 
 namespace _86BoxManager.Views
 {
@@ -16,75 +18,87 @@ namespace _86BoxManager.Views
         // Path of the VM to be cloned
         private readonly string _oldPath;
 
+        private readonly dlgCloneModel _m;
+        private readonly AppSettings _s;
+        private readonly long _uid;
+
         public dlgCloneVM()
         {
             InitializeComponent();
-            txtName.OnTextChanged(txtName_TextChanged);
+            Loaded += dlgCloneVM_Load;
         }
 
         public dlgCloneVM(string oldPath) : this()
         {
             _oldPath = oldPath;
+
+            _m = new dlgCloneModel();
+            DataContext = _m;
+            var r = Program.Root;
+            if (r != null)
+            {
+                _s = r.Settings;
+
+                _m.OrgName = _s.PathToName(oldPath);
+                _uid = _s.PathToId(oldPath);
+            }
         }
 
-        private void dlgCloneVM_Load(object sender, EventArgs e)
+        private async void dlgCloneVM_Load(object sender, EventArgs e)
         {
-            var cfgPath = Program.Root.CfgPath;
-            lblPath1.Text = cfgPath;
-            lblOldVM.Text = $@"Virtual machine ""{IOPath.GetFileName(_oldPath)}"" will be cloned into:";
+            //For the designer
+            if (_s == null)
+                return;
+            
+            if (_m.OrgName == null)
+            { 
+                await Dialogs.ShowMessageBox("Fatal error, failed to find machine that was to be cloned", MessageType.Error, this);
+                Close();
+                return;
+            }
         }
 
-        private void txtName_TextChanged(object sender, TextInputEventArgs e)
+        private async void btnClone_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtName.Text))
+            var cfgpath = _s.CFGdir;
+            if (string.IsNullOrWhiteSpace(cfgpath))
             {
-                btnClone.IsEnabled = false;
-                txtName.UnsetToolTip();
+                await Dialogs.ShowMessageBox($@"You need to set a VM folder in settings!",
+                    MessageType.Error, this, ButtonsType.Ok, "No VM Folder");
                 return;
             }
 
-            if (txtName.Text.IndexOfAny(IOPath.GetInvalidFileNameChars()) >= 0)
-            {
-                btnClone.IsEnabled = false;
-                lblPath1.Text = "Invalid path";
-                txtName.SetToolTip("You cannot use the following characters" +
-                                   " in the name: \\ / : * ? \" < > |");
-                return;
-            }
+            var new_path = FolderHelper.EnsureUniqueFolderName(cfgpath, _m.CloneName);
 
-            var cfgPath = Program.Root.CfgPath;
-            btnClone.IsEnabled = true;
-            lblPath1.Text = cfgPath + txtName.Text;
-            lblPath1.SetToolTip(cfgPath + txtName.Text);
-        }
-
-        private void btnClone_Click(object sender, RoutedEventArgs e)
-        {
-            if (VMCenter.CheckIfExists(txtName.Text))
-            {
-                Dialogs.ShowMessageBox("A virtual machine with this name already exists. Please pick a different name.",
-                    MessageType.Error, ButtonsType.Ok, "Error");
-                return;
-            }
-
-            if (txtName.Text.IndexOfAny(IOPath.GetInvalidFileNameChars()) >= 0)
-            {
-                Dialogs.ShowMessageBox("There are invalid characters in the name you specified. " +
-                                       "You can't use the following characters: \\ / : * ? \" < > |",
-                    MessageType.Error, ButtonsType.Ok, "Error");
-                return;
-            }
-
-            // Just import stuff from the existing VM
-            VMCenter.Import(txtName.Text, txtDescription.Text, _oldPath, cbxOpenCFG.IsActive(),
-                cbxStartVM.IsActive(), Program.Root);
-
-            Close(ResponseType.Ok);
+            if (await VMCenter.Clone(_uid, _m.CloneName, new_path, this))
+                Close(ResponseType.Ok);
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             Close(ResponseType.Cancel);
         }
+    }
+
+    internal class dlgCloneModel : ReactiveObject
+    {
+        private string _clone_name, _org_name;
+
+        public string OrgName { get => _org_name; set => this.RaiseAndSetIfChanged(ref _org_name, value); }
+
+        public string CloneName 
+        { 
+            get => _clone_name;
+            set
+            {
+                if (_clone_name != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _clone_name, value);
+                    this.RaisePropertyChanged(nameof(HasName));
+                }
+            }
+        }
+
+        public bool HasName { get => !string.IsNullOrWhiteSpace(_org_name); }
     }
 }
