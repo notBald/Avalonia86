@@ -83,6 +83,20 @@
     <None Update="Resources\HWDB.sqlite">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Linux\libmessagebox.so">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Linux\" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="$(ProjectDir)Resources\Linux\libmessagebox.so" DestinationFolder="$(TargetDir)" />
+  </Target>
+  <Target Name="PostPublish" AfterTargets="Publish">
+    <Copy SourceFiles="$(ProjectDir)Resources\Linux\libmessagebox.so" DestinationFolder="$(PublishDir)" />
+  </Target>
 
 </Project>
