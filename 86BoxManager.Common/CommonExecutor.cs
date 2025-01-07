@@ -22,7 +22,7 @@ namespace _86BoxManager.Common
             ops.Add("-P");
             ops.Add(args.VmPath);
             ops.Add("-V");
-            ops.Add(args.Vm.Name);
+            ops.Add(args.Vm.Title);
             return info;
         }
 

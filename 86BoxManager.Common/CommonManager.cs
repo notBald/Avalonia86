@@ -12,7 +12,7 @@ namespace _86BoxManager.Common
 
         public virtual bool IsFirstInstance(string name)
         {
-            var entry = Assembly.GetEntryAssembly()?.Location;
+            var entry = Process.GetCurrentProcess().MainModule.FileName;//Assembly.GetEntryAssembly()?.Location;
             if (entry != null)
             {
                 var exeName = Path.GetFileNameWithoutExtension(entry);
