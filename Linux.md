@@ -24,7 +24,7 @@ Download the (x64) .Net 9 runtime and unpack its files into a folder called "dot
 
 # Step 1.3 - Test dotnet
 
-Reopen the terminal (so that it gets the settings applied above)
+Reopen the terminal (so that it gets the settings above applied)
 
 Type "dotnet --info". You should get output similar to this:
 ```
@@ -42,9 +42,9 @@ Host:
 
 # Step 2.1 - Testing Avalonia 86
 
-Open a terminal in the folder where you put Avalonia 86. Start it with "./Avalonia86".
+Open a terminal in the folder where you put Avalonia 86. Start it with: *./Avalonia86*
 
-If it does not start up, try typing the command "chmod +x Avalonia86" and try again.
+If it does not start up, try typing the command *chmod +x Avalonia86* and try again.
 
 # Step 2.2 - Creating a desktop shortcut
 
@@ -79,7 +79,7 @@ Avalonia 86 needs a VM folder and a 86Box executable appimage. This has to be se
 
 The VM folder can be whatever folder you please. It's the default folder a VM is created in when you don not specify a folder for a VM.
 
-The 86Box folder has to point to a folder that contains a file called "86Box.AppImage", exactly as typed (with the big and small letters).
+The 86Box folder has to point to a folder that contains a file called *86Box.AppImage*, exactly as typed (with the big and small letters).
 
 Download an Appimage from [here](https://github.com/86Box/86Box/releases/tag/v4.2.1). Then rename it to *86Box.AppImage*
 

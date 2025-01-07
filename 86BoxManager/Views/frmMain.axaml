@@ -442,7 +442,7 @@
 								</MenuItem>
 								<MenuItem Header="Open folder in Explorer" Click="openFolderToolStripMenuItem_Click" IsEnabled="True" />
 								<MenuItem Header="Open config file" Click="openConfigFileToolStripMenuItem_Click" IsEnabled="True" />
-								<MenuItem Header="Create a desktop shortcut" Click="createADesktopShortcutToolStripMenuItem_Click" IsEnabled="True" />
+								<MenuItem Header="Create a desktop shortcut" Click="createADesktopShortcutToolStripMenuItem_Click" IsEnabled="True" IsVisible="False" />
 							</ContextMenu>
 						</ListBox.ContextMenu>
 					</ListBox>
