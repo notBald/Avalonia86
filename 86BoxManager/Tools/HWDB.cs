@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
+using System;
 
 namespace _86BoxManager.Tools
 {
@@ -22,21 +23,30 @@ namespace _86BoxManager.Tools
                     _db = new SQLiteConnection("URI=file:" + db);
                     _db.Open();
                 }
+                else
+                {
+                    throw new Exception("Failed to find HWDB.sqlite: "+ Path.Combine(startupPath, "Resources", "HWDB.sqlite"));
+                }
             }
-            catch
+            catch (Exception)
             {
-                _db = null;
-            }
-#if DEBUG
-            if (_db == null && Design.IsDesignMode)
-            {
-                //Create a dummy DB
-                _db = new SQLiteConnection("Data Source=:memory:");
-                _db.Open();
 
-                InitDB(_db);
-            }
+#if DEBUG
+                if (Design.IsDesignMode)
+                {
+                    //Create a dummy DB
+                    _db = new SQLiteConnection("Data Source=:memory:");
+                    _db.Open();
+
+                    InitDB(_db);
+                }
+                else
 #endif
+                {
+                    throw;
+                }
+            }
+
         }
 #if DEBUG
         private static bool InitDB(SQLiteConnection db)

@@ -25,18 +25,11 @@ namespace _86BoxManager.Core
 
         static DBStore()
         {
-            try 
-            { 
-                _db = OpenDB();
-                using (var cmd = _db.CreateCommand())
-                {
-                    cmd.CommandText = "PRAGMA foreign_keys = ON";
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
+            _db = OpenDB();
+            using (var cmd = _db.CreateCommand())
             {
-                Environment.FailFast("Failed to create settings database: "+ex.Message);
+                cmd.CommandText = "PRAGMA foreign_keys = ON";
+                cmd.ExecuteNonQuery();
             }
         }
 
