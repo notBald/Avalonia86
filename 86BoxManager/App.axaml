@@ -1,20 +1,35 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:avalonia="clr-namespace:HyperText.Avalonia;assembly=HyperText.Avalonia"
-             x:Class="_86BoxManager.App">
-
+			 xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
+             x:Class="_86BoxManager.App"
+			 RequestedThemeVariant="Light">	
     <Application.Styles>
         <avalonia:HyperLinkStyle/>
-        <FluentTheme Mode="Light"/>
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <!--<FluentTheme />-->
+		<!-- ^To use Fluent theme, remove SimpleTheme and comment out "FluidThemeBits" from resources below -->
+		<SimpleTheme />
+		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml"/>
+		<!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/> -->
+		<!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml"/> -->
 	</Application.Styles>
+	<Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<MergeResourceInclude Source="/Themes/FluidThemeBits.axaml" />
+				<!-- Put here to make the designer happy. Note, the designer throws an error about the 
+				     import above while viewing this file. That is annoying, but not a problem. -->
+				<MergeResourceInclude Source="/Themes/CustomCtrls.axaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Application.Resources>
 
     <TrayIcon.Icons>
             <TrayIcons>
-				<TrayIcon Icon="/Assets/86Box-gray.ico" ToolTipText="86Box Manager" Clicked="trayIcon_MouseClick">
+				<TrayIcon Icon="/Assets/86Box-gray.ico" ToolTipText="Avalonia86" Clicked="trayIcon_MouseClick">
                     <TrayIcon.Menu>
                         <NativeMenu>
-                            <NativeMenuItem Header="Show 86Box Manager" Click="open86BoxManagerToolStripMenuItem_Click" />
+                            <NativeMenuItem Header="Show Avalonia86" Click="open86BoxManagerToolStripMenuItem_Click" />
                             <NativeMenuItem Header="Settings" Click="settingsToolStripMenuItem_Click" />
 							<NativeMenuItemSeparator />
                             <NativeMenuItem Header="Exit" Click="exitToolStripMenuItem_Click" />

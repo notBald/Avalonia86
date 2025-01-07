@@ -1,0 +1,88 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <RootNamespace>_86BoxManager</RootNamespace>
+    <AssemblyName>Avalonia86</AssemblyName>
+    <StartupObject>_86BoxManager.Program</StartupObject>
+    <ApplicationIcon>86Box-gray.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectCapability Include="Avalonia" />
+    <TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.3" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.2.0.6" />
+    <PackageReference Include="HyperText.Avalonia" Version="2.0.0" />
+    <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaXaml Remove="Models\**" />
+    <Compile Remove="Models\**" />
+    <Content Remove="Resources\*.png" />
+    <EmbeddedResource Include="Resources\*.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Models\**" />
+    <None Remove="Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Actions\14 - new.png" />
+    <None Remove="Resources\CreateDB.sql" />
+    <None Remove="Resources\TestDB.sql" />
+    <None Remove="Resources\TestHWDB.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="86Box-gray.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Actions\14 - new.png" />
+    <EmbeddedResource Include="Resources\CreateDB.sql" />
+    <EmbeddedResource Include="Resources\TestDB.sql" />
+    <EmbeddedResource Include="Resources\TestHWDB.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\86BoxManager.Core\86BoxManager.Core.csproj" />
+    <ProjectReference Include="..\GroupBox.Avalonia\GroupBox.Avalonia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaXaml Update="Themes\CustomCtrls.axaml">
+      <Generator></Generator>
+    </AvaloniaXaml>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\86Box-gray.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\HWDB.sqlite">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
