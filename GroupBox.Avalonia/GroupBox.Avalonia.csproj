@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>$(DefineConstants);ENABLE_XAML_HOT_RELOAD</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>BinToss.GroupBox.Avalonia</PackageId>
+    <!-- <Title>PackageId</Title> --><!-- use PackageId -->
+    <!-- <Version>1.0.0</Version> --><!-- assigned by GitVersion, semantic-release -->
+    <Authors>BinToss</Authors>
+    <Product>GroupBox control for AvaloniaUI</Product>
+    <Description>Another attempt to recreate the GroupBox control for AvaloniaUI.</Description>
+    <Copyright>© 2023 Noah Sherwin</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>Avalonia AvaloniaUI GroupBox</PackageTags>
+    <RepositoryUrl>https://github.com/BinToss/GroupBox.Avalonia</RepositoryUrl>
+    <PackageProjectUrl>$(RepositoryUrl)#groupboxavalonia</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <IncludeSource>true</IncludeSource><!-- ...in snupkg -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols><!-- ...in snupkg -->
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <PackageIcon>GroupBox.Avalonia.256.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.3" />
+    <PackageReference Condition="$(DefineConstants.Contains(ENABLE_XAML_HOT_RELOAD))" Include="Avalonia.Markup.Xaml.Loader" Version="11.2.3" />
+    <PackageReference Condition="$(DefineConstants.Contains(ENABLE_XAML_HOT_RELOAD))" Include="HotAvalonia" Version="2.1.0" />
+    <PackageReference Include="HotAvalonia.Extensions" Version="2.1.0" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>

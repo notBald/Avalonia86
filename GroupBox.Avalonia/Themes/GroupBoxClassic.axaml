@@ -1,0 +1,81 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:conv="using:GroupBox.Avalonia.Converters"
+                    xmlns:ctrl="using:GroupBox.Avalonia.Controls"
+                    xmlns:sys="using:System">
+
+
+  <ControlTheme x:Key="GroupBoxClassic"
+                BasedOn="{StaticResource {x:Type ctrl:GroupBox}}"
+                TargetType="ctrl:GroupBox">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid Name="GBGrid"
+              ColumnDefinitions="Auto *" RowDefinitions="Auto *">
+          <Grid.Resources>
+            <ResourceDictionary>
+              <sys:Double x:Key="GBBorderPadding">3</sys:Double>
+              <sys:Double x:Key="GBBorderMargin">0</sys:Double>
+              <!-- Copied from SimpleTheme's .../Accents/Base.xaml. These are not defined in FluentTheme. -->
+              <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                  <Color x:Key="ThemeBorderMidColor">#FF888888</Color>
+                  <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="{StaticResource ThemeBorderMidColor}" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                  <Color x:Key="ThemeBorderMidColor">#d9d9d9</Color>
+                  <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="{StaticResource ThemeBorderMidColor}" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                  <Color x:Key="ThemeBorderMidColor">#FF808080</Color>
+                  <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="{StaticResource ThemeBorderMidColor}" />
+                </ResourceDictionary>
+              </ResourceDictionary.ThemeDictionaries>
+            </ResourceDictionary>
+          </Grid.Resources>
+
+          <TextBlock Name="GBHeaderText"
+                     Margin="5,1" Padding="5,0"
+                     Text="{TemplateBinding Header}"
+                     TextBlock.FontWeight="Bold" />
+          <Border Name="GBBorder"
+                  Grid.RowSpan="2" Grid.ColumnSpan="2"
+                  BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                  BorderThickness="1" CornerRadius="3"
+                  >
+            <Border.Clip>
+              <MultiBinding Converter="{x:Static conv:StaticConverters.ConvertBoundsToOuterBorder}">
+                <!--  Parent  -->
+                <Binding Path="#GBGrid.Bounds" />
+                <!--  Header; Exclude from parent geometry  -->
+                <Binding Path="#GBHeaderText.Bounds" />
+                <!--  apply offset of inverse of Margins' Left, Top  -->
+                <Binding Converter="{x:Static conv:StaticConverters.ThicknessRectConverter}" Path="#GBBorder.Margin" />
+              </MultiBinding>
+            </Border.Clip>
+            <Border.Padding>
+              <MultiBinding Converter="{x:Static conv:StaticConverters.ConvertDoublesToThickness}">
+                <Binding Source="{StaticResource GBBorderPadding}" />
+                <Binding Converter="{x:Static conv:StaticConverters.BoundsToHeaderHeightDividedByTwo}" Path="#GBHeaderText.Bounds" />
+                <Binding Source="{StaticResource GBBorderPadding}" />
+                <Binding Source="{StaticResource GBBorderPadding}" />
+              </MultiBinding>
+            </Border.Padding>
+            <Border.Margin>
+              <MultiBinding Converter="{x:Static conv:StaticConverters.ConvertDoublesToThickness}">
+                <Binding Source="{StaticResource GBBorderMargin}" />
+                <Binding Converter="{x:Static conv:StaticConverters.BoundsToHeaderHeightDividedByTwo}" Path="#GBHeaderText.Bounds" />
+                <Binding Source="{StaticResource GBBorderMargin}" />
+                <Binding Source="{StaticResource GBBorderMargin}" />
+              </MultiBinding>
+            </Border.Margin>
+
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Content="{TemplateBinding Content}"
+                               />
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

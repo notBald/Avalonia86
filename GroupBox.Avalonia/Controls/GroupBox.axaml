@@ -1,0 +1,15 @@
+﻿<HeaderedContentControl x:Class="GroupBox.Avalonia.Controls.GroupBox"
+                        xmlns="https://github.com/avaloniaui"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <HeaderedContentControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!--  default  -->
+        <ResourceInclude Source="avares://GroupBox.Avalonia/Themes/GroupBoxBasic.axaml" />
+        <!--  applied when GroupBox Theme="{StaticResource GroupBoxClassic}"  -->
+        <ResourceInclude Source="avares://GroupBox.Avalonia/Themes/GroupBoxClassic.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </HeaderedContentControl.Resources>
+</HeaderedContentControl>
