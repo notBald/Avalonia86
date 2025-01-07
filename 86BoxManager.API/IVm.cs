@@ -9,7 +9,7 @@ namespace _86BoxManager.API
         /// <summary>
         /// Name of the virtual machine
         /// </summary>
-        string Name { get; }
+        string Title { get; }
 
         /// <summary>
         /// Window handle for the VM once it's started
