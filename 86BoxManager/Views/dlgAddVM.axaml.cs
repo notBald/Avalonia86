@@ -25,6 +25,7 @@ namespace _86BoxManager.Views
     public partial class dlgAddVM : Window
     {
         private readonly dlgAddVMModel _m;
+        private readonly AppSettings _s;
         CancellationTokenSource cts = new CancellationTokenSource();
 
         public dlgAddVM()
@@ -37,6 +38,7 @@ namespace _86BoxManager.Views
                 DataContext = new dlgAddVMModel(Program.Root.Model.Settings);
 
             _m = (dlgAddVMModel)DataContext;
+            _s = AppSettings.Settings;
 
             Closing += DlgAddVM_Closing;
         }
@@ -114,7 +116,6 @@ namespace _86BoxManager.Views
         {
             try
             {
-
                 var tab = tbc.SelectedItem as TabItem;
                 switch (tab.Name)
                 {
@@ -137,6 +138,13 @@ namespace _86BoxManager.Views
 
         private async Task<bool> AddVMs()
         {
+            if (string.IsNullOrWhiteSpace(_s.CFGdir))
+            {
+                await Dialogs.ShowMessageBox("Please select a folder for imported virtual machines in the program settings.", MessageType.Error, this);
+
+                return false;
+            }
+
             var to_import = new List<dlgAddVMModel.ImportVM>(_m.Imports.Count);
             foreach (var vm in _m.Imports)
             {
@@ -196,18 +204,17 @@ namespace _86BoxManager.Views
 
         private async Task<bool> AddVM()
         {
-            var s = Program.Root.Settings;
-            string ip = _m.InstallPath;
-
-            if (string.IsNullOrWhiteSpace(ip)) 
+            if (!_m.HasPath)
             {
-                await Dialogs.ShowMessageBox($@"You need to set a VM folder in settings!",
+                await Dialogs.ShowMessageBox($@"You need to set a VM folder in settings or select a folder.",
                     MessageType.Error, this, ButtonsType.Ok, "No VM Folder");
                 return false;
             }
 
+            string ip = _m.InstallPath;
+
             ip = Path.GetFullPath(ip);
-            string name = s.PathToName(ip);
+            string name = _s.PathToName(ip);
             if (name != null)
             {
                 await Dialogs.ShowMessageBox($"The folder you selected is already used by the VM \"{name}\"", MessageType.Error, this, ButtonsType.Ok, "Folder already in use");
@@ -219,7 +226,7 @@ namespace _86BoxManager.Views
             if (icon == AppSettings.DefaultIcon)
                 icon = null;
 
-            using (var t = s.BeginTransaction())
+            using (var t = _s.BeginTransaction())
             {
                 var dc = (dlgAddVMModel)DataContext;
                 string cat = _m.Category;
@@ -329,6 +336,12 @@ namespace _86BoxManager.Views
                     this.RaisePropertyChanged(nameof(CanAdd));
                 }
             }
+        }
+
+        public bool HasPath
+        {
+            get => !string.IsNullOrWhiteSpace(_install_path) || 
+                !string.IsNullOrWhiteSpace(_base_path);
         }
 
         public string InstallPath

@@ -90,7 +90,16 @@ namespace _86BoxManager.Tools
 
         public static async Task<string> SelectFolder(string dir, string title, Window parent)
         {
-            Uri.TryCreate("file://" + dir, UriKind.Absolute, out var uri);
+            Uri uri;
+            if (!Uri.TryCreate("file://" + dir, UriKind.Absolute, out uri))
+            {
+                Uri.TryCreate("file://" + Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), UriKind.Absolute, out uri);
+                if (uri == null)
+                {
+                    await Dialogs.ShowMessageBox("Failed to open file dialog.", Icon.Error, parent);
+                    //We let the exception happen further down
+                }
+            }
             var tl = TopLevel.GetTopLevel(parent);
             var folder = await tl.StorageProvider.TryGetFolderFromPathAsync(uri);
             var res = await tl.StorageProvider.OpenFolderPickerAsync(new Avalonia.Platform.Storage.FolderPickerOpenOptions
