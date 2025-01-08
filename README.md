@@ -1,6 +1,6 @@
 # Avalonia 86
 
-**Avalonia 86** is an optional configuration manager for the [86Box emulator](https://github.com/86Box/86Box). It's released under the MIT license, so it can be freely distributed with 86Box. See the `LICENSE` file for license information and `AUTHORS` for a complete list of contributors and authors.
+**Avalonia 86** i a configuration manager for the [86Box emulator](https://github.com/86Box/86Box). It's released under the MIT license, so it can be freely distributed with 86Box. See the `LICENSE` file for license information and `AUTHORS` for a complete list of contributors and authors.
 
 It's written in C# with Avalonia.
 
@@ -40,7 +40,7 @@ See the [Linux Guide](Linux.md).
 ## How to build
 
 1. Clone the repo
-2. Open `Avalonia86.sln` solution file in Visual Studio
+2. Open `Avalonia86.sln` solution file in Visual Studio 2022
 3. Make your changes
 4. Choose the `Release` or `Debug` configuration
 5. Build the solution

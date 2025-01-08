@@ -108,9 +108,9 @@ Avalonia 86 needs a VM folder and a 86Box executable appimage. This has to be se
 
 ![Tools menu](/images/Linux_2.png?raw=true)
 
-The VM folder can be whatever folder you please. It only serves as the default folder when you don't specify a folder in the Add VM dialog.
+The VM path can go to whatever folder you please. It only serves as the default folder when you don't specify a folder in the Add VM dialog.
 
-The 86Box folder has to point to a folder that contains an executable file that starts with the name `86Box`, exactly as typed (with the same capitalization).
+The 86Box path has to point to a folder that contains an executable file that starts with the name `86Box`, exactly as typed (with the same capitalization).
 
 Point Avalonia 86 to said folder.
 
