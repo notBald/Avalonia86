@@ -94,7 +94,7 @@ So, you may have to:
 
 Now test the image by running it: `./<name of AppImage>`
 
-If it works, and you'll get this message:
+If it works, you'll get this message:
 
 ![Missing roms](/images/86Box_error.png)
 
