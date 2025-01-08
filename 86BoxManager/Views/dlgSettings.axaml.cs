@@ -22,6 +22,7 @@ namespace _86BoxManager.Views
     public partial class dlgSettings : Window
     {
         private readonly dlgSettingsModel _m;
+        private bool _was_cancled;
 
         public dlgSettings()
         {
@@ -65,7 +66,7 @@ namespace _86BoxManager.Views
 
         private async void dlgSettings_FormClosing(object sender, WindowClosingEventArgs e)
         {
-            if (!_m.HasChanges)
+            if (!_m.HasChanges || _was_cancled)
                 return;
 
             e.Cancel = true;
@@ -310,6 +311,7 @@ namespace _86BoxManager.Views
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
+            _was_cancled = true;
             Close(ResponseType.Cancel);
         }
     }

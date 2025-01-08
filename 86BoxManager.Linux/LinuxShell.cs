@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using _86BoxManager.Common;
+using Mono.Unix.Native;
 
 namespace _86BoxManager.Linux
 {
@@ -28,5 +29,29 @@ namespace _86BoxManager.Linux
             var bom = new UTF8Encoding(false);
             File.WriteAllLines(fileName, lines, bom);
         }
+
+        public override string DetermineExeName(string path, string[] exeNames)
+        {
+            var di = new DirectoryInfo(path);
+            var fileStat = new Stat();
+
+            foreach (var exeName in exeNames)
+            {
+                foreach(var exe in di.GetFiles(exeName + "*"))
+                {
+                    Syscall.stat(exe.FullName, out fileStat);
+
+                    bool isExecutable = (fileStat.st_mode & FilePermissions.S_IXUSR) != 0 ||
+                                        (fileStat.st_mode & FilePermissions.S_IXGRP) != 0 ||
+                                        (fileStat.st_mode & FilePermissions.S_IXOTH) != 0;
+
+                    if (isExecutable)
+                        return exe.Name;
+                }
+            }
+
+            return "86Box";
+        }
+
     }
 }

@@ -33,5 +33,10 @@ namespace _86BoxManager.Common
                 UseShellExecute = true
             });
         }
+
+        public virtual string DetermineExeName(string path, string[] names)
+        {
+            return names[0];
+        }
     }
 }

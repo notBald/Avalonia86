@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace _86BoxManager.API
 {
@@ -11,6 +12,8 @@ namespace _86BoxManager.API
         bool IsProcessRunning(string name);
 
         IVerInfo GetBoxVersion(string exeDir);
+
+        string Find(string[] folders, string[] exeNames);
 
         IMessageLoop GetLoop(IMessageReceiver callback);
 

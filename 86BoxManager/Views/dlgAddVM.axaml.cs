@@ -243,8 +243,8 @@ namespace _86BoxManager.Views
             else
                 w = this;
 
-            await Dialogs.ShowMessageBox($@"Virtual machine ""{_m.VMName}"" was successfully created!",
-                    MessageType.Info, w, ButtonsType.Ok, "Success");
+            //await Dialogs.ShowMessageBox($@"Virtual machine ""{_m.VMName}"" was successfully created!",
+            //        MessageType.Info, w, ButtonsType.Ok, "Success");
 
             Close(ResponseType.Ok);
             return true;

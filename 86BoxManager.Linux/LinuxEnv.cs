@@ -6,23 +6,18 @@ namespace _86BoxManager.Linux
 {
     public sealed class LinuxEnv : IEnv
     {
-        public LinuxEnv()
-        {
-            MyComputer = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer);
-            Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            UserProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-            var fakeDoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            MyDocuments = Path.Combine(fakeDoc, "Documents");
-
-            ExeNames = new[] { "86Box.AppImage" };
+        public string[] ExeNames { get => new[] { "86Box" }; }
+        public string MyComputer { get => Environment.GetFolderPath(Environment.SpecialFolder.MyComputer); }
+        public string UserProfile { get => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile); }
+        public string MyDocuments 
+        { 
+            get
+            {
+                var fakeDoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                return Path.Combine(fakeDoc, "Documents");
+            }
         }
-
-        public string[] ExeNames { get; }
-        public string MyComputer { get; }
-        public string UserProfile { get; }
-        public string MyDocuments { get; }
-        public string Desktop { get; }
+        public string Desktop { get => Environment.GetFolderPath(Environment.SpecialFolder.Desktop); }
 
         public string[] GetProgramFiles(string appName)
         {

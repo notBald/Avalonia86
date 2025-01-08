@@ -13,5 +13,7 @@ namespace _86BoxManager.API
         void OpenFolder(string folder);
 
         void EditFile(string file);
+
+        string DetermineExeName(string exePath, string[] exeNames);
     }
 }

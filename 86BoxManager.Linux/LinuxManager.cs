@@ -3,6 +3,7 @@ using System.Linq;
 using _86BoxManager.API;
 using _86BoxManager.Common;
 using _86BoxManager.Unix;
+using System;
 
 namespace _86BoxManager.Linux
 {
@@ -18,19 +19,24 @@ namespace _86BoxManager.Linux
                 return null;
             }
             var info = new CommonVerInfo();
-            var appImage = Directory.GetFiles(exeDir, "86Box-*.AppImage").FirstOrDefault();
+            var appImage = Directory.GetFiles(exeDir, "86Box-*").FirstOrDefault();
             if (appImage != null)
             {
                 var full = Path.GetFileNameWithoutExtension(appImage);
-                var build = full.Split('-').LastOrDefault();
-
-                // HACK: Set version because we can't read the ELF version
-                if (build == "b4311")
+                var split = full.Split('-');
+                if (split.Length > 1)
                 {
-                    info.FilePrivatePart = int.Parse(build.TrimStart('b'));
-                    info.FileMinorPart = 11;
-                    info.FileMajorPart = 3;
-                    info.FileBuildPart = 0;
+                    var build = split.LastOrDefault();
+
+                    if (build.StartsWith('b') && build.Length > 2 && int.TryParse(build.AsSpan(1), out int build_nr))
+                    {
+                        info.FilePrivatePart = build_nr;
+
+                        // HACK: Set version because we can't read the ELF version
+                        info.FileMinorPart = 11;
+                        info.FileMajorPart = 3;
+                        info.FileBuildPart = 0;
+                    }
                 }
             }
             return info;

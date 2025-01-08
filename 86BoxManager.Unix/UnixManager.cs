@@ -1,5 +1,6 @@
 using _86BoxManager.API;
 using _86BoxManager.Common;
+using System.IO;
 
 namespace _86BoxManager.Unix
 {
@@ -27,6 +28,18 @@ namespace _86BoxManager.Unix
         public override IExecutor GetExecutor()
         {
             return _exec;
+        }
+
+        public override string Find(string[] folders, string[] exeNames)
+        {
+            foreach (var folder in folders)
+                foreach (var exeName in exeNames)
+                {
+                    var files = new DirectoryInfo(folder).GetFiles(exeName + "*");
+                    if (files.Length > 0)
+                        return folder;
+                }
+            return null;
         }
     }
 }

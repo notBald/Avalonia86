@@ -39,6 +39,19 @@ namespace _86BoxManager.Common
             return processes.Length > 0;
         }
 
+        public virtual string Find(string[] folders, string[] exeNames)
+        {
+            foreach (var folder in folders)
+                foreach (var exeName in exeNames)
+                {
+                    var exePath = Path.Combine(folder, exeName);
+                    if (!File.Exists(exePath))
+                        continue;
+                    return folder;
+                }
+            return null;
+        }
+
         public abstract IVerInfo GetBoxVersion(string exeDir);
         public abstract IMessageLoop GetLoop(IMessageReceiver callback);
         public abstract IMessageSender GetSender();
