@@ -12,7 +12,7 @@
 
 # Step 1.1 - The .NET runtime
 
-Download the (x64) .NET 9 runtime and unpack its files into a folder called "dotnet". Put this folder into your home directory.
+Download the (x64) .NET 9 runtime and unpack its files into a folder called `dotnet`. Put this folder into your `home` directory.
 
 # Step 1.2 - Edit .bashrc
 
@@ -96,7 +96,7 @@ Now test the image by running it: `./<name of AppImage>`
 
 If it works, and you'll get this message:
 
-[Missing roms](/images/86Box_error.png)
+![Missing roms](/images/86Box_error.png)
 
 Download those roms from [here](https://github.com/86Box/roms/releases).
 
