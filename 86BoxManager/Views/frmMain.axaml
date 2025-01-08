@@ -367,7 +367,7 @@
 							</DataTemplate>
 						</ListBox.ItemTemplate>
 						<ListBox.ContextMenu>
-							<ContextMenu Name="lstVMpop">
+							<ContextMenu Name="lstVMpop" IsEnabled="{Binding VmIsSelected}">
 								<MenuItem Header="Start" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}" IsVisible="{Binding !SelVmRunning}">
 									<MenuItem.Icon>
 										<Image Source="/Assets/Actions/18 - start 32x32.png" />
