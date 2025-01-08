@@ -72,6 +72,8 @@ Name[en_US]=Avalonia 1.0
 
 Then replace &lt;user name&gt; and adjust the paths to point at the location where you put Avalonia 86.
 
+Save the file on the desktop with the name _Avalonia 86.desktop_
+
 # Step 2.3 - Run Avalonia 86
 
 Hopefully you now have Avalonia runnning
