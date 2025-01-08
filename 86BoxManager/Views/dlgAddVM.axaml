@@ -122,8 +122,12 @@
 								<DockPanel DockPanel.Dock="Top">
 									<DockPanel DockPanel.Dock="Left" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 										<DockPanel DockPanel.Dock="Bottom">
-											<Button Click="btnLeftImg_Click" FontFamily="Wingdings" DockPanel.Dock="Left" Padding="7, 2">ç</Button>
-											<Button Click="btnRightImg_Click" FontFamily="Wingdings" DockPanel.Dock="Right" Padding="7, 2">è</Button>
+											<Button Click="btnLeftImg_Click" DockPanel.Dock="Left" Padding="7, 2">
+												<Image Source="{StaticResource SvgArrowLeft}" Width="14" Height="12" />
+											</Button>
+											<Button Click="btnRightImg_Click" DockPanel.Dock="Right" Padding="7, 2">
+												<Image Source="{StaticResource SvgArrowRight}" Width="14" Height="12" />
+											</Button>
 											<Grid></Grid>
 										</DockPanel>
 										<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" MaxHeight="52">
