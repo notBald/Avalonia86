@@ -125,16 +125,16 @@ namespace _86BoxManager.Tools
             Window parent, string ext = null)
         {
             //Todo: figure out how the file type filtering is supposed to work. This is a get it to compile impl:
-            FilePickerFileType[] fpft = ext == null ? Array.Empty<FilePickerFileType>() : new FilePickerFileType[] { new FilePickerFileType(ext) };
+            FilePickerFileType[] fpft = ext == null ? Array.Empty<FilePickerFileType>() : [ new FilePickerFileType(ext) { Patterns = [ "*.log "], MimeTypes = [ "*/* "] }, FilePickerFileTypes.All ];
 
             Uri.TryCreate("file://" + dir, UriKind.Absolute, out var uri);
             var tl = TopLevel.GetTopLevel(parent);
             var folder = await tl.StorageProvider.TryGetFolderFromPathAsync(uri);
-            var res = await tl.StorageProvider.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions
+            var res = await tl.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
                 Title = title,
                 SuggestedStartLocation = folder,
-                FileTypeFilter = fpft
+                FileTypeChoices = fpft
             });
 
             //if (filter != null)
@@ -148,9 +148,9 @@ namespace _86BoxManager.Tools
 
             string fld = null;
 
-            foreach (var s in res)
+            //foreach (var s in res)
             {
-                fld = s.Path.AbsolutePath;
+                fld = res.Path.AbsolutePath;
             }
 
             if (string.IsNullOrWhiteSpace(fld))

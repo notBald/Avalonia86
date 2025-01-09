@@ -106,8 +106,16 @@ namespace _86BoxManager.Views
             var dir = Platforms.Env.MyComputer;
             var title = "Select a file where 86Box logs will be saved";
             var filter = "Log files (*.log)|*.log";
+            string fileName = null;
 
-            var fileName = await Dialogs.SaveFile(title, dir, filter, parent: this, ext: ".log");
+            try
+            {
+                fileName = await Dialogs.SaveFile(title, dir, filter, parent: this, ext: ".log");
+            }
+            catch
+            {
+                await Dialogs.ShowMessageBox("Failed to open file dialog.", MessageType.Error, this);
+            }
 
             if (!string.IsNullOrWhiteSpace(fileName))
             {
