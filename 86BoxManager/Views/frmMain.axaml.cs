@@ -113,15 +113,18 @@ namespace _86BoxManager.Views
             RestoreSize = new Size(Width, Height);
             OldPos = NewPos = Position;
 
+            //Presumably this will never actually change, but just in case
+            DataContextChanged += FrmMain_DataContextChanged;
+            DataContext = new MainModel();
+
             InitializeComponent();
+            try
+            {
+                if (!Design.IsDesignMode)
+                    SetWindowSize();
+            } catch { }
 
             PropertyChanged += FrmMain_PropertyChanged;
-
-            //The application's data context is set to "MainModel". Menu items want to execute commands, and those are most easily fetched from the
-            //data context. Now, these commands needs to implement the ICommand interface. However, Avalonia allows a simplification in executing
-            //a method. It's this later method we use. 
-            DataContextChanged += FrmMain_DataContextChanged;
-
 
             //Multibinding can not be set on classes, so we do it here instead.
             //
@@ -174,6 +177,56 @@ namespace _86BoxManager.Views
             };
         }
 
+        private void SetWindowSize()
+        {
+            var size = Core.DBStore.FetchWindowSize();
+
+            //If size for some reason fails to load, we do nothing. The window will the open with
+            //default size.
+            if (size != null && size.Width > 50 && size.Height > 50)
+            {
+                var left_pos = new PixelPoint((int)size.Left, (int)size.Top);
+                var right_pos = new PixelPoint((int)(size.Left + size.Width), (int)size.Top);
+                var windowRect = new PixelRect(left_pos, new PixelSize((int)size.Width, (int)size.Height));
+                double windowArea = windowRect.Width * windowRect.Height * 0.5;
+                double totalIntersectionArea = 0;
+                bool isPositionValid = false;
+
+                //What we want is to furfill two conditions.
+                // 1. That the top/left position on the window is visible on at least one screen.
+                //    The goal here is to avoid situations where the top of the window is above
+                //    the screen.
+                // 2. At least 50% of the window is visible on all screens combinded. Maybe we can
+                //    reduse this number, as what we want is a decent chunk of the app visible.
+                foreach (var screen in Screens.All)
+                {
+                    var intersection = screen.Bounds.Intersect(windowRect);
+                    totalIntersectionArea += intersection.Width * intersection.Height;
+
+                    if (screen.Bounds.Contains(left_pos) || screen.Bounds.Contains(right_pos))
+                        isPositionValid = true;
+                }
+
+                //Note that "windowArea" referes to the size of the app's window, and we've halved it
+                //so that we'll pass the check with half the window intersecting with all screens.
+                if (totalIntersectionArea >= windowArea && isPositionValid)
+                {
+                    Position = left_pos;
+                    Width = size.Width;
+                    Height = size.Height;
+                    if (size.Maximized)
+                        WindowState = WindowState.Maximized;
+
+                    var iw = Settings.ListWidth;
+                    if (iw.HasValue)
+                        gridSplitListMain.ColumnDefinitions[0].Width = new GridLength(iw.Value);
+                    iw = Settings.InfoWidth;
+                    if (iw.HasValue)
+                        gridSplitInfoStats.ColumnDefinitions[2].Width = new GridLength(iw.Value);
+                }
+            }
+        }
+
         private static bool CheckRunningEmulator()
         {
             return Platforms.Manager.IsProcessRunning("86box") ||
@@ -189,6 +242,7 @@ namespace _86BoxManager.Views
             if (dc != null)
             {
                 dc.UI = this;
+                Settings = dc.Settings;
                 UpdateState();
 
                 dc.PropertyChanged += Dc_PropertyChanged;
@@ -241,7 +295,6 @@ namespace _86BoxManager.Views
             }
 
             PrepareUi();
-            Settings = Model.Settings;
             VMCenter.CountRefresh();
 
             msgHandler = new VMHandler();
@@ -435,10 +488,22 @@ namespace _86BoxManager.Views
                 }
             }
 
-            if (WindowState == WindowState.Maximized)
-                DBStore.UpdateWindow(OldPos.Y, OldPos.X, RestoreSize.Height, RestoreSize.Width, true);
-            else
-                DBStore.UpdateWindow(Position.Y, Position.X, Height, Width, false);
+            using (var t = Settings.BeginTransaction())
+            {
+                if (WindowState == WindowState.Maximized)
+                    DBStore.UpdateWindow(OldPos.Y, OldPos.X, RestoreSize.Height, RestoreSize.Width, true);
+                else
+                    DBStore.UpdateWindow(Position.Y, Position.X, Height, Width, false);
+
+                try
+                {
+                    Settings.ListWidth = gridSplitListMain.ColumnDefinitions[0].Width.Value;
+                    Settings.InfoWidth = gridSplitInfoStats.ColumnDefinitions[2].Width.Value;
+                }
+                catch { }
+
+                t.Commit();
+            }
         }
 
         /// <summary>

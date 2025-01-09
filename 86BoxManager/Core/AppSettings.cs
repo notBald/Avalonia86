@@ -108,6 +108,26 @@ namespace _86BoxManager.Core
             set => SetProperty("log_dir", value);
         }
 
+        public double? ListWidth
+        {
+            get
+            {
+                Double? def = null;
+                return FetchProperty("machine_width", def);
+            }
+            set => SetProperty("machine_width", value);
+        }
+
+        public double? InfoWidth
+        {
+            get
+            {
+                Double? def = null;
+                return FetchProperty("stats_width", def);
+            }
+            set => SetProperty("stats_width", value);
+        }
+
         public void RefreshCats()
         {
             var to_remove = new HashSet<string>(_categories.Count);
@@ -456,6 +476,14 @@ namespace _86BoxManager.Core
             return def;
         }
 
+        private double? FetchProperty(string key, double? def)
+        {
+            if (FetchProperty(key) is string b && double.TryParse(b, out double num))
+                return num;
+
+            return null;
+        }
+
         private object FetchProperty(string key)
         {
             foreach (var res in _store.Query($"select value from AppSettings where field = '{key}'"))
@@ -475,6 +503,11 @@ namespace _86BoxManager.Core
         private void SetProperty(string key, bool value)
         {
             SetProperty(key, value ? "true" : "false");
+        }
+
+        private void SetProperty(string key, double? value)
+        {
+            SetProperty(key, value.HasValue ? value.Value.ToString() : null);
         }
 
         private void SetProperty(string key, string value)

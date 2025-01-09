@@ -324,7 +324,12 @@
 			</Canvas>
 		</Grid>
 		<Border Padding="2">
-			<Grid ColumnDefinitions="200, 3, *">
+			<Grid Name="gridSplitListMain">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="200" />
+					<ColumnDefinition Width="3" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
 				<Border Grid.Column="0" BorderThickness="1" BorderBrush="#828790">
 					<ListBox BorderThickness="1" BorderBrush="White" Padding="0"
 							 x:Name="lstVMs" SelectedIndex="{Binding MachineIndex}" ItemsSource="{Binding Path=Machines}" 
@@ -487,7 +492,7 @@
 								</DockPanel>
 							</Border>
 							<Grid>
-								<Grid IsVisible="{Binding Machine.HasValidPath}">
+								<Grid Name="gridSplitInfoStats" IsVisible="{Binding Machine.HasValidPath}">
 									<Grid.ColumnDefinitions>
 										<!-- Column 1: Machine configuration -->
 										<ColumnDefinition Width="*"></ColumnDefinition>

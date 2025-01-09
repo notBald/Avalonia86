@@ -37,50 +37,7 @@ namespace _86BoxManager
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var main = new frmMain
-                {
-                    DataContext = new MainModel()
-                };
-
-                var size = Core.DBStore.FetchWindowSize();
-
-                //If size for some reason fails to load, we do nothing. The window will the open with
-                //default size.
-                if (size != null && size.Width > 50 && size.Height > 50) 
-                {
-                    var left_pos = new PixelPoint((int)size.Left, (int)size.Top);
-                    var right_pos = new PixelPoint((int)(size.Left + size.Width) , (int)size.Top);
-                    var windowRect = new PixelRect(left_pos, new PixelSize((int)size.Width, (int)size.Height));
-                    double windowArea = windowRect.Width * windowRect.Height * 0.5;
-                    double totalIntersectionArea = 0;
-                    bool isPositionValid = false;
-
-                    //What we want is to furfill two conditions.
-                    // 1. That the top/left position on the window is visible on at least one screen.
-                    //    The goal here is to avoid situations where the top of the window is above
-                    //    the screen.
-                    // 2. At least 50% of the window is visible on all screens combinded. Maybe we can
-                    //    reduse this number, as what we want is a decent chunk of the app visible.
-                    foreach (var screen in main.Screens.All)
-                    {
-                        var intersection = screen.Bounds.Intersect(windowRect);
-                        totalIntersectionArea += intersection.Width * intersection.Height;
-
-                        if (screen.Bounds.Contains(left_pos) || screen.Bounds.Contains(right_pos))
-                            isPositionValid = true;
-                    }
-
-                    //Note that "windowArea" referes to the size of the app's window, and we've halved it
-                    //so that we'll pass the check with half the window intersecting with all screens.
-                    if (totalIntersectionArea >= windowArea && isPositionValid)
-                    {
-                        main.Position = left_pos;
-                        main.Width = size.Width;
-                        main.Height = size.Height;
-                        if (size.Maximized)
-                            main.WindowState = WindowState.Maximized;
-                    }
-                }
+                var main = new frmMain();
 
                 desktop.MainWindow = main;
                 desktop.Exit += Desktop_Exit;
