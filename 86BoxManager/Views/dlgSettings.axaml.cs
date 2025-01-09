@@ -225,20 +225,20 @@ namespace _86BoxManager.Views
                 }
             }
 
-            var exeName = Platforms.Env.ExeNames.First();
-            var boxExe = IOPath.Combine(_m.ExeDir, exeName);
-            if (!File.Exists(boxExe) && _m.ExeDirChanged)
-            {
-                var result = await Dialogs.ShowMessageBox(
-                    "86Box executable could not be found in the directory you specified, so " +
-                    "you won't be able to use any virtual machines. Are you sure you want " +
-                    "to use this path?",
-                    MessageType.Warning, this, ButtonsType.YesNo, "Warning");
-                if (result == ResponseType.No)
-                {
-                    return false;
-                }
-            }
+            //var exeName = Platforms.Env.ExeNames.First();
+            //var boxExe = IOPath.Combine(_m.ExeDir, exeName);
+            //if (!File.Exists(boxExe) && _m.ExeDirChanged)
+            //{
+            //    var result = await Dialogs.ShowMessageBox(
+            //        "86Box executable could not be found in the directory you specified, so " +
+            //        "you won't be able to use any virtual machines. Are you sure you want " +
+            //        "to use this path?",
+            //        MessageType.Warning, this, ButtonsType.YesNo, "Warning");
+            //    if (result == ResponseType.No)
+            //    {
+            //        return false;
+            //    }
+            //}
 
             try
             {
