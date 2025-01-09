@@ -1,14 +1,9 @@
 ﻿using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using Avalonia;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace _86BoxManager.Converters
 {
@@ -23,7 +18,7 @@ namespace _86BoxManager.Converters
     /// </summary>
     public class BitmapAssetValueConverter : IValueConverter
     {
-        public static BitmapAssetValueConverter Instance = new BitmapAssetValueConverter();
+        public static readonly BitmapAssetValueConverter Instance = new();
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

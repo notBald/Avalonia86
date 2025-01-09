@@ -164,6 +164,11 @@ namespace _86BoxManager.ViewModels
             }
         }
 
+        public bool CompactList
+        {
+            get => Settings.CompactMachineList;
+        }
+
         private frmMain _ui;
         public frmMain UI {  get => _ui; set { if (_ui == null) _ui = value; } }
 
@@ -201,11 +206,20 @@ namespace _86BoxManager.ViewModels
                 .Subscribe();
 
             this.PropertyChanged += MainModel_PropertyChanged;
+            Settings.PropertyChanged += Settings_PropertyChanged;
         }
 
         public void Dispose()
         {
             _machine.Dispose();
+        }
+
+        private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(AppSettings.CompactMachineList))
+            {
+                this.RaisePropertyChanged(nameof(CompactList));
+            }
         }
 
         /// <summary>

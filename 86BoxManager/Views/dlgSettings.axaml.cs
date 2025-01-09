@@ -1,21 +1,18 @@
-using System;
-using System.ComponentModel;
+using _86BoxManager.Core;
 using _86BoxManager.Tools;
 using _86BoxManager.Xplat;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
+using ReactiveUI;
+using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using _86BoxManager.Core;
-using Avalonia.Media;
+using System.Threading.Tasks;
 using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
+using IOPath = System.IO.Path;
 using MessageType = MsBox.Avalonia.Enums.Icon;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
-using IOPath = System.IO.Path;
-using System.Threading.Tasks;
-using ReactiveUI;
-using System.Reflection.Metadata.Ecma335;
 
 namespace _86BoxManager.Views
 {
@@ -147,6 +144,7 @@ namespace _86BoxManager.Views
             _m.EnableLogging = false;
             _m.LogPath = "";
             _m.AllowInstances = false;
+            _m.CompactList = false;
             _m.RaisePropertyChanged(nameof(dlgSettingsModel.HasChanges));
         }
 
@@ -263,9 +261,16 @@ namespace _86BoxManager.Views
                     s.EnableLogging = _m.EnableLogging;
                     s.LogPath = _m.LogPath;
                     s.AllowInstances = _m.AllowInstances;
+                    s.CompactMachineList = _m.CompactList;
 
                     t.Commit();
                 }
+
+                //This will set of a chain of events.
+                // - MainModel is listening and will notify if CompactMachineList has changed
+                // - frmMain is listening to MainModel and will update the list if the CompactList
+                //   property have changed.
+                _m.NotifyPropertyChange(s);
 
                 _m.Commit();
             }
@@ -299,6 +304,7 @@ namespace _86BoxManager.Views
             _m.CloseToTray = s.CloseTray;
             _m.EnableLogging = s.EnableLogging;
             _m.AllowInstances = s.AllowInstances;
+            _m.CompactList = s.CompactMachineList;
 
             if (string.IsNullOrWhiteSpace(_m.ExeDir) || string.IsNullOrWhiteSpace(_m.CFGDir))
             {
@@ -331,6 +337,7 @@ namespace _86BoxManager.Views
         private bool _enable_logging;
         private string _log_path;
         private bool _allow_instances, _enable_console;
+        private bool _compact_list;
 
         dlgSettingsModel _me;
 
@@ -354,7 +361,8 @@ namespace _86BoxManager.Views
                        _me.EnableLogging != EnableLogging ||
                        _me.EnableConsole != EnableConsole ||
                        _me.AllowInstances != AllowInstances ||
-                       _me.LogPath != LogPath;
+                       _me.LogPath != LogPath ||
+                       _me.CompactList != CompactList;
             }
         }
 
@@ -444,6 +452,19 @@ namespace _86BoxManager.Views
             }
         }
 
+        public bool CompactList
+        {
+            get => _compact_list;
+            set
+            {
+                if (_compact_list != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _compact_list, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
         public bool EnableLogging
         {
             get => _enable_logging;
@@ -493,6 +514,15 @@ namespace _86BoxManager.Views
                     this.RaiseAndSetIfChanged(ref _log_path, value);
                     this.RaisePropertyChanged(nameof(HasChanges));
                 }
+            }
+        }
+
+        public void NotifyPropertyChange(AppSettings s)
+        {
+            if (s.PropertyChanged != null)
+            {
+                if (_me.CompactList != CompactList)
+                    s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.CompactMachineList)));
             }
         }
 

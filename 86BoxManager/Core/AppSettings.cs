@@ -1,11 +1,11 @@
 ﻿using _86BoxManager.Tools;
 using _86BoxManager.ViewModels;
 using _86BoxManager.Xplat;
-using Avalonia.Controls;
 using Avalonia.Platform;
 using DynamicData;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
@@ -26,6 +26,8 @@ namespace _86BoxManager.Core
         internal VMCategory DefaultCat { get; } = new VMCategory("All machines");
 
         internal readonly static string DefaultIcon = "/Assets/Computers/ibm_at.png";
+
+        public PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// Path to 86box.exe and the romset
@@ -97,6 +99,15 @@ namespace _86BoxManager.Core
         {
             get => FetchProperty("86logg", false);
             set => SetProperty("86logg", value);
+        }
+
+        /// <summary>
+        /// Whenever the list should show compact or not
+        /// </summary>
+        public bool CompactMachineList
+        {
+            get => FetchProperty("compact_list", false);
+            set => SetProperty("compact_list", value);
         }
 
         /// <summary>

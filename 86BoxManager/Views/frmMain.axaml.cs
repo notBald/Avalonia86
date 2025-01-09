@@ -27,6 +27,8 @@ using System.Threading.Tasks;
 using MsBox.Avalonia.Dto;
 using System.IO;
 using ReactiveUI;
+using Avalonia.Controls.Documents;
+using System.Collections.Generic;
 
 namespace _86BoxManager.Views
 {
@@ -255,6 +257,14 @@ namespace _86BoxManager.Views
             {
                 UpdateState();
             }
+            else if (e.PropertyName == nameof(MainModel.CompactList))
+            {
+                //Hack. I don't know how to properly do this. What we do is
+                //      forcing a property changed event on ItemTemplate
+                var hold = lstVMs.ItemTemplate;
+                lstVMs.ItemTemplate = null;
+                lstVMs.ItemTemplate = hold;
+            }
         }
 
         internal MainModel Model => (MainModel)DataContext;
@@ -364,19 +374,18 @@ namespace _86BoxManager.Views
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            var row = Model.Machine;
-            var vm = row.Tag;
-            if (vm.Status == VM.STATUS_STOPPED)
+            var vis = Model.Machine;
+            if (vis.Status == MachineStatus.STOPPED)
             {
                 VMCenter.Start(this);
             }
-            else if (vm.Status == VM.STATUS_RUNNING)
+            else if (vis.Status == MachineStatus.RUNNING)
             {
-                VMCenter.RequestStop(row, this);
+                VMCenter.RequestStop(vis, this);
             }
-            else if (vm.Status == VM.STATUS_PAUSED)
+            else if (vis.Status == MachineStatus.PAUSED)
             {
-                VMCenter.Resume(row, this);
+                VMCenter.Resume(vis, this);
             }
         }
 
@@ -409,26 +418,26 @@ namespace _86BoxManager.Views
                 dc.VmIsSelected = true;
 
                 //Disable relevant buttons if VM is running
-                VM vm = Model.Machine.Tag;
-                if (vm.Status == VM.STATUS_RUNNING)
+                var vm = Model.Machine;
+                if (vm.Status == MachineStatus.RUNNING)
                 {
                     dc.SelVmRunning = true;
                     dc.SelVmPaused = false;
                     dc.SelVmWating = false;
                 }
-                else if (vm.Status == VM.STATUS_STOPPED)
+                else if (vm.Status == MachineStatus.STOPPED)
                 {
                     dc.SelVmRunning = false;
                     dc.SelVmPaused = false;
                     dc.SelVmWating = false;
                 }
-                else if (vm.Status == VM.STATUS_PAUSED)
+                else if (vm.Status == MachineStatus.PAUSED)
                 {
                     dc.SelVmRunning = true;
                     dc.SelVmPaused = true;
                     dc.SelVmWating = false;
                 }
-                else if (vm.Status == VM.STATUS_WAITING)
+                else if (vm.Status == MachineStatus.WAITING)
                 {
                     //This condition happens when the configuration dialog is opened in the emulator
                     dc.SelVmRunning = true;
@@ -542,13 +551,12 @@ namespace _86BoxManager.Views
 
         private void btnPause_Click(object sender, RoutedEventArgs e)
         {
-            var selected = Model.Machine;
-            var vm = selected.Tag;
-            if (vm.Status == VM.STATUS_PAUSED)
+            var vis = Model.Machine;
+            if (vis.Status == MachineStatus.PAUSED)
             {
                 VMCenter.Resume(Model.Machine, this);
             }
-            else if (vm.Status == VM.STATUS_RUNNING)
+            else if (vis.Status == MachineStatus.RUNNING)
             {
                 VMCenter.Pause(Model.Machine, this);
             }
@@ -610,12 +618,12 @@ namespace _86BoxManager.Views
 
         private void pauseToolStripMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var vm = Model.Machine.Tag;
-            if (vm.Status == VM.STATUS_PAUSED)
+            var vm = Model.Machine;
+            if (vm.Status == MachineStatus.PAUSED)
             {
                 VMCenter.Resume(Model.Machine, this);
             }
-            else if (vm.Status == VM.STATUS_RUNNING)
+            else if (vm.Status == MachineStatus.RUNNING)
             {
                 VMCenter.Pause(Model.Machine, this);
             }
@@ -655,12 +663,12 @@ namespace _86BoxManager.Views
         // Start VM if it's stopped or stop it if it's running/paused
         private void startToolStripMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var vm = Model.Machine.Tag;
-            if (vm.Status == VM.STATUS_STOPPED)
+            var vm = Model.Machine;
+            if (vm.Status == MachineStatus.STOPPED)
             {
                 VMCenter.Start(this);
             }
-            else if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
+            else if (vm.Status == MachineStatus.RUNNING || vm.Status == MachineStatus.PAUSED)
             {
                 VMCenter.RequestStop(Model.Machine, this);
             }
@@ -815,12 +823,12 @@ namespace _86BoxManager.Views
             var isEnter = e.Key is Key.Return or Key.Enter;
             if (isEnter && Model.MachineIndex != -1)
             {
-                var vm = Model.Machine.Tag;
-                if (vm.Status == VM.STATUS_RUNNING)
+                var vm = Model.Machine;
+                if (vm.Status == MachineStatus.RUNNING)
                 {
                     VMCenter.RequestStop(Model.Machine, this);
                 }
-                else if (vm.Status == VM.STATUS_STOPPED)
+                else if (vm.Status == MachineStatus.STOPPED)
                 {
                     VMCenter.Start(this);
                 }
@@ -839,16 +847,16 @@ namespace _86BoxManager.Views
         {
             if (sender is ListBoxItem box && box.DataContext is VMVisual item)
             {
-                var vm = item.Tag;
-                if (vm.Status == VM.STATUS_STOPPED)
+                var vm = item;
+                if (vm.Status == MachineStatus.STOPPED)
                 {
                     VMCenter.Start(item, this);
                 }
-                else if (vm.Status == VM.STATUS_RUNNING)
+                else if (vm.Status == MachineStatus.RUNNING)
                 {
                     VMCenter.RequestStop(item, this);
                 }
-                else if (vm.Status == VM.STATUS_PAUSED)
+                else if (vm.Status == MachineStatus.PAUSED)
                 {
                     VMCenter.Resume(item, this);
                 }

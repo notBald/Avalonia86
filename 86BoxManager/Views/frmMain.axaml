@@ -39,6 +39,7 @@
 		</ControlTheme>
 
 		<conv:BitmapAssetValueConverter x:Key="variableImage"/>
+		<conv:StatusToColorConverter x:Key="colorConv"/>
 	</Window.Resources>
 	<!--
 	UI Structur
@@ -357,19 +358,27 @@
 							</Style>
 						</ListBox.Styles>
 						<ListBox.ItemTemplate>
-							<DataTemplate>
-								<DockPanel Height="48">
-									<Panel DockPanel.Dock="Left" Width="48" Height="48">
-										<Image Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-												 Source="{Binding VMIcon, Converter={StaticResource variableImage}}" Margin="6"
-										   RenderOptions.BitmapInterpolationMode="MediumQuality" />
-									</Panel>
-									<Grid RowDefinitions="5, Auto, Auto" Height="48" >
-										<TextBlock Grid.Row="1" Text="{Binding Name, Mode=OneWay}" FontWeight="Bold"  FontSize="11" Margin="0" Padding="0"/>
-										<TextBlock Grid.Row="2" Text="{Binding Status, Mode=OneWay}" FontSize="11" Margin="0" Padding="0"/>
+							<conv:MachineTemplateSelector CompactMachine="{Binding #lstVMs.((vm:MainModel)DataContext).CompactList, Mode=OneWay}">
+								<DataTemplate x:Key="FullMachineTpl" DataType="vm:VMVisual">
+									<DockPanel Height="48">
+										<Panel DockPanel.Dock="Left" Width="48" Height="48">
+											<Image Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+													 Source="{Binding VMIcon, Mode=OneWay, Converter={StaticResource variableImage}}" Margin="6"
+											   RenderOptions.BitmapInterpolationMode="MediumQuality" />
+										</Panel>
+										<Grid RowDefinitions="5, Auto, Auto" Height="48" >
+											<TextBlock Grid.Row="1" Text="{Binding Name, Mode=OneWay}" FontWeight="Bold"  FontSize="11" Margin="0" Padding="0"/>
+											<TextBlock Grid.Row="2" Text="{Binding StatusText, Mode=OneWay}" FontSize="11" Margin="0" Padding="0"/>
+										</Grid>
+									</DockPanel>
+								</DataTemplate>
+								<DataTemplate x:Key="CompactMachineTpl" DataType="vm:VMVisual">
+									<Grid ColumnDefinitions="10, *">
+										<Ellipse Margin="2, 1, 0, 0" Width="8" Height="8" Fill="{Binding Status, Mode=OneWay, Converter={StaticResource colorConv}}" />
+										<TextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay}" FontSize="14" Margin="3" Padding="0"/>
 									</Grid>
-								</DockPanel>
-							</DataTemplate>
+								</DataTemplate>
+							</conv:MachineTemplateSelector>
 						</ListBox.ItemTemplate>
 						<ListBox.ContextMenu>
 							<ContextMenu Name="lstVMpop" IsEnabled="{Binding VmIsSelected}">

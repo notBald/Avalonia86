@@ -40,11 +40,11 @@ namespace _86BoxManager.Core
         // Wait for the associated window of a VM to close
         private async void background_DoWork(object sender, DoWorkEventArgs e)
         {
-            var vm = e.Argument as VM;
+            var vm = e.Argument as VMVisual;
             try
             {
                 // Find the process associated with the VM
-                var p = Process.GetProcessById(vm.Pid);
+                var p = Process.GetProcessById(vm.Tag.Pid);
 
                 // Wait for it to exit
                 p.WaitForExit();
@@ -63,33 +63,29 @@ namespace _86BoxManager.Core
         {
             var Now = DateTime.Now;
 
-            var ui = Program.Root;
-            var lstVMs = ui.lstVMs;
-            var vm = e.Result as VM;
+            var vm = (e.Result as VMVisual) ?? _vis;
 
-            _vis.CommitUptime(Now);
-
-            var allItems = ui.Model.AllMachines;
-            var selected = ui.Model.Machine;
+            vm.CommitUptime(Now);
 
             // Go through the listview, find the item representing the VM and update things accordingly
-            foreach (var item in allItems)
+            //foreach (var item in allItems)
             {
-                if (ReferenceEquals(item.Tag, vm))
+                //if (ReferenceEquals(item.Tag, vm))
                 {
-                    vm.Status = VM.STATUS_STOPPED;
-                    vm.hWnd = IntPtr.Zero;
-                    item.RefreshStatus(vm.Status);
+                    vm.Status = MachineStatus.STOPPED;
+                    vm.Tag.hWnd = IntPtr.Zero;
+                    vm.RefreshStatus();
 
-                    if (vm.OnExit != null)
+                    if (vm.Tag.OnExit != null)
                     {
-                        vm.OnExit(vm);
-                        vm.OnExit = null;
+                        vm.Tag.OnExit(vm.Tag);
+                        vm.Tag.OnExit = null;
                     }
 
-                    if (ReferenceEquals(selected, item))
+                    if (Program.Root != null && ReferenceEquals(Program.Root.Model.Machine, vm))
                     {
-                        ui.UpdateState();
+                        //Updates state if this is the selected machine
+                        Program.Root.UpdateState();
                     }
                 }
             }

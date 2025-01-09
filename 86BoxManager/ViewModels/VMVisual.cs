@@ -14,6 +14,7 @@ namespace _86BoxManager.ViewModels
         private readonly VM _vm;
         private readonly AppSettings _s;
         private bool _has_valid_path = true;
+        private MachineStatus _status;
 
         /// <summary>
         /// Used to determine whenever 86Box.conf should be parsed when the VM is running.
@@ -127,8 +128,47 @@ namespace _86BoxManager.ViewModels
         /// </summary>
         public string IconPath { get => _vm.IconPath; set => this.RaiseAndSetIfChanged(ref _vm.IconPath, value); }
 
-        public string Status => Tag.GetStatusString();
-        public bool IsRunning => Tag.Status != VM.STATUS_STOPPED;
+        /// <summary>
+        /// For cases where the VM is both paused and waiting
+        /// </summary>
+        public bool IsPaused { get; private set; }
+
+        public MachineStatus Status
+        {
+            get => _status;
+            set
+            {
+                if (value == MachineStatus.PAUSED)
+                    IsPaused = true;
+                else if (value != MachineStatus.WAITING)
+                    IsPaused = false;
+
+                if (_status != value)
+                {
+                    _status = value;
+                    this.RaisePropertyChanged(nameof(Status));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns a lovely status string for use in UI
+        /// </summary>
+        public string StatusText
+        {
+            get
+            {
+                switch (_status)
+                {
+                    case MachineStatus.STOPPED: return "Stopped";
+                    case MachineStatus.RUNNING: return "Running";
+                    case MachineStatus.PAUSED: return "Paused";
+                    case MachineStatus.WAITING: return "Waiting";
+                    default: return "Invalid status";
+                }
+            }
+        }
+        public bool IsRunning => Status != MachineStatus.STOPPED;
 
         public bool IsConfig { get; set; }
 
@@ -318,13 +358,17 @@ namespace _86BoxManager.ViewModels
             _cached_image = null;
         }
 
-        public void RefreshStatus(int status)
+        /// <remarks>
+        /// Todo: this function should be replaced by value converters
+        /// @see StatusToColorConverter
+        /// </remarks>
+        public void RefreshStatus()
         {
-            this.RaisePropertyChanged(nameof(Status));
+            this.RaisePropertyChanged(nameof(StatusText));
             this.RaisePropertyChanged(nameof(Tag));
             this.RaisePropertyChanged(nameof(IsRunning));
 
-            if (status == VM.STATUS_WAITING)
+            if (Status == MachineStatus.WAITING)
                 _has_waited = true;
         }
 

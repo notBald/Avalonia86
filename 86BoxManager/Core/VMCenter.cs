@@ -298,7 +298,7 @@ namespace _86BoxManager.Core
                 MessageType.Warning, Program.Root, ButtonsType.YesNo, "Warning");
             if (result == ResponseType.Yes)
             {
-                if (vm.Tag.Status != VM.STATUS_STOPPED)
+                if (vm.Status != MachineStatus.STOPPED)
                 {
                     await Dialogs.ShowMessageBox($@"The virtual machine ""{vm.Name}"" is currently " +
                                             "running and cannot be wiped. Please stop virtual machines " +
@@ -328,9 +328,9 @@ namespace _86BoxManager.Core
         }
 
         // Kills the process associated with the selected VM
-        public static async Task<bool> Kill(VMVisual selected, frmMain ui)
+        public static async Task<bool> Kill(VMVisual vis, frmMain ui)
         {
-            var vm = selected.Tag;
+            var vm = vis.Tag;
 
             //Ask the user to confirm
             var result = await Dialogs.ShowMessageBox(
@@ -348,7 +348,7 @@ namespace _86BoxManager.Core
                         _watch.Remove(vm.Name);
                     }
 
-                    selected.CommitUptime(DateTime.Now);
+                    vis.CommitUptime(DateTime.Now);
 
                     var p = Process.GetProcessById(vm.Pid);
                     p.Kill();
@@ -362,10 +362,10 @@ namespace _86BoxManager.Core
                 }
 
                 // We need to cleanup afterwards to make sure the VM is put back into a valid state
-                vm.Status = VM.STATUS_STOPPED;
+                vis.Status = MachineStatus.STOPPED;
                 vm.hWnd = IntPtr.Zero;
 
-                selected.RefreshStatus(vm.Status);
+                vis.RefreshStatus();
 
                 ui.UpdateState();
             }
@@ -457,21 +457,20 @@ namespace _86BoxManager.Core
             var stoppedVMs = 0;
 
             var vms = ui.Model.Machines;
-            foreach (var item in vms)
+            foreach (var vis in vms)
             {
-                var vm = item.Tag;
-                switch (vm.Status)
+                switch (vis.Status)
                 {
-                    case VM.STATUS_PAUSED:
+                    case MachineStatus.PAUSED:
                         pausedVMs++;
                         break;
-                    case VM.STATUS_RUNNING:
+                    case MachineStatus.RUNNING:
                         runningVMs++;
                         break;
-                    case VM.STATUS_STOPPED:
+                    case MachineStatus.STOPPED:
                         stoppedVMs++;
                         break;
-                    case VM.STATUS_WAITING:
+                    case MachineStatus.WAITING:
                         waitingVMs++;
                         break;
                 }
@@ -483,14 +482,12 @@ namespace _86BoxManager.Core
         }
 
         // Sends the CTRL+ALT+DEL keystroke to the VM, result depends on the guest OS
-        public static void CtrlAltDel(VMVisual selected, frmMain ui)
+        public static void CtrlAltDel(VMVisual vis, frmMain ui)
         {
-            var row = selected;
-            var vm = row.Tag;
-            if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
+            if (vis.Status == MachineStatus.RUNNING || vis.Status == MachineStatus.PAUSED)
             {
-                Platforms.Manager.GetSender().DoVmCtrlAltDel(vm);
-                vm.Status = VM.STATUS_RUNNING;
+                Platforms.Manager.GetSender().DoVmCtrlAltDel(vis.Tag);
+                vis.Status = MachineStatus.RUNNING;
                 ui.UpdateState();
             }
             CountRefresh();
@@ -505,7 +502,7 @@ namespace _86BoxManager.Core
 
             if (result1 == ResponseType.Yes)
             {
-                if (vm.Tag.Status != VM.STATUS_STOPPED)
+                if (vm.Status != MachineStatus.STOPPED)
                 {
                     await Dialogs.ShowMessageBox((string)($@"Virtual machine ""{vm.Name}"" is currently " +
                                             "running and cannot be removed. Please stop virtual machines" +
@@ -608,38 +605,33 @@ namespace _86BoxManager.Core
         }
 
         // Performs a hard reset for the selected VM
-        public static void HardReset(VMVisual selected)
+        public static void HardReset(VMVisual vis)
         {
-            var vm = selected.Tag;
-            if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
+            if (vis.Status == MachineStatus.RUNNING || vis.Status == MachineStatus.PAUSED)
             {
-                Platforms.Manager.GetSender().DoVmHardReset(vm);
-                Platforms.Shell.PushToForeground(vm.hWnd);
+                Platforms.Manager.GetSender().DoVmHardReset(vis.Tag);
+                Platforms.Shell.PushToForeground(vis.Tag.hWnd);
             }
             CountRefresh();
         }
 
         // Pauses the selected VM
-        public static void Pause(VMVisual selected, frmMain ui)
+        public static void Pause(VMVisual vis, frmMain ui)
         {
-            var row = selected;
-            var vm = row.Tag;
-            Platforms.Manager.GetSender().DoVmPause(vm);
-            vm.Status = VM.STATUS_PAUSED;
-            row.RefreshStatus(2);
+            Platforms.Manager.GetSender().DoVmPause(vis.Tag);
+            vis.Status = MachineStatus.PAUSED;
+            vis.RefreshStatus();
             ui.UpdateState();
 
             CountRefresh();
         }
 
         // Resumes the selected VM
-        public static void Resume(VMVisual selected, frmMain ui)
+        public static void Resume(VMVisual vis, frmMain ui)
         {
-            var row = selected;
-            var vm = row.Tag;
-            Platforms.Manager.GetSender().DoVmResume(vm);
-            vm.Status = VM.STATUS_RUNNING;
-            row.RefreshStatus(1);
+            Platforms.Manager.GetSender().DoVmResume(vis.Tag);
+            vis.Status = MachineStatus.RUNNING;
+            vis.RefreshStatus();
             ui.UpdateState();
 
             CountRefresh();
@@ -672,7 +664,7 @@ namespace _86BoxManager.Core
         }
 
         // Starts the selected VM
-        public static void Start(VMVisual row, Window parent)
+        public static void Start(VMVisual vis, Window parent)
         {
             var ui = Program.Root;
             var start_time = DateTime.Now;
@@ -680,15 +672,13 @@ namespace _86BoxManager.Core
 
             try
             {
-                var vm = row.Tag;
-
-                var id = VMWatch.GetTempId(row);
+                var id = VMWatch.GetTempId(vis);
                 var idString = $"{id:X}".PadLeft(16, '0');
 
-                if (vm.Status == VM.STATUS_STOPPED)
+                if (vis.Status == MachineStatus.STOPPED)
                 {
                     var exec = Platforms.Manager.GetExecutor();
-                    var info = exec.BuildStartInfo(GetExecArgs(ui, row, idString));
+                    var info = exec.BuildStartInfo(GetExecArgs(ui, vis, idString));
                     if (!ui.Settings.ShowConsole)
                     {
                         info.RedirectStandardOutput = true;
@@ -699,18 +689,18 @@ namespace _86BoxManager.Core
                     if (p == null)
                         throw new InvalidOperationException($"Could not start: {info.FileName}");
 
-                    vm.Status = VM.STATUS_RUNNING;
-                    vm.Pid = p.Id;
-                    row.ClearWaiting();
+                    vis.Status = MachineStatus.RUNNING;
+                    vis.Tag.Pid = p.Id;
+                    vis.ClearWaiting();
 
-                    row.RefreshStatus(1);
+                    vis.RefreshStatus();
 
                     // Minimize the main window if the user wants this
                     if (ui.Settings.MinimizeOnVMStart)
                     {
                         ui.Iconify();
                     }
-                    row.IsConfig = false;
+                    vis.IsConfig = false;
 
                     // Create a new background worker which will wait for the VM's window to
                     // close, so it can update the UI accordingly
@@ -719,16 +709,16 @@ namespace _86BoxManager.Core
                         WorkerReportsProgress = false,
                         WorkerSupportsCancellation = false
                     };
-                    var watch = new VMWatch(bgw, row);
-                    _watch.Add(vm.Name, watch);
-                    bgw.RunWorkerAsync(vm);
+                    var watch = new VMWatch(bgw, vis);
+                    _watch.Add(vis.Name, watch);
+                    bgw.RunWorkerAsync(vis);
 
                     ui.UpdateState();
 
                     using (var t = Sett.BeginTransaction())
                     {
-                        row.RunCount++;
-                        row.SetLastRun(start_time);
+                        vis.RunCount++;
+                        vis.SetLastRun(start_time);
 
                         t.Commit();
                     }
@@ -757,15 +747,14 @@ namespace _86BoxManager.Core
         }
 
         // Sends a running/paused VM a request to stop and asking the user for confirmation
-        public static void RequestStop(VMVisual selected, frmMain ui)
+        public static void RequestStop(VMVisual vis, frmMain ui)
         {
-            var vm = selected.Tag;
             try
             {
-                if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
+                if (vis.Status == MachineStatus.RUNNING || vis.Status == MachineStatus.PAUSED)
                 {
-                    Platforms.Manager.GetSender().DoVmRequestStop(vm);
-                    Platforms.Shell.PushToForeground(vm.hWnd);
+                    Platforms.Manager.GetSender().DoVmRequestStop(vis.Tag);
+                    Platforms.Shell.PushToForeground(vis.Tag.hWnd);
                 }
             }
             catch (Exception)
@@ -782,22 +771,21 @@ namespace _86BoxManager.Core
         {
             var ui = Program.Root;
 
-            var row = ui.Model.Machine;
-            var vm = row.Tag;
+            var vis = ui.Model.Machine;
 
             // If the VM is already running, only send the message to open the settings window. 
             // Otherwise, start the VM with the -S parameter
-            if (vm.Status == VM.STATUS_RUNNING || vm.Status == VM.STATUS_PAUSED)
+            if (vis.Status == MachineStatus.RUNNING || vis.Status == MachineStatus.PAUSED)
             {
-                Platforms.Manager.GetSender().DoVmConfigure(vm);
-                Platforms.Shell.PushToForeground(vm.hWnd);
+                Platforms.Manager.GetSender().DoVmConfigure(vis.Tag);
+                Platforms.Shell.PushToForeground(vis.Tag.hWnd);
             }
-            else if (vm.Status == VM.STATUS_STOPPED)
+            else if (vis.Status == MachineStatus.STOPPED)
             {
                 try
                 {
                     var exec = Platforms.Manager.GetExecutor();
-                    var info = exec.BuildConfigInfo(GetExecArgs(ui, row, null));
+                    var info = exec.BuildConfigInfo(GetExecArgs(ui, vis, null));
                     if (!ui.Settings.ShowConsole)
                     {
                         info.RedirectStandardOutput = true;
@@ -808,22 +796,22 @@ namespace _86BoxManager.Core
                         throw new InvalidOperationException($"Could not start: {info.FileName}");
                     VMWatch.TryWaitForInputIdle(p, 250);
 
-                    vm.Status = VM.STATUS_WAITING;
-                    vm.hWnd = p.MainWindowHandle;
-                    vm.Pid = p.Id;
-                    row.CancelUptime();
+                    vis.Status = MachineStatus.WAITING;
+                    vis.Tag.hWnd = p.MainWindowHandle;
+                    vis.Tag.Pid = p.Id;
+                    vis.CancelUptime();
 
-                    row.RefreshStatus(vm.Status);
-                    row.IsConfig = true;
+                    vis.RefreshStatus();
+                    vis.IsConfig = true;
 
                     var bgw = new BackgroundWorker
                     {
                         WorkerReportsProgress = false,
                         WorkerSupportsCancellation = false
                     };
-                    var watch = new VMWatch(bgw, row);
-                    _watch.Add(vm.Name, watch);
-                    bgw.RunWorkerAsync(vm);
+                    var watch = new VMWatch(bgw, vis);
+                    _watch.Add(vis.Name, watch);
+                    bgw.RunWorkerAsync(vis);
 
                     ui.UpdateState();
                 }
@@ -836,9 +824,9 @@ namespace _86BoxManager.Core
                 catch (Exception ex)
                 {
                     // Revert to stopped status and alert the user
-                    vm.Status = VM.STATUS_STOPPED;
-                    vm.hWnd = IntPtr.Zero;
-                    vm.Pid = -1;
+                    vis.Status = MachineStatus.STOPPED;
+                    vis.Tag.hWnd = IntPtr.Zero;
+                    vis.Tag.Pid = -1;
                     Dialogs.DispatchMSGBox("This virtual machine could not be configured. Please " +
                                            "provide the following information to the developer:\n" +
                                            $"{ex.Message}\n{ex.StackTrace}",

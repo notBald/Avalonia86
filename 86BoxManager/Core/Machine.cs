@@ -194,7 +194,7 @@ namespace _86BoxManager.Core
                 //
                 //This is quite dependent on quirks of 86Box, making it fragile. A more robust
                 //solution is probably to set the throttle_timer to a much higher value.
-                parse_config = (!_current.IsRunning || _current.Tag.Status == VM.STATUS_RUNNING && _current.ClearWaiting()) 
+                parse_config = (!_current.IsRunning || _current.Status == MachineStatus.RUNNING && _current.ClearWaiting()) 
                     || Program.IsLinux || _current.IsConfig;
                 check_size = parse_config;
             }
@@ -358,7 +358,7 @@ namespace _86BoxManager.Core
                 // Query the value on the UI thread
                 bool is_vm_running = Dispatcher.UIThread.Invoke(() =>
                 {
-                    return mi.VM.Tag.Status != VM.STATUS_STOPPED;
+                    return mi.VM.Status != MachineStatus.STOPPED;
                 });
 
                 if (is_vm_running)
@@ -474,12 +474,12 @@ namespace _86BoxManager.Core
 
         private void _current_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(VMVisual.Status))
+            if (e.PropertyName == nameof(VMVisual.StatusText))
             {
                 //Note that when the VMRow ovject is "edited", it's actually recreated. Because of this we don't
                 //need to worry about Path changes and such. 
 
-                if (_pendingSizeCheck == true && _current.Tag.Status != VM.STATUS_RUNNING)
+                if (_pendingSizeCheck == true && _current.Status != MachineStatus.RUNNING)
                 {
                     //Do size check right away
                     lock (_throttle_timer)

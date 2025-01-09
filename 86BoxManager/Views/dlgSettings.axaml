@@ -109,6 +109,15 @@
 						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>
+				<TabItem Header="Apperance" Theme="{StaticResource CustomTabItm}">
+					<gb:GroupBox Header="List of machines" MaxHeight="70" VerticalAlignment="Top"
+								 Theme="{StaticResource GroupBoxClassic}"
+								 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+						<StackPanel>
+							<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" Margin="12" />
+						</StackPanel>
+					</gb:GroupBox>
+				</TabItem>
 				<TabItem Header="Advanced" Theme="{StaticResource CustomTabItm}">
 					<StackPanel Margin="0,0,0,110">
 						<gb:GroupBox Header="Logging"

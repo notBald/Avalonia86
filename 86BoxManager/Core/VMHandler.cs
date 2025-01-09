@@ -35,15 +35,15 @@ namespace _86BoxManager.Core
             var dc = (MainModel) Program.Root.DataContext;
             var items = dc.AllMachines;
 
-            foreach (var lvi in items)
+            foreach (var vis in items)
             {
-                var vm = lvi.Tag;
-                if (!vm.hWnd.Equals(hWnd) || vm.Status == VM.STATUS_STOPPED)
+                var vm = vis.Tag;
+                if (!vm.hWnd.Equals(hWnd) || vis.Status == MachineStatus.STOPPED)
                     continue;
 
-                vm.Status = VM.STATUS_STOPPED;
+                vis.Status = MachineStatus.STOPPED;
                 vm.hWnd = IntPtr.Zero;
-                lvi.RefreshStatus(0);
+                vis.RefreshStatus();
 
                 Program.Root.UpdateState();
             }
@@ -55,14 +55,14 @@ namespace _86BoxManager.Core
             var dc = (MainModel)Program.Root.DataContext;
             var items = dc.AllMachines;
 
-            foreach (var lvi in items)
+            foreach (var vis in items)
             {
-                var vm = lvi.Tag;
-                if (!vm.hWnd.Equals(hWnd) || vm.Status == VM.STATUS_PAUSED)
+                var vm = vis.Tag;
+                if (!vm.hWnd.Equals(hWnd) || vis.Status == MachineStatus.PAUSED)
                     continue;
 
-                vm.Status = VM.STATUS_PAUSED;
-                lvi.RefreshStatus(2);
+                vis.Status = MachineStatus.PAUSED;
+                vis.RefreshStatus();
                 Program.Root.UpdateState();
             }
             VMCenter.CountRefresh();
@@ -73,14 +73,14 @@ namespace _86BoxManager.Core
             var dc = (MainModel)Program.Root.DataContext;
             var items = dc.AllMachines;
 
-            foreach (var lvi in items)
+            foreach (var vis in items)
             {
-                var vm = lvi.Tag;
-                if (!vm.hWnd.Equals(hWnd) || vm.Status == VM.STATUS_RUNNING)
+                var vm = vis.Tag;
+                if (!vm.hWnd.Equals(hWnd) || vis.Status == MachineStatus.RUNNING)
                     continue;
 
-                vm.Status = VM.STATUS_RUNNING;
-                lvi.RefreshStatus(1);
+                vis.Status = MachineStatus.RUNNING;
+                vis.RefreshStatus();
                 Program.Root.UpdateState();
             }
             VMCenter.CountRefresh();
@@ -91,14 +91,14 @@ namespace _86BoxManager.Core
             var dc = (MainModel)Program.Root.DataContext;
             var items = dc.AllMachines;
 
-            foreach (var lvi in items)
+            foreach (var vis in items)
             {
-                var vm = lvi.Tag;
-                if (!vm.hWnd.Equals(hWnd) || vm.Status == VM.STATUS_WAITING)
+                var vm = vis.Tag;
+                if (!vm.hWnd.Equals(hWnd) || vis.Status == MachineStatus.WAITING)
                     continue;
 
-                vm.Status = VM.STATUS_WAITING;
-                lvi.RefreshStatus(2);
+                vis.Status = MachineStatus.WAITING;
+                vis.RefreshStatus();
                 Program.Root.UpdateState();
             }
             VMCenter.CountRefresh();
@@ -109,14 +109,14 @@ namespace _86BoxManager.Core
             var dc = (MainModel)Program.Root.DataContext;
             var items = dc.AllMachines;
 
-            foreach (var lvi in items)
+            foreach (var vis in items)
             {
-                var vm = lvi.Tag;
-                if (!vm.hWnd.Equals(hWnd) || vm.Status == VM.STATUS_RUNNING)
+                var vm = vis.Tag;
+                if (!vm.hWnd.Equals(hWnd) || vis.Status == MachineStatus.RUNNING)
                     continue;
 
-                vm.Status = vm.IsPaused ? VM.STATUS_PAUSED : VM.STATUS_RUNNING;
-                lvi.RefreshStatus(1);
+                vis.Status = vis.IsPaused ? MachineStatus.PAUSED : MachineStatus.RUNNING;
+                vis.RefreshStatus();
                 Program.Root.UpdateState();
             }
             VMCenter.CountRefresh();
@@ -143,12 +143,10 @@ namespace _86BoxManager.Core
             // This check is necessary in case the specified VM was already removed but the shortcut remains
             if (ids != null && ids.Length > 0)
             {
-                var lvi = ui.Settings.RefreshVisual(ids[0]);
-
-                var vm = lvi.Tag;
+                var vis = ui.Settings.RefreshVisual(ids[0]);
 
                 // If the VM is already running, display a message, otherwise, start it
-                if (vm.Status != VM.STATUS_STOPPED)
+                if (vis.Status != MachineStatus.STOPPED)
                 {
                     Dispatcher.UIThread.Post(async () =>
                     {
@@ -158,9 +156,9 @@ namespace _86BoxManager.Core
                 }
                 else
                 {
-                    VMCenter.Start(lvi, ui);
+                    VMCenter.Start(vis, ui);
 
-                    ui.Model.Machine = lvi;
+                    ui.Model.Machine = vis;
                 }
                 return;
             }
