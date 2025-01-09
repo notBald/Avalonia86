@@ -117,9 +117,14 @@ namespace _86BoxManager.Views
 
             //Presumably this will never actually change, but just in case
             DataContextChanged += FrmMain_DataContextChanged;
+
+            //The template now have bindings that references the datacontext, so it must be set
+            //before InitializeComponent. Unfortunatly, this causes some trouble. See comment
+            //in ctrlMachineInfo's constructor.
             DataContext = new MainModel();
 
             InitializeComponent();
+
             try
             {
                 if (!Design.IsDesignMode)
@@ -141,7 +146,7 @@ namespace _86BoxManager.Views
             //</Button.Classes.stop>
             var mb = new MultiBinding()
             {
-                Bindings = new Binding[] { new Binding("VmIsSelected"), new Binding("SelVmRunning"), new Binding("!SelVmWating"), new Binding("!SelVmPaused") },
+                Bindings = [new Binding("VmIsSelected"), new Binding("SelVmRunning"), new Binding("!SelVmWating"), new Binding("!SelVmPaused")],
                 Converter = BoolConverters.And
             };
             btnStart.BindClass("stop", mb, null);
