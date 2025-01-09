@@ -845,20 +845,22 @@ namespace _86BoxManager.Views
         /// </summary>
         private void lstVMs_MouseDoubleClick(object sender, RoutedEventArgs e)
         {
-            if (sender is ListBoxItem box && box.DataContext is VMVisual item)
+            if (sender is ListBox box)
             {
-                var vm = item;
-                if (vm.Status == MachineStatus.STOPPED)
+                if (e.Source is Control ctrl && ctrl.DataContext is VMVisual v)
                 {
-                    VMCenter.Start(item, this);
-                }
-                else if (vm.Status == MachineStatus.RUNNING)
-                {
-                    VMCenter.RequestStop(item, this);
-                }
-                else if (vm.Status == MachineStatus.PAUSED)
-                {
-                    VMCenter.Resume(item, this);
+                    if (v.Status == MachineStatus.STOPPED)
+                    {
+                        VMCenter.Start(v, this);
+                    }
+                    else if (v.Status == MachineStatus.RUNNING)
+                    {
+                        VMCenter.RequestStop(v, this);
+                    }
+                    else if (v.Status == MachineStatus.PAUSED)
+                    {
+                        VMCenter.Resume(v, this);
+                    }
                 }
             }
         }

@@ -334,7 +334,7 @@
 				<Border Grid.Column="0" BorderThickness="1" BorderBrush="#828790">
 					<ListBox BorderThickness="1" BorderBrush="White" Padding="0"
 							 x:Name="lstVMs" SelectedIndex="{Binding MachineIndex}" ItemsSource="{Binding Path=Machines}" 
-							 KeyDown="lstVMs_KeyDown" Background="White" 
+							 KeyDown="lstVMs_KeyDown" Background="White" DoubleTapped="lstVMs_MouseDoubleClick"
 							 ScrollViewer.AllowAutoHide="False">
 						<ListBox.Styles>
 							<Style Selector="ListBoxItem">
