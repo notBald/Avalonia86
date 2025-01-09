@@ -52,7 +52,7 @@ namespace _86BoxManager.Views
                 LoadSettings();
                 Get86BoxVersion();
             }
-            catch 
+            catch
             {
                 await Dialogs.ShowMessageBox("Settings could not be loaded, sorry.",
                          MessageType.Error, this, ButtonsType.Ok, "Failure");
