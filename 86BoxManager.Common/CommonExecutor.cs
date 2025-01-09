@@ -23,6 +23,7 @@ namespace _86BoxManager.Common
             ops.Add(args.VmPath);
             ops.Add("-V");
             ops.Add(args.Vm.Title);
+            info.WorkingDirectory = args.VmPath;
             return info;
         }
 
