@@ -29,6 +29,8 @@ using System.IO;
 using ReactiveUI;
 using Avalonia.Controls.Documents;
 using System.Collections.Generic;
+using _86BoxManager.Converters;
+using System.Reactive.Linq;
 
 namespace _86BoxManager.Views
 {
@@ -91,6 +93,8 @@ namespace _86BoxManager.Views
 
         #endregion
 
+        internal MainModel Model => (MainModel)DataContext;
+
         internal AppSettings Settings { get; private set; }
 
         public static string WindowTitle
@@ -111,26 +115,49 @@ namespace _86BoxManager.Views
 
         public frmMain()
         {
+            //Version number and debug string is applied to the window title, so we set it in code behind.
             Title = WindowTitle;
+
+            //Restore size is a feature missing in Avalonia, so we do it ourselves. The basic problem is that
+            //we need to know the size of the window before it was maximized when saving the window size.
             RestoreSize = new Size(Width, Height);
             OldPos = NewPos = Position;
 
             //Presumably this will never actually change, but just in case
             DataContextChanged += FrmMain_DataContextChanged;
 
-            //The template now have bindings that references the datacontext, so it must be set
-            //before InitializeComponent. Unfortunatly, this causes some trouble. See comment
-            //in ctrlMachineInfo's constructor.
+            InitializeComponent();
             DataContext = new MainModel();
 
-            InitializeComponent();
+            //This binding must be done after DataContext is set. I don't want to set DataContext before InitializeComponent,
+            //as that causes issues in ctrlMachineInfo
+            //
+            // Binding replaced: #lstVMs.((vm:MainModel)DataContext).CompactList
+            // In a future version of Avalonia, this code might be replaced with:
+            //  #lstVMs.((vm:MainModel)DataContext)?.CompactList
+            //
+            // https://github.com/AvaloniaUI/Avalonia/issues/17029
+            if (lstVMs.ItemTemplate is MachineTemplateSelector mts)
+            {
+                
+                var dc = (MainModel)DataContext;
+                mts.CompactMachine = dc.CompactList;
 
+                dc.PropertyChanged += (o, e) =>
+                {
+                    if (e.PropertyName == nameof(MainModel.CompactList))
+                        mts.CompactMachine = dc.CompactList;
+                };
+            }
+
+            //This is where the window size is restored
             try
             {
                 if (!Design.IsDesignMode)
                     SetWindowSize();
             } catch { }
 
+            //We need to catch changes in window state.
             PropertyChanged += FrmMain_PropertyChanged;
 
             //Multibinding can not be set on classes, so we do it here instead.
@@ -184,6 +211,9 @@ namespace _86BoxManager.Views
             };
         }
 
+        /// <summary>
+        /// Sets the window size, but makes sure not to set the window in a bad location.
+        /// </summary>
         private void SetWindowSize()
         {
             var size = Core.DBStore.FetchWindowSize();
@@ -234,12 +264,6 @@ namespace _86BoxManager.Views
             }
         }
 
-        private static bool CheckRunningEmulator()
-        {
-            return Platforms.Manager.IsProcessRunning("86box") ||
-                            Platforms.Manager.IsProcessRunning("86Box");
-        }
-
         /// <summary>
         /// Sets itself to the data context, so that command bindings are easier to implement.
         /// </summary>
@@ -272,7 +296,11 @@ namespace _86BoxManager.Views
             }
         }
 
-        internal MainModel Model => (MainModel)DataContext;
+        //private static bool CheckRunningEmulator()
+        //{
+        //    return Platforms.Manager.IsProcessRunning("86box") ||
+        //                    Platforms.Manager.IsProcessRunning("86Box");
+        //}
 
         private async void Main_OnOpened(object sender, EventArgs e)
         {
@@ -762,49 +790,17 @@ namespace _86BoxManager.Views
             }
         }
 
-        //private DataGridColumn clmIcon;
-        //private DataGridColumn clmName;
-        //private DataGridColumn clmCategory;
-        //private DataGridColumn clmStatus;
-        //private DataGridColumn clmDesc;
-        //private DataGridColumn clmPath;
         private TrayIcon trayIcon;
         private NativeMenu cmsTrayIcon;
 
         private void PrepareUi()
         {
-            //var columns = lstVMs.Columns;
-            //int col_nr = 0;
-            //clmIcon = columns[col_nr++];
-            //clmName = columns[col_nr++];
-            //clmCategory = columns[col_nr++];
-            ////clmStatus = columns[2];
-            //clmDesc = columns[col_nr++];
-            ////clmPath = columns[col_nr++];
-
-            //clmIcon.PropertyChanged += lstVMs_ColumnClick;
-            //clmName.PropertyChanged += lstVMs_ColumnClick;
-            //clmCategory.PropertyChanged += lstVMs_ColumnClick;
-            ////clmStatus.PropertyChanged += lstVMs_ColumnClick;
-            //clmDesc.PropertyChanged += lstVMs_ColumnClick;
-            ////clmPath.PropertyChanged += lstVMs_ColumnClick;
-
             var app = Application.Current;
             trayIcon = app?.GetValue(TrayIcon.IconsProperty).FirstOrDefault();
             if (trayIcon is { Menu: { } })
             {
                 cmsTrayIcon = trayIcon.Menu;
             }
-        }
-
-        // Handles the click event for the listview column headers, allowing to sort the items by columns
-        private void lstVMs_ColumnClick(object sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
-        {
-            // TODO Sorting?!
-            // var source = (TreeViewColumn)sender;
-            // var column = source.SortColumnId;
-            // var order = source.SortOrder;
-            // VMCenter.Sort(column, order);
         }
 
         internal void trayIcon_MouseClick(object sender, EventArgs e)

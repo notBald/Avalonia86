@@ -337,43 +337,43 @@
 							 KeyDown="lstVMs_KeyDown" Background="White" DoubleTapped="lstVMs_MouseDoubleClick"
 							 ScrollViewer.AllowAutoHide="False">
 						<ListBox.Resources>
-							<ContextMenu Name="lstVMpop" x:Key="lstVMpop">
-								<MenuItem Header="Start" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !#lstVMs.((vm:MainModel)DataContext).SelVmWating}" IsVisible="{Binding !#lstVMs.((vm:MainModel)DataContext).SelVmRunning}">
+							<ContextMenu Name="lstVMpop" x:Key="lstVMpop" DataContext="{Binding #lstVMs.((vm:MainModel)DataContext), Mode=OneWay}">
+								<MenuItem Header="Start" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}" IsVisible="{Binding !SelVmRunning}">
 									<MenuItem.Icon>
 										<Image Source="/Assets/Actions/18 - start 32x32.png" />
 									</MenuItem.Icon>
 								</MenuItem>
-								<MenuItem Header="Stop" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !#lstVMs.((vm:MainModel)DataContext).SelVmWating}" IsVisible="{Binding #lstVMs.((vm:MainModel)DataContext).SelVmRunning}">
+								<MenuItem Header="Stop" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}" IsVisible="{Binding SelVmRunning}">
 									<MenuItem.Icon>
 										<Image Source="/Assets/Actions/19 - stop 32x32.png" />
 									</MenuItem.Icon>
 								</MenuItem>
-								<MenuItem Header="Configure" Click="configureToolStripMenuItem_Click" IsEnabled="{Binding !#lstVMs.((vm:MainModel)DataContext).SelVmWating}">
+								<MenuItem Header="Configure" Click="configureToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}">
 									<MenuItem.Icon>
 										<Image Source="/Assets/Actions/9 - gears.png" />
 									</MenuItem.Icon>
 								</MenuItem>
-								<MenuItem Header="Pause" Click="pauseToolStripMenuItem_Click" IsVisible="{Binding !#lstVMs.((vm:MainModel)DataContext).SelVmPaused}">
+								<MenuItem Header="Pause" Click="pauseToolStripMenuItem_Click" IsVisible="{Binding !SelVmPaused}">
 									<MenuItem.IsEnabled>
 										<MultiBinding Converter="{x:Static BoolConverters.And}">
-											<Binding Path="#lstVMs.((vm:MainModel)DataContext).SelVmRunning"/>
-											<Binding Path="!#lstVMs.((vm:MainModel)DataContext).SelVmWating"/>
+											<Binding Path="SelVmRunning"/>
+											<Binding Path="!SelVmWating"/>
 										</MultiBinding>
 									</MenuItem.IsEnabled>
 								</MenuItem>
-								<MenuItem Header="Resume" Click="pauseToolStripMenuItem_Click" IsVisible="{Binding #lstVMs.((vm:MainModel)DataContext).SelVmPaused}">
+								<MenuItem Header="Resume" Click="pauseToolStripMenuItem_Click" IsVisible="{Binding SelVmPaused}">
 									<MenuItem.IsEnabled>
 										<MultiBinding Converter="{x:Static BoolConverters.And}">
-											<Binding Path="#lstVMs.((vm:MainModel)DataContext).SelVmRunning"/>
-											<Binding Path="!#lstVMs.((vm:MainModel)DataContext).SelVmWating"/>
+											<Binding Path="SelVmRunning"/>
+											<Binding Path="!SelVmWating"/>
 										</MultiBinding>
 									</MenuItem.IsEnabled>
 								</MenuItem>
 								<MenuItem Header="Send CTRL+ALT+DEL" Click="resetCTRLALTDELETEToolStripMenuItem_Click">
 									<MenuItem.IsEnabled>
 										<MultiBinding Converter="{x:Static BoolConverters.And}">
-											<Binding Path="#lstVMs.((vm:MainModel)DataContext).SelVmRunning"/>
-											<Binding Path="!#lstVMs.((vm:MainModel)DataContext).SelVmWating"/>
+											<Binding Path="SelVmRunning"/>
+											<Binding Path="!SelVmWating"/>
 										</MultiBinding>
 									</MenuItem.IsEnabled>
 									<MenuItem.Icon>
@@ -383,8 +383,8 @@
 								<MenuItem Header="Hard reset" Click="hardResetToolStripMenuItem_Click" IsEnabled="True">
 									<MenuItem.IsEnabled>
 										<MultiBinding Converter="{x:Static BoolConverters.And}">
-											<Binding Path="#lstVMs.((vm:MainModel)DataContext).SelVmRunning"/>
-											<Binding Path="!#lstVMs.((vm:MainModel)DataContext).SelVmWating"/>
+											<Binding Path="SelVmRunning"/>
+											<Binding Path="!SelVmWating"/>
 										</MultiBinding>
 									</MenuItem.IsEnabled>
 									<MenuItem.Icon>
@@ -392,20 +392,20 @@
 									</MenuItem.Icon>
 								</MenuItem>
 								<Separator />
-								<MenuItem Header="Kill" Click="killToolStripMenuItem_Click" IsEnabled="{Binding #lstVMs.((vm:MainModel)DataContext).SelVmRunning}"/>
-								<MenuItem Header="Wipe config" Click="wipeToolStripMenuItem_Click" IsEnabled="{Binding !#lstVMs.((vm:MainModel)DataContext).SelVmRunning}"/>
+								<MenuItem Header="Kill" Click="killToolStripMenuItem_Click" IsEnabled="{Binding SelVmRunning}"/>
+								<MenuItem Header="Wipe config" Click="wipeToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}"/>
 								<Separator />
 								<MenuItem Header="Edit" Click="editToolStripMenuItem_Click" IsEnabled="True">
 									<MenuItem.Icon>
 										<Image Source="/Assets/Actions/32 - tools.png" />
 									</MenuItem.Icon>
 								</MenuItem>
-								<MenuItem Header="Clone" Click="cloneToolStripMenuItem_Click" IsEnabled="{Binding !#lstVMs.((vm:MainModel)DataContext).SelVmRunning}">
+								<MenuItem Header="Clone" Click="cloneToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}">
 									<MenuItem.Icon>
 										<Image Source="/Assets/Actions/3 - clone 32x32.png" />
 									</MenuItem.Icon>
 								</MenuItem>
-								<MenuItem Header="Remove" Click="deleteToolStripMenuItem_Click" IsEnabled="{Binding !#lstVMs.((vm:MainModel)DataContext).SelVmRunning}">
+								<MenuItem Header="Remove" Click="deleteToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}">
 									<MenuItem.Icon>
 										<Image Source="/Assets/Actions/6 - delete.png" />
 									</MenuItem.Icon>
@@ -437,7 +437,8 @@
 							</Style>
 						</ListBox.Styles>
 						<ListBox.ItemTemplate>
-							<conv:MachineTemplateSelector CompactMachine="{Binding #lstVMs.((vm:MainModel)DataContext).CompactList, Mode=OneWay}">
+							<!--<conv:MachineTemplateSelector CompactMachine="{Binding #lstVMs.((vm:MainModel)DataContext).CompactList, Mode=OneWay}">-->
+							<conv:MachineTemplateSelector>
 								<DataTemplate x:Key="FullMachineTpl" DataType="vm:VMVisual">
 									<DockPanel Height="48" Background="Transparent" ContextMenu="{StaticResource lstVMpop}">
 										<Panel DockPanel.Dock="Left" Width="48" Height="48">
@@ -528,7 +529,7 @@
 										</Style>
 									</Grid.Styles>
 									<Border Margin="3, 0, 0, 0" BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0">
-										<view:ctrlMachineInfo DataContext="{Binding VMConfig}" />
+										<view:ctrlMachineInfo DataContext="{Binding VMConfig, Mode=OneWay}" />
 									</Border>
 									<GridSplitter Grid.Column="1" ResizeDirection="Columns" Theme="{StaticResource VerticalGridSplitter}" Margin="7, 2, 8, 2" />
 									<DockPanel Grid.Column="2" Margin="0, 0, 18, 0">

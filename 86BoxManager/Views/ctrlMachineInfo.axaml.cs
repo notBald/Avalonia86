@@ -12,7 +12,8 @@ public partial class ctrlMachineInfo : UserControl
         // Didn't have this before, since DataContext used to be sett in App OnFrameworkInitializationCompleted, but now it's set
         // in frmMain (before initializing components over there), so we get a unwanted non-null datacontect inherithed here.
         // Avalonia supresses the "null" errors, by design, so we had no trouble until now.
-        DataContext = new ViewModels.VMConfig();
+        //DataContext = new ViewModels.VMConfig();
+        // ^not needed thanks to workaround
 
         InitializeComponent();
     }
