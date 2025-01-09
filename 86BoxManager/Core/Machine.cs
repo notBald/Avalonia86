@@ -99,7 +99,7 @@ namespace _86BoxManager.Core
             _pfsw.NotifyFilter = NotifyFilters.DirectoryName;
 
             _throttle_timer.Elapsed += HandleChangeEvents;
-            _minutte_clock.Elapsed += _minutte_clock_Elapsed;;
+            _minutte_clock.Elapsed += _minutte_clock_Elapsed;
             _minutte_clock.Start();
 
             //Linux does not get the waiting/paused events from 86Box.

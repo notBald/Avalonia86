@@ -148,7 +148,7 @@ namespace _86BoxManager.Tools
 
             string fld = null;
 
-            //foreach (var s in res)
+            if (res != null)
             {
                 fld = res.Path.AbsolutePath;
             }
