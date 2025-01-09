@@ -8,6 +8,7 @@ using _86BoxManager.ViewModels;
 using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
 using MessageType = MsBox.Avalonia.Enums.Icon;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
+using Avalonia.Threading;
 
 // ReSharper disable InconsistentNaming
 
@@ -61,11 +62,9 @@ namespace _86BoxManager.Core
         // Update the UI once the VM's window is closed
         private void background_RunCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            var Now = DateTime.Now;
-
             var vm = (e.Result as VMVisual) ?? _vis;
 
-            vm.CommitUptime(Now);
+            vm.CommitUptime(DateTime.Now);
 
             // Go through the listview, find the item representing the VM and update things accordingly
             //foreach (var item in allItems)

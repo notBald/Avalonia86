@@ -398,11 +398,12 @@ namespace _86BoxManager.ViewModels
             _last_run = TM.LastRun.HasValue ? TM.LastRun.Value : DateTime.MaxValue;
             _duration = TM.Uptime.HasValue ? TM.Uptime.Value : TimeSpan.Zero;
 
-            UpdateClocks();
+            UpdateClocks(DateTime.Now);
         }
 
         public void SetLastRun(DateTime lastRun)
         {
+            var now = DateTime.Now;
             TM.LastRun = lastRun;
             _last_run = lastRun;
             _since_run = DateTime.Now - _last_run;
@@ -411,7 +412,7 @@ namespace _86BoxManager.ViewModels
             if (IsRunning)
             {
                 _total_duration = TimeSpan.MinValue / 10;
-                UpdateClocks();
+                UpdateClocks(now);
             }
 
             _s.UpdateStartTime(Tag.UID, _last_run, RunCount);
@@ -420,9 +421,8 @@ namespace _86BoxManager.ViewModels
         /// <summary>
         /// Update the "time since" calculations
         /// </summary>
-        public void UpdateClocks()
+        public void UpdateClocks(DateTime now)
         {
-            var now = DateTime.Now;
             {
                 var since_created = now - _created;
                 var time_since_ui_update = since_created - _since_created;

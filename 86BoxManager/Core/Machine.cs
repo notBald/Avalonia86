@@ -1,16 +1,13 @@
-﻿using _86BoxManager.Models;
+﻿using _86BoxManager.Tools;
 using _86BoxManager.ViewModels;
 using Avalonia.Threading;
+using ReactiveUI;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
-using ReactiveUI;
-using _86BoxManager.Tools;
 
 namespace _86BoxManager.Core
 {
@@ -102,7 +99,7 @@ namespace _86BoxManager.Core
             _pfsw.NotifyFilter = NotifyFilters.DirectoryName;
 
             _throttle_timer.Elapsed += HandleChangeEvents;
-            _minutte_clock.Elapsed += _minutte_clock_Elapsed;
+            _minutte_clock.Elapsed += _minutte_clock_Elapsed;;
             _minutte_clock.Start();
 
             //Linux does not get the waiting/paused events from 86Box.
@@ -246,95 +243,101 @@ namespace _86BoxManager.Core
 
         private void _minutte_clock_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (_current != null)
+            Dispatcher.UIThread.Post(() =>
             {
-                _current.UpdateClocks();
-            }
+                if (_current != null)
+                {
+                    _current.UpdateClocks(DateTime.Now);
+                }
+            });
         }
 
         private void HandleChangeEvents(object _, ElapsedEventArgs evt)
         {
-            //On MT: This function will never execute after a machine has been
-            //switched, as the method that does the switch is on the UI thread
-            //and disables the timer (which is also the UI thread)
-
-            bool parse_config = false;
-            bool check_folders = false;
-            bool check_size = false;
-
-            while(!_event_queue.IsEmpty)
+            Dispatcher.UIThread.Post(() =>
             {
-                if (_event_queue.TryDequeue(out UpdateEvent e))
+                //On MT: This function will never execute after a machine has been
+                //switched, as the method that does the switch is on the UI thread
+                //and disables the timer (which is also the UI thread)
+
+                bool parse_config = false;
+                bool check_folders = false;
+                bool check_size = false;
+
+                while (!_event_queue.IsEmpty)
                 {
-                    parse_config |= e.Config;
-                    check_size |= e.Size;
-                    check_folders |= e.Folders;
-                }
-            }
-
-            //If is working, check if the bool types above match, if so ignore this event.
-            if (_pendingConfigCheck) parse_config = false;
-            if (_pendingSizeCheck) check_size = false;
-            if (_pendingFolderCheck) check_folders = false;
-
-            if (!parse_config && !check_size && !check_folders)
-                return;
-
-            var mi = new MachineInfo(_current, _current_job_id);
-            var work = new BackgroundTask(
-                () =>
-                {
-                    if (parse_config)
-                        mi.Config = ReadConfig(mi.ConfigFile);
-                    if (check_size)
+                    if (_event_queue.TryDequeue(out UpdateEvent e))
                     {
-                        var size = TryCheckFldSize(mi);
-                        if (size != null)
-                            mi.VMSize = size;
-                        else
-                        {
-                            //This will now be handled later
-                            check_size = false;
-                        }
+                        parse_config |= e.Config;
+                        check_size |= e.Size;
+                        check_folders |= e.Folders;
                     }
+                }
 
-                    if (check_folders)
-                        CheckFolders(mi);
+                //If is working, check if the bool types above match, if so ignore this event.
+                if (_pendingConfigCheck) parse_config = false;
+                if (_pendingSizeCheck) check_size = false;
+                if (_pendingFolderCheck) check_folders = false;
 
-                    return mi;
-                },
-                o =>
-                {
-                    if (mi.JobID == _current_job_id)
+                if (!parse_config && !check_size && !check_folders)
+                    return;
+
+                var mi = new MachineInfo(_current, _current_job_id);
+                var work = new BackgroundTask(
+                    () =>
                     {
                         if (parse_config)
-                        {
-                            _pendingConfigCheck = false;
-                            mi.VM.VMConfig = mi.Config;
-                            _m.RaisePropertyChanged(nameof(VMConfig));
-                        }
-
+                            mi.Config = ReadConfig(mi.ConfigFile);
                         if (check_size)
                         {
-                            _pendingSizeCheck = false;
-                            mi.VM.VMSize = mi.VMSize;
+                            var size = TryCheckFldSize(mi);
+                            if (size != null)
+                                mi.VMSize = size;
+                            else
+                            {
+                                //This will now be handled later
+                                check_size = false;
+                            }
                         }
 
                         if (check_folders)
+                            CheckFolders(mi);
+
+                        return mi;
+                    },
+                    o =>
+                    {
+                        if (mi.JobID == _current_job_id)
                         {
-                            _pendingFolderCheck = false;
-                            mi.VM.HasPrintTray = mi.HasPrinterFolder;
-                            mi.VM.Images = mi.Images;
+                            if (parse_config)
+                            {
+                                _pendingConfigCheck = false;
+                                mi.VM.VMConfig = mi.Config;
+                                _m.RaisePropertyChanged(nameof(VMConfig));
+                            }
+
+                            if (check_size)
+                            {
+                                _pendingSizeCheck = false;
+                                mi.VM.VMSize = mi.VMSize;
+                            }
+
+                            if (check_folders)
+                            {
+                                _pendingFolderCheck = false;
+                                mi.VM.HasPrintTray = mi.HasPrinterFolder;
+                                mi.VM.Images = mi.Images;
+                            }
                         }
                     }
-                }
-            );
+                );
 
-            _pendingSizeCheck |= check_size;
-            _pendingFolderCheck |= check_folders;
-            _pendingConfigCheck |= parse_config;
+                _pendingSizeCheck |= check_size;
+                _pendingFolderCheck |= check_folders;
+                _pendingConfigCheck |= parse_config;
 
-            _worker.Post(work);
+                _worker.Post(work);
+            });
         }
 
         private string TryCheckFldSize(MachineInfo mi)

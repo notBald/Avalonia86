@@ -374,7 +374,7 @@
 								</DataTemplate>
 								<DataTemplate x:Key="CompactMachineTpl" DataType="vm:VMVisual">
 									<Grid ColumnDefinitions="10, *">
-										<Ellipse Margin="2, 1, 0, 0" Width="8" Height="8" Fill="{Binding Status, Mode=OneWay, Converter={StaticResource colorConv}}" />
+										<Ellipse Margin="2, 1, 0, 0" VerticalAlignment="Center" Width="8" Height="8" Fill="{Binding Status, Mode=OneWay, Converter={StaticResource colorConv}}" />
 										<TextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay}" FontSize="14" Margin="3" Padding="0"/>
 									</Grid>
 								</DataTemplate>
