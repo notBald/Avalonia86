@@ -146,7 +146,7 @@
 											 FilterMode="Contains"
 											 Watermark="{Binding DefaultCategory}"
 											 ItemsSource="{Binding Categories}"
-											 Text="{Binding Category, Mode=OneWayToSource}">
+											 Text="{Binding Category}">
 											<i:Interaction.Behaviors>
 												<vm:AutoCompleteBehavior/>
 											</i:Interaction.Behaviors>

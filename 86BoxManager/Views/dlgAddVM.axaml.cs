@@ -33,11 +33,18 @@ namespace _86BoxManager.Views
             InitializeComponent();
 
             if (Design.IsDesignMode)
-                DataContext = new dlgAddVMModel(null);
+                _m = new dlgAddVMModel(null);
             else
-                DataContext = new dlgAddVMModel(Program.Root.Model.Settings);
+            {
+                var m = Program.Root.Model;
 
-            _m = (dlgAddVMModel)DataContext;
+                _m = new dlgAddVMModel(m.Settings);
+
+                if (m.CategoryIndex > 0)
+                    _m.Category = m.CategoryName;
+            }
+
+            DataContext = _m;
             _s = AppSettings.Settings;
 
             Closing += DlgAddVM_Closing;
