@@ -34,6 +34,7 @@ namespace _86BoxManager.Common
             ops.Add("--settings");
             ops.Add("-P");
             ops.Add(args.VmPath);
+            info.WorkingDirectory = args.VmPath;
             return info;
         }
     }

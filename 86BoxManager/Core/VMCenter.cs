@@ -757,9 +757,18 @@ namespace _86BoxManager.Core
                         info.RedirectStandardOutput = true;
                         info.UseShellExecute = false;
                     }
-                    var p = Process.Start(info);
-                    if (p == null)
+
+                    var p = new Process();
+                    p.StartInfo.FileName = info.FileName;
+                    foreach (var a in info.ArgumentList)
+                        p.StartInfo.ArgumentList.Add(a);
+                    p.StartInfo.WorkingDirectory = info.WorkingDirectory;
+                    if (!p.Start())
                         throw new InvalidOperationException($"Could not start: {info.FileName}");
+
+                    //var p = Process.Start(info);
+                    //if (p == null)
+                    //    throw new InvalidOperationException($"Could not start: {info.FileName}");
                     VMWatch.TryWaitForInputIdle(p, 250);
 
                     vis.Status = MachineStatus.WAITING;
