@@ -600,6 +600,8 @@ namespace _86BoxManager.Core
             var exePath = Sett.EXEdir;
             var exeName = Platforms.Shell.DetermineExeName(exePath, Platforms.Env.ExeNames);
 
+            if (vmPath != null)
+                vmPath = vmPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
             var vars = new CommonExecVars
             {
