@@ -9,7 +9,9 @@ namespace _86BoxManager.Tools
 {
     internal static class FolderHelper
     {
-        public static void CopyFilesAndFolders(string sourceDir, string destinationDir, int copyDepth, Action<int> progressCallback = null)
+        public delegate bool ProgressCallback(int number);
+
+        public static void CopyFilesAndFolders(string sourceDir, string destinationDir, int copyDepth, ProgressCallback progressCallback = null)
         {
             if (copyDepth < 0)
             {
@@ -66,7 +68,7 @@ namespace _86BoxManager.Tools
                 if (failed)
                     throw new IOException("Copy operation failed but was not rolled back.", ex);
 
-                throw new IOException("Copy operation failed and was rolled back.", ex);
+                throw new IOException("Copy operation failed but was rolled back.", ex);
             }
         }
 
@@ -108,7 +110,7 @@ namespace _86BoxManager.Tools
             return total;
         }
 
-        private static void CopyFileWithProgress(string sourceFile, string destinationFile, long fileSize, ref long totalCopied, long totalSizeEstimate, Action<int> progressCallback)
+        private static void CopyFileWithProgress(string sourceFile, string destinationFile, long fileSize, ref long totalCopied, long totalSizeEstimate, ProgressCallback progressCallback)
         {
             const int bufferSize = 81920;
             byte[] buffer = new byte[bufferSize];
@@ -132,8 +134,10 @@ namespace _86BoxManager.Tools
                         if (totalSizeEstimate > 0)
                         {
                             int progress = (int)((totalCopied * 100) / totalSizeEstimate);
-                            if (progressCallback != null)
-                                progressCallback?.Invoke(progress);
+                            if (progressCallback != null && !progressCallback.Invoke(progress))
+                            {
+                                throw new Exception("User requested quit");
+                            }
                         }
                     }
                 }

@@ -243,50 +243,6 @@ namespace _86BoxManager.Core
             }
         } 
 
-        // Imports existing VM files to a new VM
-        public static async Task<bool> Clone(long uid, string name, string dest_dir, Window parent)
-        {
-            var importFailed = false;
-            var vis = Sett.RefreshVisual(uid);
-            if (vis == null)
-            {
-                await Dialogs.ShowMessageBox($@"Virtual machine could not be imported.",
-                    MessageType.Error, parent, ButtonsType.Ok, "Import failed");
-                
-                return false;
-            }
-
-            try
-            {
-                FolderHelper.CopyFilesAndFolders(vis.Path, dest_dir, 1);
-
-                Add(name, dest_dir, vis.Desc, vis.Category, vis.IconPath, DateTime.Now, false, false, parent);
-
-                var new_vis = Sett.RefreshVisual(Sett.PathToId(dest_dir));
-                
-                new_vis.Comment = vis.Comment;
-            }
-            catch 
-            {
-                importFailed = true;
-            }
-
-            if (importFailed)
-            {
-                await Dialogs.ShowMessageBox($@"Virtual machine ""{vis.Name}"" could not be imported.",
-                    MessageType.Error, parent, ButtonsType.Ok, "Import failed");
-            }
-            else
-            {
-                await Dialogs.ShowMessageBox($@"Virtual machine ""{name}"" was successfully created, files " +
-                                       "were imported. Remember to update any paths pointing to disk images in " +
-                                       "your config!",
-                    MessageType.Info, parent, ButtonsType.Ok, "Success");
-            }
-
-            return true;
-        }
-
         // Deletes the config and nvr of selected VM
         public static async Task<bool> Wipe(VMVisual vm, Window parent)
         {
