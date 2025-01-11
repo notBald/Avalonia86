@@ -1,9 +1,12 @@
 ﻿using _86BoxManager.Xplat;
 using Avalonia.Controls;
+using DynamicData;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace _86BoxManager.Core
@@ -13,6 +16,8 @@ namespace _86BoxManager.Core
     /// </summary>
     internal sealed class DBStore
     {
+        const int CUR_MINOR_DB_VER = 1;
+
         #region Static fields
 
         private static readonly SQLiteConnection _db;
@@ -78,22 +83,59 @@ namespace _86BoxManager.Core
             return con;
         }
 
-        private static bool InitDB(SQLiteConnection db)
+        private static bool InitDB(SQLiteConnection db, int current_minor = -1)
         {
+            const string SCRIPT_DIV = "--§";
+            const string SCRIPT_VERSION = SCRIPT_DIV + "Version";
+            const string SCRIPT_VERSION_NR = SCRIPT_DIV + "v1.";
+            const string SCRIPT_MAIN = SCRIPT_DIV + "Main";
+
             try
             {
-                var commands = CreateDefaultDB().Split("--§");
+                var scripts = CreateDefaultDB().Split(SCRIPT_VERSION);
+                int minor_version = 0;
 
-                foreach (var command in commands)
+                for (int c=0;c < scripts.Length; c++)
                 {
-                    using var cmd = new SQLiteCommand(command, db);
-                    cmd.ExecuteNonQuery();
+                    var script = scripts[c].TrimStart();
+                    int end = script.IndexOfAny(['\n' , '\r'], SCRIPT_VERSION_NR.Length);
+
+                    //Gets the version number
+                    if (!script.StartsWith(SCRIPT_VERSION_NR) || !int.TryParse(script.AsSpan(SCRIPT_VERSION_NR.Length, end - SCRIPT_VERSION_NR.Length + 1), out minor_version))
+                        throw new Exception("Failed to find version of script");
+
+                    if (minor_version > current_minor)
+                    {
+                        //First comes an upgrade script.
+                        var sub_script = script.Substring(end).TrimStart().Split(SCRIPT_MAIN);
+                        if (sub_script.Length != 2)
+                            throw new Exception("Failed to find main script");
+
+                        bool do_upgrade = current_minor != -1 && minor_version == (current_minor + 1);
+
+                        for (int i = do_upgrade ? 0 : 1; i < sub_script.Length; i++)
+                        {
+                            var commands = sub_script[i].TrimStart().Split(SCRIPT_DIV);
+
+                            foreach (var command in commands)
+                            {
+                                using var cmd = new SQLiteCommand(command, db);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
                 }
 
                 //Inserts the version number
+                var version = Assembly.GetExecutingAssembly().GetName().Version;
+                if (current_minor != -1)
                 {
-                    var version = Assembly.GetExecutingAssembly().GetName().Version;
-                    using var cmd = new SQLiteCommand($"INSERT INTO FileInfo(Creator, Version) VALUES('{AppName} {version.Major}.{version.Minor}', 1.0)", db);
+                    using var cmd = new SQLiteCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}', Version = 1.1, Minor = {minor_version}", db);
+                    cmd.ExecuteNonQuery();
+                }
+                else
+                {
+                    using var cmd = new SQLiteCommand($"INSERT INTO FileInfo(Creator, Version, Minor) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 1.1, 1.{minor_version})", db);
                     cmd.ExecuteNonQuery();
                 }
 
@@ -183,12 +225,29 @@ namespace _86BoxManager.Core
                                         @"select Version from FileInfo"
                                 };
 
+                                float major;
                                 using (fetch)
                                 using (var r = fetch.ExecuteReader())
                                 {
-                                    //Tests if the file is a Version 1.x format.
-                                    if (!r.Read() || r.GetFloat(0) >= 2)
+                                    if (!r.Read())
                                         return false;
+                                    major = r.GetFloat("Version");
+
+                                    //Tests if the file is a Version 1.x format.
+                                    if (major >= 2)
+                                        return false;
+                                }
+
+                                //First version of the DB, does not have the "Minor" column.
+                                if (major == 1.0)
+                                {
+                                    //We got to upgrade.
+                                    using (var t = db.BeginTransaction())
+                                    {
+                                        if (!InitDB(db, 0))
+                                            throw new Exception("DB create failed.");
+                                        t.Commit();
+                                    }
                                 }
                             }
                             

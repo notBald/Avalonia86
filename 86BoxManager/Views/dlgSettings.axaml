@@ -47,6 +47,10 @@
 				<Setter Property="Foreground" Value="Green" />
 			</Style>
 		</Style>
+
+		<Style Selector="gb|GroupBox">
+			<Setter Property="BorderBrush" Value="{StaticResource TabCtrlBorderBrush}" />
+		</Style>
 	</Window.Styles>
 	<Grid>
 		<DockPanel Margin="12">
@@ -69,8 +73,7 @@
 				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
 					<StackPanel Orientation="Vertical">
 						<gb:GroupBox Header="Paths"
-									 Theme="{StaticResource GroupBoxClassic}"
-									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+									 Theme="{StaticResource GroupBoxClassic}">
 							<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
 								<Label Content="Path to the default 86Box executable:" 
 									   Target="{Binding ElementName=tbPath}"
@@ -96,20 +99,38 @@
 										Grid.Row="4" Grid.Column="2"/>
 							</Grid>
 						</gb:GroupBox>
+						<gb:GroupBox Header="Alternative 86Box executables"
+									 Theme="{StaticResource GroupBoxClassic}">
+							<DockPanel Margin="9">
+								<StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+									<Button>Add</Button>
+									<Button>Remove</Button>
+								</StackPanel>
+								<TextBlock DockPanel.Dock="Bottom" TextWrapping="Wrap" FontStyle="Italic" Margin="0, 5, 0, 0">
+									The way this works is that if a executable is set as the default, but is not found, 
+									the app falls back to using the "path to the default 86Box executable".
+								</TextBlock>
+								<DataGrid>
+									<DataGrid.Columns>
+										<DataGridTextColumn Header="Is default" />
+										<DataGridTextColumn Header="Path" Width="*" />
+										<DataGridTextColumn Header="Version" />
+									</DataGrid.Columns>
+								</DataGrid>
+							</DockPanel>
+						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>
 				<TabItem Header="Behaviour" Theme="{StaticResource CustomTabItm}">
 					<StackPanel Orientation="Vertical">
 						<gb:GroupBox Header="List of machines" MaxHeight="70" VerticalAlignment="Top"
-									 Theme="{StaticResource GroupBoxClassic}"
-									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+									 Theme="{StaticResource GroupBoxClassic}">
 							<StackPanel>
 								<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" Margin="12" />
 							</StackPanel>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Behaviour"
-									 Theme="{StaticResource GroupBoxClassic}"
-									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+									 Theme="{StaticResource GroupBoxClassic}">
 							<Border Margin="9">
 								<StackPanel Orientation="Vertical">
 									<StackPanel Orientation="Horizontal">
@@ -123,8 +144,7 @@
 							</Border>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Startup"
-									 Theme="{StaticResource GroupBoxClassic}"
-									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+									 Theme="{StaticResource GroupBoxClassic}">
 							<CheckBox IsChecked="{Binding AllowInstances}" Content="Allow multiple instances of Avalonia86" Margin="12" />
 						</gb:GroupBox>
 					</StackPanel>
@@ -132,8 +152,7 @@
 				<TabItem Header="Advanced" Theme="{StaticResource CustomTabItm}">
 					<StackPanel Margin="0,0,0,110">
 						<gb:GroupBox Header="Logging"
-									 Theme="{StaticResource GroupBoxClassic}"
-									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+									 Theme="{StaticResource GroupBoxClassic}">
 							<Border Margin="9">
 								<StackPanel Orientation="Vertical">
 									<StackPanel Orientation="Vertical">
@@ -147,8 +166,7 @@
 							</Border>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Miscellaneous"
-									 Theme="{StaticResource GroupBoxClassic}"
-									 BorderBrush="{StaticResource TabCtrlBorderBrush}">						
+									 Theme="{StaticResource GroupBoxClassic}">						
 							<Border Margin="9">
 								<StackPanel Orientation="Vertical">
 									<StackPanel Orientation="Horizontal">
