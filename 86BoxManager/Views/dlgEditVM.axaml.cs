@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.ComponentModel;
 using ReactiveUI;
+using Mono.Unix.Native;
+using System.Xml.Linq;
 
 namespace _86BoxManager.Views
 {
@@ -89,7 +91,18 @@ namespace _86BoxManager.Views
         private async void btnApply_Click(object sender, RoutedEventArgs e)
         {
             var dc = DataContext as dlgEditModel;
-            await VMCenter.Edit(_vm.Tag.UID, txtName.Text, txtDesc.Text, _m.Category, dc?.VMIcon, txtComment.Text, this);
+
+            try
+            {
+                VMCenter.Edit(_vm.Tag.UID, txtName.Text, txtDesc.Text, _m.Category, dc?.VMIcon, txtComment.Text, this);
+            }
+            catch (Exception ex)
+            {
+                await Dialogs.ShowMessageBox($@"Unable to save edit: "+ex.Message, MessageType.Error, this);
+            }
+
+            //await Dialogs.ShowMessageBox($@"Virtual machine ""{name}"" was successfully modified.",
+            //    MessageType.Info, parent, ButtonsType.Ok, "Success");
 
             Close(ResponseType.Ok);
         }

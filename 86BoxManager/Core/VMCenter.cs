@@ -359,7 +359,7 @@ namespace _86BoxManager.Core
         }
 
         // Changes a VM's name and/or description
-        public static async Task<bool> Edit(long uid, string name, string desc, string category, string icon, string comment, Window parent)
+        public static void Edit(long uid, string name, string desc, string category, string icon, string comment, Window parent)
         {
             var m = Program.Root.Model;
             var current_cat = m.CategoryIndex != 0 ? m.CategoryName : null;
@@ -394,12 +394,6 @@ namespace _86BoxManager.Core
                 m.CategoryName = category;
                 m.Machine = vm;
             }
-
-            await Dialogs.ShowMessageBox($@"Virtual machine ""{name}"" was successfully modified.",
-                MessageType.Info, parent, ButtonsType.Ok, "Success");
-
-            //Done for async
-            return true;
         }
 
         // Refreshes the VM counter in the status bar
