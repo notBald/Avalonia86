@@ -407,33 +407,47 @@ namespace _86BoxManager.Core
         {
             var ui = Program.Root;
 
+            var total = 0;
             var runningVMs = 0;
+            var allRunningVMs = 0;
             var pausedVMs = 0;
             var waitingVMs = 0;
             var stoppedVMs = 0;
 
-            var vms = ui.Model.Machines;
+            var vms = ui.Model.AllMachines;
             foreach (var vis in vms)
             {
+                total++;
+
                 switch (vis.Status)
                 {
                     case MachineStatus.PAUSED:
                         pausedVMs++;
+                        allRunningVMs++;
                         break;
                     case MachineStatus.RUNNING:
                         runningVMs++;
+                        allRunningVMs++;
                         break;
                     case MachineStatus.STOPPED:
                         stoppedVMs++;
                         break;
                     case MachineStatus.WAITING:
                         waitingVMs++;
+                        allRunningVMs++;
                         break;
                 }
             }
 
-            var model = ui.Model;
-            model.VmCount = "All VMs: " + vms.Count + " | Running: " + runningVMs + " | Paused: " + pausedVMs +
+            var m = ui.Model;
+            m.AllVmCount = total;
+            m.AllRunningVMs = allRunningVMs;
+            m.RunningVMs = runningVMs;
+            m.PausedVMs = pausedVMs;
+            m.WaitingVMs = waitingVMs;
+            m.StoppedVMs = stoppedVMs;
+
+            m.VmCount = "All VMs: " + total + " | Running: " + runningVMs + " | Paused: " + pausedVMs +
                             " | Waiting: " + waitingVMs + " | Stopped: " + stoppedVMs;
         }
 

@@ -184,6 +184,15 @@ namespace _86BoxManager.ViewModels
             }
         }
 
+        private int _all_vms, _all_running_vms, _running_vms, _paused_vms, _waiting_vms, _stopped_vms;
+
+        public int AllVmCount { get => _all_vms; set => this.RaiseAndSetIfChanged(ref _all_vms, value); }
+        public int AllRunningVMs { get => _all_running_vms; set => this.RaiseAndSetIfChanged(ref _all_running_vms, value); }
+        public int RunningVMs { get => _running_vms; set => this.RaiseAndSetIfChanged(ref _running_vms, value); }
+        public int PausedVMs { get => _paused_vms; set => this.RaiseAndSetIfChanged(ref _paused_vms, value); }
+        public int WaitingVMs { get => _waiting_vms; set => this.RaiseAndSetIfChanged(ref _waiting_vms, value); }
+        public int StoppedVMs { get => _stopped_vms; set => this.RaiseAndSetIfChanged(ref _stopped_vms, value); }
+
         public MainModel()
         {
             _machine = new Machine(this);
