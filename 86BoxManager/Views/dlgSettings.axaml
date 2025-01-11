@@ -71,26 +71,30 @@
 						<gb:GroupBox Header="Paths"
 									 Theme="{StaticResource GroupBoxClassic}"
 									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
-							<Border Margin="9">
-								<StackPanel Orientation="Vertical">
-									<StackPanel Orientation="Horizontal" Margin="5" Spacing="5">
-										<Label Margin="9" Content="86Box path:"/>
-										<TextBox Width="360" Text="{Binding ExeDir}" Margin="0,0,10,0" />
-										<Button Click="btnBrowse1_Click" Name="btnBrowse1">Browse...</Button>
-									</StackPanel>
-									<StackPanel Orientation="Horizontal" Margin="5" Spacing="5">
-										<Label Margin="9" Content="86Box version:"/>
-										<SelectableTextBlock Margin="9" Classes="version" Classes.error="{Binding ExeError}"
-											   Classes.warn="{Binding ExeWarn}" Classes.valid="{Binding ExeValid}"
-											   Text="{Binding ExePath, Mode=OneWay, TargetNullValue='&lt;status string goes here&gt;'}"/>
-									</StackPanel>
-									<StackPanel Orientation="Horizontal" Margin="5,5,5,25" Spacing="5">
-										<Label Margin="9" Content="VM path:"/>
-										<TextBox Width="360" Text="{Binding CFGDir}" Margin="0,0,10,0" />
-										<Button Click="btnBrowse2_Click" Name="btnBrowse2">Browse...</Button>
-									</StackPanel>
+							<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+								<Label Content="Path to the default 86Box executable:" 
+									   Target="{Binding ElementName=tbPath}"
+									   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
+								<TextBox Text="{Binding ExeDir}" Name="tbPath" 
+										Grid.Row="1" Grid.Column="0" />
+								<Button Click="btnBrowse1_Click" Name="btnBrowse1" Content="Browse..." 
+										Grid.Row="1" Grid.Column="2"/>
+								<StackPanel Orientation="Horizontal" Margin="5, 5, 5, 10" Spacing="5"
+											Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+									<TextBlock Text="86Box version:" FontSize="14"/>
+									<SelectableTextBlock Classes="version" Classes.error="{Binding ExeError}"
+											Classes.warn="{Binding ExeWarn}" Classes.valid="{Binding ExeValid}"
+											Text="{Binding ExePath, Mode=OneWay, TargetNullValue='&lt;status string goes here&gt;'}"/>
 								</StackPanel>
-							</Border>
+								
+								<Label Content="Default destination path for new virtual machines:"
+									   Target="{Binding ElementName=tbCFG}"
+									   Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"/>
+								<TextBox Text="{Binding CFGDir}" Name="tbCFG" 
+									   Grid.Row="4" Grid.Column="0"/>
+								<Button Click="btnBrowse2_Click" Name="btnBrowse2" Content="Browse..."
+										Grid.Row="4" Grid.Column="2"/>
+							</Grid>
 						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>
