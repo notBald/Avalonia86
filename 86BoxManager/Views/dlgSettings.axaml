@@ -92,9 +92,20 @@
 								</StackPanel>
 							</Border>
 						</gb:GroupBox>
+					</StackPanel>
+				</TabItem>
+				<TabItem Header="Behaviour" Theme="{StaticResource CustomTabItm}">
+					<StackPanel Orientation="Vertical">
+						<gb:GroupBox Header="List of machines" MaxHeight="70" VerticalAlignment="Top"
+									 Theme="{StaticResource GroupBoxClassic}"
+									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+							<StackPanel>
+								<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" Margin="12" />
+							</StackPanel>
+						</gb:GroupBox>
 						<gb:GroupBox Header="Behaviour"
 									 Theme="{StaticResource GroupBoxClassic}"
-									 BorderBrush="{StaticResource TabCtrlBorderBrush}">						
+									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
 							<Border Margin="9">
 								<StackPanel Orientation="Vertical">
 									<StackPanel Orientation="Horizontal">
@@ -107,16 +118,12 @@
 								</StackPanel>
 							</Border>
 						</gb:GroupBox>
+						<gb:GroupBox Header="Startup"
+									 Theme="{StaticResource GroupBoxClassic}"
+									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+							<CheckBox IsChecked="{Binding AllowInstances}" Content="Allow multiple instances of Avalonia86" Margin="12" />
+						</gb:GroupBox>
 					</StackPanel>
-				</TabItem>
-				<TabItem Header="Apperance" Theme="{StaticResource CustomTabItm}">
-					<gb:GroupBox Header="List of machines" MaxHeight="70" VerticalAlignment="Top"
-								 Theme="{StaticResource GroupBoxClassic}"
-								 BorderBrush="{StaticResource TabCtrlBorderBrush}">
-						<StackPanel>
-							<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" Margin="12" />
-						</StackPanel>
-					</gb:GroupBox>
 				</TabItem>
 				<TabItem Header="Advanced" Theme="{StaticResource CustomTabItm}">
 					<StackPanel Margin="0,0,0,110">
@@ -141,7 +148,6 @@
 							<Border Margin="9">
 								<StackPanel Orientation="Vertical">
 									<StackPanel Orientation="Horizontal">
-										<CheckBox IsChecked="{Binding AllowInstances}" Content="Allow multiple instances of Avalonia86" Margin="12" />
 										<CheckBox IsChecked="{Binding EnableConsole}" Content="Enable 86Box console window" Margin="12" />
 									</StackPanel>
 								</StackPanel>
