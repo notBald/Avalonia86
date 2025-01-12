@@ -23,8 +23,6 @@
     <Folder Include="Compression\Algorithms\" />
     <Folder Include="Compression\PPMd\H\" />
     <Folder Include="Compression\PPMd\I1\" />
-    <Folder Include="Compression\Rar\UnpackV1\Decode\" />
-    <Folder Include="Compression\Rar\UnpackV1\PPM\" />
     <Folder Include="Compression\Rar\VM\" />
     <Folder Include="Compression\Rar\UnpackV2017\" />
     <Folder Include="Compression\Readers\" />
