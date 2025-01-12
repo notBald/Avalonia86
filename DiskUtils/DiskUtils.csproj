@@ -36,7 +36,6 @@
     <Folder Include="System\" />
     <Folder Include="Streams\Buffer\" />
     <Folder Include="Streams\Block\" />
-    <Folder Include="Utilities\" />
     <Folder Include="Vfs\" />
     <Folder Include="Streams\Util\" />
   </ItemGroup>
