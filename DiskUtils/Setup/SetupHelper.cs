@@ -32,7 +32,6 @@ namespace DiscUtils.Setup
                     return;
 
                 FileSystemManager.RegisterFileSystems(assembly);
-                VirtualDiskManager.RegisterVirtualDiskTypes(assembly);
             }
         }
 
