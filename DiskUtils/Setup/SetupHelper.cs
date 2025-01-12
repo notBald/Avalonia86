@@ -33,7 +33,6 @@ namespace DiscUtils.Setup
 
                 FileSystemManager.RegisterFileSystems(assembly);
                 VirtualDiskManager.RegisterVirtualDiskTypes(assembly);
-                VolumeManager.RegisterLogicalVolumeFactory(assembly);
             }
         }
 

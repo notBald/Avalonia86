@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using DiscUtils.Internal;
-using DiscUtils.Partitions;
 using DiscUtils.Streams;
 
 namespace DiscUtils
@@ -135,62 +134,7 @@ namespace DiscUtils
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the disk appears to have a valid partition table.
-        /// </summary>
-        /// <remarks>There is no reliable way to determine whether a disk has a valid partition
-        /// table.  The 'guess' consists of checking for basic indicators and looking for obviously
-        /// invalid data, such as overlapping partitions.</remarks>
-        public virtual bool IsPartitioned
-        {
-            get { return PartitionTable.IsPartitioned(Content); }
-        }
 
-        /// <summary>
-        /// Gets the object that interprets the partition structure.
-        /// </summary>
-        /// <remarks>It is theoretically possible for a disk to contain two independent partition structures - a
-        /// BIOS/GPT one and an Apple one, for example.  This method will return in order of preference,
-        /// a GUID partition table, a BIOS partition table, then in undefined preference one of any other partition
-        /// tables found.  See PartitionTable.GetPartitionTables to gain access to all the discovered partition
-        /// tables on a disk.</remarks>
-        public virtual PartitionTable Partitions
-        {
-            get
-            {
-                IList<PartitionTable> tables = PartitionTable.GetPartitionTables(this);
-                if (tables == null || tables.Count == 0)
-                {
-                    return null;
-                }
-                if (tables.Count == 1)
-                {
-                    return tables[0];
-                }
-                PartitionTable best = null;
-                int bestScore = -1;
-                for (int i = 0; i < tables.Count; ++i)
-                {
-                    int newScore = 0;
-                    if (tables[i] is GuidPartitionTable)
-                    {
-                        newScore = 2;
-                    }
-                    else if (tables[i] is BiosPartitionTable)
-                    {
-                        newScore = 1;
-                    }
-
-                    if (newScore > bestScore)
-                    {
-                        bestScore = newScore;
-                        best = tables[i];
-                    }
-                }
-
-                return best;
-            }
-        }
 
         /// <summary>
         /// Gets the parameters of the disk.

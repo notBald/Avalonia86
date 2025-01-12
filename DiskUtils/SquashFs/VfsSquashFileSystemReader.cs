@@ -20,10 +20,6 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using System.IO;
-using System.IO.Compression;
-using DiscUtils.Compression;
 using DiscUtils.Streams;
 using DiscUtils.Vfs;
 
@@ -263,9 +259,15 @@ namespace DiscUtils.SquashFs
                 switch (_context.SuperBlock.Compression)
                 {
                     case 1: //deflate
+                        //using (
+                        //    ZlibStream zlibStream = new ZlibStream(new MemoryStream(_ioBuffer, 0, readLen, false),
+                        //        CompressionMode.Decompress, true))
+                        //{
+                        //    block.Available = StreamUtilities.ReadMaximum(zlibStream, block.Data, 0, (int)_context.SuperBlock.BlockSize);
+                        //}
                         using (
-                            ZlibStream zlibStream = new ZlibStream(new MemoryStream(_ioBuffer, 0, readLen, false),
-                                CompressionMode.Decompress, true))
+                            var zlibStream = new SharpCompress.Compressors.Deflate.ZlibStream(new MemoryStream(_ioBuffer, 0, readLen, false),
+                                SharpCompress.Compressors.CompressionMode.Decompress))
                         {
                             block.Available = StreamUtilities.ReadMaximum(zlibStream, block.Data, 0, (int)_context.SuperBlock.BlockSize);
                         }
@@ -325,9 +327,15 @@ namespace DiscUtils.SquashFs
                 switch(_context.SuperBlock.Compression)
                 {
                     case 1: //deflate
+                        //using (
+                        //    ZlibStream zlibStream = new ZlibStream(new MemoryStream(_ioBuffer, 0, readLen, false),
+                        //        CompressionMode.Decompress, true))
+                        //{
+                        //    block.Available = StreamUtilities.ReadMaximum(zlibStream, block.Data, 0, MetadataBufferSize);
+                        //}
                         using (
-                            ZlibStream zlibStream = new ZlibStream(new MemoryStream(_ioBuffer, 0, readLen, false),
-                                CompressionMode.Decompress, true))
+                            var zlibStream = new SharpCompress.Compressors.Deflate.ZlibStream(new MemoryStream(_ioBuffer, 0, readLen, false),
+                                SharpCompress.Compressors.CompressionMode.Decompress))
                         {
                             block.Available = StreamUtilities.ReadMaximum(zlibStream, block.Data, 0, MetadataBufferSize);
                         }

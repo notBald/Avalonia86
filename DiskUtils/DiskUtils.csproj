@@ -31,8 +31,6 @@
     <Folder Include="Compression\Xz\Filters\" />
     <Folder Include="Internal\" />
     <Folder Include="CoreCompat\" />
-    <Folder Include="Raw\" />
-    <Folder Include="Partitions\" />
     <Folder Include="Setup\" />
     <Folder Include="Streams\Builder\" />
     <Folder Include="System\" />
