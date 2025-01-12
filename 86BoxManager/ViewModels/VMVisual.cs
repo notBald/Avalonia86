@@ -5,6 +5,7 @@ using Avalonia.Media.Imaging;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace _86BoxManager.ViewModels
@@ -216,10 +217,26 @@ namespace _86BoxManager.ViewModels
         public bool HasPrintTray { get => _has_print; set => this.RaiseAndSetIfChanged(ref _has_print, value); }
 
         private string _str_since_created, _str_since_run;
-        private TimeDifferenceResult _uptime = new TimeDifferenceResult("None", "", "");
+        private TimeDifferenceResult _uptime = new TimeDifferenceResult("None", "", "", TimeSpan.Zero);
         public string SinceCreated { get => _str_since_created; set => this.RaiseAndSetIfChanged(ref _str_since_created, value); }
         public string SinceRun { get => _str_since_run; set => this.RaiseAndSetIfChanged(ref _str_since_run, value); }
-        public TimeDifferenceResult Uptime { get => _uptime; set => this.RaiseAndSetIfChanged(ref _uptime, value); }
+        public TimeDifferenceResult Uptime 
+        { 
+            get => _uptime;
+            set
+            {
+                if (value != null && _uptime != null && value.TimeDifference < _uptime.TimeDifference)
+                {
+                    //This is a bug
+                    Debug.Assert(false);
+
+                    //We ignore the update
+                    return;
+                }
+
+                this.RaiseAndSetIfChanged(ref _uptime, value);
+            }
+        }
 
         private string _sel_image;
         private Bitmap _cached_image;
@@ -458,9 +475,11 @@ namespace _86BoxManager.ViewModels
             }
             else
             {
-                if (_total_duration != _duration)
+                if (_total_duration < _duration)
+                {
                     Uptime = TimeDifferenceFormatter.FormatTimeDifference(_duration, "Just started", "");
-                _total_duration = _duration;
+                    _total_duration = _duration;
+                }
             }
         }
 
