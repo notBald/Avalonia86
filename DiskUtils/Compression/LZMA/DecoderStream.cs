@@ -49,48 +49,6 @@ internal static class DecoderStreamHelper
         throw new InvalidOperationException("Could not link output stream to coder.");
     }
 
-    private static void FindPrimaryOutStreamIndex(
-        CFolder folderInfo,
-        out int primaryCoderIndex,
-        out int primaryOutStreamIndex
-    )
-    {
-        var foundPrimaryOutStream = false;
-        primaryCoderIndex = -1;
-        primaryOutStreamIndex = -1;
-
-        for (
-            int outStreamIndex = 0, coderIndex = 0;
-            coderIndex < folderInfo._coders.Count;
-            coderIndex++
-        )
-        {
-            for (
-                var coderOutStreamIndex = 0;
-                coderOutStreamIndex < folderInfo._coders[coderIndex]._numOutStreams;
-                coderOutStreamIndex++, outStreamIndex++
-            )
-            {
-                if (folderInfo.FindBindPairForOutStream(outStreamIndex) < 0)
-                {
-                    if (foundPrimaryOutStream)
-                    {
-                        throw new NotSupportedException("Multiple output streams.");
-                    }
-
-                    foundPrimaryOutStream = true;
-                    primaryCoderIndex = coderIndex;
-                    primaryOutStreamIndex = outStreamIndex;
-                }
-            }
-        }
-
-        if (!foundPrimaryOutStream)
-        {
-            throw new NotSupportedException("No output stream.");
-        }
-    }
-
     private static Stream CreateDecoderStream(
         Stream[] packStreams,
         long[] packSizes,
@@ -176,43 +134,6 @@ internal static class DecoderStreamHelper
             coderInfo._props,
             pass,
             unpackSize
-        );
-    }
-
-    internal static Stream CreateDecoderStream(
-        Stream inStream,
-        long startPos,
-        long[] packSizes,
-        CFolder folderInfo,
-        IPasswordProvider pass
-    )
-    {
-        if (!folderInfo.CheckStructure())
-        {
-            throw new NotSupportedException("Unsupported stream binding structure.");
-        }
-
-        var inStreams = new Stream[folderInfo._packStreams.Count];
-        for (var j = 0; j < folderInfo._packStreams.Count; j++)
-        {
-            inStreams[j] = new BufferedSubStream(inStream, startPos, packSizes[j]);
-            startPos += packSizes[j];
-        }
-
-        var outStreams = new Stream[folderInfo._unpackSizes.Count];
-
-        FindPrimaryOutStreamIndex(
-            folderInfo,
-            out var primaryCoderIndex,
-            out var primaryOutStreamIndex
-        );
-        return CreateDecoderStream(
-            inStreams,
-            packSizes,
-            outStreams,
-            folderInfo,
-            primaryCoderIndex,
-            pass
         );
     }
 }

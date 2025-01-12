@@ -29,6 +29,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroupBox.Avalonia", "GroupB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskUtils", "DiskUtils\DiskUtils.csproj", "{45C56B38-96A7-416B-BA26-CA648D8949F0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Readme", "Readme", "{4838308E-4EB7-49D4-8C45-609C1AC4B23C}"
+	ProjectSection(SolutionItems) = preProject
+		AUTHORS = AUTHORS
+		LICENSE = LICENSE
+		Linux.md = Linux.md
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

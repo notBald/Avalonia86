@@ -1,6 +1,10 @@
 MIT License
 
-Copyright (c) 2018-2022 David Simunič
+Copyright (c) 2018-2022 David Simunič (86Box Manager)
+Copyright (c) 2021 Oleg Stepanischev (ZstdSharp)
+Copyright (c) 2008-2011, Kenneth Bell (DiscUtils)
+Copyright (c) 2014, Quamotion (DiscUtils)
+Copyright (c) 2014  Adam Hathcock (SharpCompress)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

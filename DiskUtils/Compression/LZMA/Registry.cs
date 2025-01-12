@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
 using SharpCompress.Common.SevenZip;
 using SharpCompress.Compressors.BZip2;
 using SharpCompress.Compressors.Deflate;

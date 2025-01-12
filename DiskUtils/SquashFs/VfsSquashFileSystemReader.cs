@@ -256,15 +256,19 @@ namespace DiscUtils.SquashFs
 
                 StreamUtilities.ReadExact(stream, _ioBuffer, 0, readLen);
 
+                //╔═══╦════════════════════╦════════════════════╗
+                //║ # ║ Compression Method ║ Compatible Version ║
+                //╠═══╬════════════════════╬════════════════════╣
+                //║ 1 ║ gzip               ║ 1.0 and newer      ║
+                //║ 2 ║ lzma               ║ 4.1 and newer      ║
+                //║ 3 ║ lzo                ║ 4.1 and newer      ║
+                //║ 4 ║ xz                 ║ 4.2 and newer      ║
+                //║ 5 ║ lz4                ║ 4.3 and newer      ║
+                //║ 6 ║ zstd               ║ 4.4 and newer      ║
+                //╚═══╩════════════════════╩════════════════════╝
                 switch (_context.SuperBlock.Compression)
                 {
-                    case 1: //deflate
-                        //using (
-                        //    ZlibStream zlibStream = new ZlibStream(new MemoryStream(_ioBuffer, 0, readLen, false),
-                        //        CompressionMode.Decompress, true))
-                        //{
-                        //    block.Available = StreamUtilities.ReadMaximum(zlibStream, block.Data, 0, (int)_context.SuperBlock.BlockSize);
-                        //}
+                    case 1: 
                         using (
                             var zlibStream = new SharpCompress.Compressors.Deflate.ZlibStream(new MemoryStream(_ioBuffer, 0, readLen, false),
                                 SharpCompress.Compressors.CompressionMode.Decompress))
@@ -272,6 +276,13 @@ namespace DiscUtils.SquashFs
                             block.Available = StreamUtilities.ReadMaximum(zlibStream, block.Data, 0, (int)_context.SuperBlock.BlockSize);
                         }
                         break;
+                    case 2:
+                        //There is a Lzma decomprssor in the libary, but I'm not sure how to configure it.
+                        throw new NotImplementedException("Lzma AppImage compression");
+
+                    case 3:
+                        //https://github.com/zivillian/lzo.net (Mit lisenced)
+                        throw new NotImplementedException("LZO AppImage compression"); ;
 
                     case 4: //xz
                         using (var s = new SharpCompress.Compressors.Xz.XZStream(new MemoryStream(_ioBuffer, 0, readLen, false)))
@@ -279,6 +290,12 @@ namespace DiscUtils.SquashFs
                             block.Available = StreamUtilities.ReadMaximum(s, block.Data, 0, (int)_context.SuperBlock.BlockSize);
                         }
                         break;
+                    case 5:
+                        //https://github.com/MiloszKrajewski/lz4net
+                        throw new NotImplementedException("LZ4 AppImage compression");
+                    case 6:
+                        //https://github.com/oleg-st/ZstdSharp/tree/master (This libary is already imported)
+                        throw new NotImplementedException("Zstd AppImage compression");
                     default:
                         throw new NotImplementedException("Compression method: " + _context.SuperBlock.Compression);
                 }
