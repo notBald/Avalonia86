@@ -19,6 +19,6 @@ Any future work on this libary should be done from the basis of the maintained f
  (Though TargetPath is not implemented, on the other hand, bugs have been fixed)
 
 My changes are light
- - Removed many files not needed for reading SquashFs.
- - Allow SymNodes to get the TargetPath, so directories can be itterated (Symlink.cs and SymlinkContentBuffer).
- - Added xo decompression support (VfsSquashFileSystemReader). 
+ - Removed many files/methodes not needed for reading SquashFs.
+ - Allow SymNodes to get the TargetPath, so directories can be itterated (Files: Symlink.cs and SymlinkContentBuffer).
+ - Added xo decompression support (Files: VfsSquashFileSystemReader).
