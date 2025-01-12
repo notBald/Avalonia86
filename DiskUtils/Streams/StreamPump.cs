@@ -23,6 +23,10 @@
 using System;
 using System.IO;
 
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8603
+#pragma warning disable CS8604
 namespace DiscUtils.Streams
 {
     /// <summary>
@@ -78,12 +82,12 @@ namespace DiscUtils.Streams
         /// <summary>
         /// Gets or sets the stream that will be read from.
         /// </summary>
-        public Stream InputStream { get; set; }
+        public Stream? InputStream { get; set; }
 
         /// <summary>
         /// Gets or sets the stream that will be written to.
         /// </summary>
-        public Stream OutputStream { get; set; }
+        public Stream? OutputStream { get; set; }
 
         /// <summary>
         /// Gets or sets, for sparse transfers, the size of each chunk.
@@ -107,7 +111,7 @@ namespace DiscUtils.Streams
         /// This event is signalled synchronously, so to avoid slowing the pumping activity
         /// implementations should return quickly.
         /// </remarks>
-        public event EventHandler<PumpProgressEventArgs> ProgressEvent;
+        public event EventHandler<PumpProgressEventArgs>? ProgressEvent;
 
         /// <summary>
         /// Performs the pump activity, blocking until complete.
@@ -180,10 +184,12 @@ namespace DiscUtils.Streams
 
         private void RunSparse()
         {
-            SparseStream inStream = InputStream as SparseStream;
+            SparseStream? inStream = InputStream as SparseStream;
             if (inStream == null)
             {
+#pragma warning disable CS8604
                 inStream = SparseStream.FromStream(InputStream, Ownership.None);
+#pragma warning restore CS8604
             }
 
             if (BufferSize > SparseChunkSize && BufferSize % SparseChunkSize != 0)

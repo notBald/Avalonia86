@@ -1,10 +1,7 @@
 #nullable disable
 
-using System;
-
 namespace SharpCompress.Compressors.Xz;
 
-[CLSCompliant(false)]
 public static class Crc32
 {
     public const uint DefaultPolynomial = 0xedb88320u;

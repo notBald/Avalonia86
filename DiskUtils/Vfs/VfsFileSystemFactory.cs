@@ -20,8 +20,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-using System.IO;
-
+#pragma warning disable CS8625
 namespace DiscUtils.Vfs
 {
     /// <summary>

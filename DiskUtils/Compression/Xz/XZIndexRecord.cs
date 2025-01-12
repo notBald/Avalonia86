@@ -1,9 +1,5 @@
-using System;
-using System.IO;
-
 namespace SharpCompress.Compressors.Xz;
 
-[CLSCompliant(false)]
 public class XZIndexRecord
 {
     public ulong UnpaddedSize { get; private set; }

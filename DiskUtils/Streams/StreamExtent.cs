@@ -23,6 +23,10 @@
 using System;
 using System.Collections.Generic;
 
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8603
+#pragma warning disable CS8604
 namespace DiscUtils.Streams
 {
     /// <summary>
@@ -62,7 +66,7 @@ namespace DiscUtils.Streams
         /// <returns>Value greater than zero if this extent starts after
         /// <c>other</c>, zero if they start at the same position, else
         /// a value less than zero.</returns>
-        public int CompareTo(StreamExtent other)
+        public int CompareTo(StreamExtent? other)
         {
             if (Start > other.Start)
             {
@@ -80,7 +84,7 @@ namespace DiscUtils.Streams
         /// </summary>
         /// <param name="other">The extent to compare.</param>
         /// <returns><c>true</c> if the extents are equal, else <c>false</c>.</returns>
-        public bool Equals(StreamExtent other)
+        public bool Equals(StreamExtent? other)
         {
             if (other == null)
             {
@@ -420,7 +424,7 @@ namespace DiscUtils.Streams
         /// <param name="a">The first extent to compare.</param>
         /// <param name="b">The second extent to compare.</param>
         /// <returns>Whether the two extents are equal.</returns>
-        public static bool operator ==(StreamExtent a, StreamExtent b)
+        public static bool operator ==(StreamExtent? a, StreamExtent? b)
         {
             if (ReferenceEquals(a, null))
             {
@@ -476,9 +480,11 @@ namespace DiscUtils.Streams
         /// </summary>
         /// <param name="obj">The object to test.</param>
         /// <returns><c>true</c> if <c>obj</c> is equivalent, else <c>false</c>.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
+#pragma warning disable CS8604
             return Equals(obj as StreamExtent);
+#pragma warning restore CS8604
         }
 
         /// <summary>

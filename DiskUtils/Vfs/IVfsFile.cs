@@ -49,7 +49,7 @@ namespace DiscUtils.Vfs
         /// <summary>
         /// Gets a buffer to access the file's contents.
         /// </summary>
-        IBuffer FileContent { get; }
+        IBuffer? FileContent { get; }
 
         /// <summary>
         /// Gets the length of the file.

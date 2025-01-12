@@ -62,7 +62,7 @@ namespace DiscUtils.Streams
         /// </summary>
         /// <param name="other">The range to compare.</param>
         /// <returns><c>true</c> if the ranges are equivalent, else <c>false</c>.</returns>
-        public bool Equals(Range<TOffset, TCount> other)
+        public bool Equals(Range<TOffset, TCount>? other)
         {
             if (other == null)
             {

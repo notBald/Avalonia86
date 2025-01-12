@@ -281,10 +281,13 @@ namespace DiscUtils.Internal
                 return relativePath;
             }
 
+#pragma warning disable CS8600
             if (!basePath.EndsWith(@"\"))
                 basePath = Path.GetDirectoryName(basePath);
-
+#pragma warning restore CS8600
+#pragma warning disable CS8604
             string merged = Path.GetFullPath(Path.Combine(basePath, relativePath));
+#pragma warning restore CS8604
 
             if (basePath.StartsWith(@"\") && merged.Length > 2 && merged[1].Equals(':'))
             {

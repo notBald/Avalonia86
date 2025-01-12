@@ -28,9 +28,10 @@ namespace DiscUtils.Setup
         {
             lock (_alreadyLoaded)
             {
+#pragma warning disable CS8604
                 if (!_alreadyLoaded.Add(assembly.FullName))
                     return;
-
+#pragma warning restore CS8604
                 FileSystemManager.RegisterFileSystems(assembly);
             }
         }
@@ -43,7 +44,7 @@ namespace DiscUtils.Setup
         /// modify the parameters for opening files, validate file names 
         /// and many more.
         /// </remarks>
-        public static event EventHandler<FileOpenEventArgs> OpeningFile;
+        public static event EventHandler<FileOpenEventArgs>? OpeningFile;
 
         internal static void OnOpeningFile(object sender, FileOpenEventArgs e)
         {

@@ -23,6 +23,9 @@
 using DiscUtils.Streams;
 using DiscUtils.Vfs;
 
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8604
 namespace DiscUtils.SquashFs
 {
     internal class VfsSquashFileSystemReader : VfsReadOnlyFileSystem<DirectoryEntry, File, Directory, Context>,
@@ -32,7 +35,7 @@ namespace DiscUtils.SquashFs
         private readonly BlockCache<Block> _blockCache;
 
         private readonly Context _context;
-        private byte[] _ioBuffer;
+        private byte[]? _ioBuffer;
         private readonly BlockCache<Metablock> _metablockCache;
 
         public VfsSquashFileSystemReader(Stream stream)
@@ -241,7 +244,7 @@ namespace DiscUtils.SquashFs
                 return block;
             }
 
-            Stream stream = _context.RawStream;
+            Stream? stream = _context.RawStream;
             stream.Position = pos;
 
             int readLen = diskLen & 0x00FFFFFF;

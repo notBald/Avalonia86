@@ -1,11 +1,7 @@
 #nullable disable
 
-using System;
-using System.IO;
-
 namespace SharpCompress.Crypto;
 
-[CLSCompliant(false)]
 public sealed class Crc32Stream(Stream stream, uint polynomial, uint seed) : Stream
 {
     public const uint DEFAULT_POLYNOMIAL = 0xedb88320u;

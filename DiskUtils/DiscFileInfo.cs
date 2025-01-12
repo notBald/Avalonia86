@@ -35,7 +35,7 @@ namespace DiscUtils
         /// <summary>
         /// Gets an instance of the parent directory.
         /// </summary>
-        public DiscDirectoryInfo Directory
+        public DiscDirectoryInfo? Directory
         {
             get { return Parent; }
         }
@@ -43,9 +43,9 @@ namespace DiscUtils
         /// <summary>
         /// Gets a string representing the directory's full path.
         /// </summary>
-        public string DirectoryName
+        public string? DirectoryName
         {
-            get { return Directory.FullName; }
+            get { return Directory?.FullName; }
         }
 
         /// <summary>

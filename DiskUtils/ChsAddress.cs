@@ -66,7 +66,7 @@ namespace DiscUtils
         /// </summary>
         /// <param name="obj">The object to test against.</param>
         /// <returns><c>true</c> if the <paramref name="obj"/> is equivalent, else <c>false</c>.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null || obj.GetType() != GetType())
             {

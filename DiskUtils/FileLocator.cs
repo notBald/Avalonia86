@@ -56,7 +56,7 @@ namespace DiscUtils
 
         public abstract string ResolveRelativePath(string path);
 
-        internal string MakeRelativePath(FileLocator fileLocator, string path)
+        internal string? MakeRelativePath(FileLocator fileLocator, string path)
         {
             if (!HasCommonRoot(fileLocator))
             {

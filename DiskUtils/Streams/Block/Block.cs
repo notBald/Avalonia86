@@ -26,7 +26,7 @@ namespace DiscUtils.Streams
     {
         public int Available { get; set; }
 
-        public byte[] Data { get; set; }
+        public byte[]? Data { get; set; }
 
         public long Position { get; set; }
 

@@ -41,14 +41,14 @@ namespace DiscUtils.Vfs
         /// <summary>
         /// Gets a self-reference, if available.
         /// </summary>
-        TDirEntry Self { get; }
+        TDirEntry? Self { get; }
 
         /// <summary>
         /// Gets a specific directory entry, by name.
         /// </summary>
         /// <param name="name">The name of the directory entry.</param>
         /// <returns>The directory entry, or <c>null</c> if not found.</returns>
-        TDirEntry GetEntryByName(string name);
+        TDirEntry? GetEntryByName(string name);
 
         /// <summary>
         /// Creates a new file.

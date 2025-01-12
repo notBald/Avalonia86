@@ -23,6 +23,10 @@
 using System;
 using System.Collections.Generic;
 
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8603
+#pragma warning disable CS8604
 namespace DiscUtils.Internal
 {
     /// <summary>
@@ -34,7 +38,7 @@ namespace DiscUtils.Internal
     /// Can be use for two purposes - to ensure there is only one instance of a given object,
     /// and to prevent the need to recreate objects that are expensive to create.
     /// </remarks>
-    internal class ObjectCache<K, V>
+    internal class ObjectCache<K, V> where K : notnull
     {
         private const int MostRecentListSize = 20;
         private const int PruneGap = 500;
@@ -49,7 +53,7 @@ namespace DiscUtils.Internal
             _recent = new List<KeyValuePair<K, V>>();
         }
 
-        public V this[K key]
+        public V? this[K key]
         {
             get
             {
@@ -66,7 +70,7 @@ namespace DiscUtils.Internal
                 WeakReference wRef;
                 if (_entries.TryGetValue(key, out wRef))
                 {
-                    V val = (V)wRef.Target;
+                    var val = (V)wRef.Target;
                     if (val != null)
                     {
                         MakeMostRecent(key, val);
@@ -75,7 +79,7 @@ namespace DiscUtils.Internal
                     return val;
                 }
 
-                return default(V);
+                return default;
             }
 
             set

@@ -467,7 +467,7 @@ namespace DiscUtils
         /// Reads the boot code of the file system into a byte array.
         /// </summary>
         /// <returns>The boot code, or <c>null</c> if not available.</returns>
-        public virtual byte[] ReadBootCode()
+        public virtual byte[]? ReadBootCode()
         {
             return null;
         }

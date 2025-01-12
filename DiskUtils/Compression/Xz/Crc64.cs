@@ -1,10 +1,7 @@
 #nullable disable
 
-using System;
-
 namespace SharpCompress.Compressors.Xz;
 
-[CLSCompliant(false)]
 public static class Crc64
 {
     public const ulong DefaultSeed = 0x0;

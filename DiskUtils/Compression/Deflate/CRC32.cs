@@ -32,9 +32,6 @@
 //
 // ------------------------------------------------------------------
 
-using System;
-using System.IO;
-
 namespace SharpCompress.Compressors.Deflate;
 
 /// <summary>
@@ -43,7 +40,6 @@ namespace SharpCompress.Compressors.Deflate;
 /// directly by applications wishing to create, read, or manipulate zip archive
 /// files.
 /// </summary>
-[CLSCompliant(false)]
 public class CRC32
 {
     private const int BUFFER_SIZE = 8192;

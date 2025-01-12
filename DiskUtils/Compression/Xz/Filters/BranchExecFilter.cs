@@ -4,13 +4,10 @@
  * @TODO Encoding
  */
 
-using System;
-using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace SharpCompress.Compressors.Filters;
 
-[CLSCompliant(false)]
 public sealed class BranchExecFilter
 {
     public enum Alignment : int

@@ -26,6 +26,8 @@ using System.Text;
 using DiscUtils.Streams;
 using static System.Net.Mime.MediaTypeNames;
 
+#pragma warning disable CS8602
+#pragma warning disable CS8604
 namespace DiscUtils.SquashFs
 {
     internal class FileContentBuffer : IBuffer
@@ -172,3 +174,5 @@ namespace DiscUtils.SquashFs
         }
     }
 }
+#pragma warning restore CS8604
+#pragma warning restore CS8602

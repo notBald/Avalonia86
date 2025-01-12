@@ -28,6 +28,10 @@ using System.Text.RegularExpressions;
 using DiscUtils.Internal;
 using DiscUtils.Streams;
 
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8603
+#pragma warning disable CS8604
 namespace DiscUtils.Vfs
 {
     /// <summary>
@@ -58,12 +62,12 @@ namespace DiscUtils.Vfs
         /// <summary>
         /// Gets or sets the global shared state.
         /// </summary>
-        protected TContext Context { get; set; }
+        protected TContext? Context { get; set; }
 
         /// <summary>
         /// Gets or sets the object representing the root directory.
         /// </summary>
-        protected TDirectory RootDirectory { get; set; }
+        protected TDirectory? RootDirectory { get; set; }
 
         /// <summary>
         /// Gets the volume label.
@@ -316,7 +320,9 @@ namespace DiscUtils.Vfs
             SparseStream stream = null;
             if (string.IsNullOrEmpty(attributeName))
             {
+#pragma warning disable CS8604
                 stream = new BufferStream(file.FileContent, access);
+#pragma warning restore CS8604
             }
             else
             {
@@ -521,14 +527,14 @@ namespace DiscUtils.Vfs
             return file;
         }
 
-        protected TDirectory GetDirectory(string path)
+        protected TDirectory? GetDirectory(string path)
         {
             if (IsRoot(path))
             {
                 return RootDirectory;
             }
 
-            TDirEntry dirEntry = GetDirectoryEntry(path);
+            TDirEntry? dirEntry = GetDirectoryEntry(path);
 
             if (dirEntry != null && dirEntry.IsSymlink)
             {
@@ -543,9 +549,11 @@ namespace DiscUtils.Vfs
             return (TDirectory)GetFile(dirEntry);
         }
 
-        protected TDirEntry GetDirectoryEntry(string path)
+        protected TDirEntry? GetDirectoryEntry(string path)
         {
+#pragma warning disable CS8604
             return GetDirectoryEntry(RootDirectory, path);
+#pragma warning restore CS8604
         }
 
         /// <summary>
@@ -585,7 +593,7 @@ namespace DiscUtils.Vfs
         /// </summary>
         /// <param name="path">The path to query.</param>
         /// <returns>The file object corresponding to the path.</returns>
-        protected TFile GetFile(string path)
+        protected TFile? GetFile(string path)
         {
             if (IsRoot(path))
             {
@@ -631,15 +639,15 @@ namespace DiscUtils.Vfs
             return string.IsNullOrEmpty(path) || path == @"\";
         }
 
-        private TDirEntry GetDirectoryEntry(TDirectory dir, string path)
+        private TDirEntry? GetDirectoryEntry(TDirectory dir, string path)
         {
             string[] pathElements = path.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
             return GetDirectoryEntry(dir, pathElements, 0);
         }
 
-        private TDirEntry GetDirectoryEntry(TDirectory dir, string[] pathEntries, int pathOffset)
+        private TDirEntry? GetDirectoryEntry(TDirectory dir, string[] pathEntries, int pathOffset)
         {
-            TDirEntry entry;
+            TDirEntry? entry;
 
             if (pathEntries.Length == 0)
             {
@@ -708,7 +716,7 @@ namespace DiscUtils.Vfs
             }
         }
 
-        private TDirEntry ResolveSymlink(TDirEntry entry, string path)
+        private TDirEntry? ResolveSymlink(TDirEntry entry, string path)
         {
             TDirEntry currentEntry = entry;
             if (path.Length > 0 && path[0] != '\\')

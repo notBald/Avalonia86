@@ -7,7 +7,6 @@ using SharpCompress.IO;
 
 namespace SharpCompress.Compressors.Xz;
 
-[CLSCompliant(false)]
 public class XZIndex
 {
     private readonly BinaryReader _reader;

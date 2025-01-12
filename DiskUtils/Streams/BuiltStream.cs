@@ -24,13 +24,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8603
+#pragma warning disable CS8604
+#pragma warning disable CS8625
 namespace DiscUtils.Streams
 {
     public class BuiltStream : SparseStream
     {
         private Stream _baseStream;
 
-        private BuilderExtent _currentExtent;
+        private BuilderExtent? _currentExtent;
         private readonly List<BuilderExtent> _extents;
         private readonly long _length;
         private long _position;
@@ -206,7 +211,7 @@ namespace DiscUtils.Streams
             }
         }
 
-        private BuilderExtent FindNext(long pos)
+        private BuilderExtent? FindNext(long pos)
         {
             int min = 0;
             int max = _extents.Count - 1;
@@ -267,7 +272,7 @@ namespace DiscUtils.Streams
 
         private class ExtentRangeComparer : IComparer<BuilderExtent>
         {
-            public int Compare(BuilderExtent x, BuilderExtent y)
+            public int Compare(BuilderExtent? x, BuilderExtent? y)
             {
                 if (x == null)
                 {
@@ -297,7 +302,7 @@ namespace DiscUtils.Streams
 
         private class ExtentStartComparer : IComparer<BuilderExtent>
         {
-            public int Compare(BuilderExtent x, BuilderExtent y)
+            public int Compare(BuilderExtent? x, BuilderExtent? y)
             {
                 if (x == null)
                 {

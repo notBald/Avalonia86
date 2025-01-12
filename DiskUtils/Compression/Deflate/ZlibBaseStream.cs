@@ -33,6 +33,7 @@ using System.IO;
 using System.Text;
 using SharpCompress.Common.Tar.Headers;
 
+#pragma warning disable CA2022
 namespace SharpCompress.Compressors.Deflate;
 
 internal enum ZlibStreamFlavor

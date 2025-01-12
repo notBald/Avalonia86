@@ -21,7 +21,12 @@
 //
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8603
+#pragma warning disable CS8604
 namespace DiscUtils.Streams
 {
     public class BlockCache<T>
@@ -54,7 +59,7 @@ namespace DiscUtils.Streams
             return _blocks.ContainsKey(position);
         }
 
-        public bool TryGetBlock(long position, out T block)
+        public bool TryGetBlock(long position, out T? block)
         {
             if (_blocks.TryGetValue(position, out block))
             {
@@ -68,7 +73,7 @@ namespace DiscUtils.Streams
 
         public T GetBlock(long position)
         {
-            T result;
+            T? result;
 
             if (TryGetBlock(position, out result))
             {

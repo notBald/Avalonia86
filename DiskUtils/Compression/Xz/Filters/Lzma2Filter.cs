@@ -1,10 +1,7 @@
-using System;
-using System.IO;
 using SharpCompress.Compressors.LZMA;
 
 namespace SharpCompress.Compressors.Xz.Filters;
 
-[CLSCompliant(false)]
 public class Lzma2Filter : BlockFilter
 {
     public override bool AllowAsLast => true;

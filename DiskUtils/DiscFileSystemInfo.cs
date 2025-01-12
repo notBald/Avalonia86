@@ -157,7 +157,7 @@ namespace DiscUtils
         /// <summary>
         /// Gets the <see cref="DiscDirectoryInfo"/> of the directory containing the current <see cref="DiscFileSystemInfo"/> object.
         /// </summary>
-        public virtual DiscDirectoryInfo Parent
+        public virtual DiscDirectoryInfo? Parent
         {
             get
             {
@@ -190,12 +190,14 @@ namespace DiscUtils
             }
         }
 
+#pragma warning disable CS8600
+#pragma warning disable CS8602
         /// <summary>
         /// Indicates if <paramref name="obj"/> is equivalent to this object.
         /// </summary>
         /// <param name="obj">The object to compare.</param>
         /// <returns><c>true</c> if <paramref name="obj"/> is equivalent, else <c>false</c>.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             DiscFileSystemInfo asInfo = obj as DiscFileSystemInfo;
             if (obj == null)
@@ -206,6 +208,8 @@ namespace DiscUtils
             return string.Compare(Path, asInfo.Path, StringComparison.Ordinal) == 0 &&
                    Equals(FileSystem, asInfo.FileSystem);
         }
+#pragma warning restore CS8600
+#pragma warning restore CS8602
 
         /// <summary>
         /// Gets the hash code for this object.

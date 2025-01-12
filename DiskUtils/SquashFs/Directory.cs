@@ -28,7 +28,7 @@ namespace DiscUtils.SquashFs
 {
     internal class Directory : File, IVfsDirectory<DirectoryEntry, File>
     {
-        private readonly IDirectoryInode _dirInode;
+        private readonly IDirectoryInode? _dirInode;
 
         public Directory(Context context, Inode inode, MetadataRef inodeRef)
             : base(context, inode, inodeRef)
@@ -40,6 +40,8 @@ namespace DiscUtils.SquashFs
             }
         }
 
+#pragma warning disable CS8600
+#pragma warning disable CS8602
         public ICollection<DirectoryEntry> AllEntries
         {
             get
@@ -64,13 +66,15 @@ namespace DiscUtils.SquashFs
                 return records;
             }
         }
+#pragma warning restore CS8600
+#pragma warning restore CS8602
 
-        public DirectoryEntry Self
+        public DirectoryEntry? Self
         {
             get { return null; }
         }
 
-        public DirectoryEntry GetEntryByName(string name)
+        public DirectoryEntry? GetEntryByName(string name)
         {
             foreach (DirectoryEntry entry in AllEntries)
             {

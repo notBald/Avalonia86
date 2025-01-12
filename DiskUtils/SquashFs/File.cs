@@ -31,7 +31,7 @@ namespace DiscUtils.SquashFs
 {
     internal class File : IVfsFile
     {
-        private IBuffer _content;
+        private IBuffer? _content;
         private readonly MetadataRef _inodeRef;
 
         public File(Context context, Inode inode, MetadataRef inodeRef)
@@ -82,7 +82,7 @@ namespace DiscUtils.SquashFs
             get { return Inode.FileSize; }
         }
 
-        public IBuffer FileContent
+        public IBuffer? FileContent
         {
             get
             {

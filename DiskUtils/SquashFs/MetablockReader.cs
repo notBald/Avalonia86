@@ -62,6 +62,8 @@ namespace DiscUtils.SquashFs
                    + (_currentOffset - blockOffset);
         }
 
+#pragma warning disable CS8604
+#pragma warning disable CS8602
         public void Skip(int count)
         {
             Metablock block = _context.ReadMetaBlock(_start + _currentBlockStart);
@@ -106,6 +108,7 @@ namespace DiscUtils.SquashFs
 
             return totalRead;
         }
+
 
         public uint ReadUInt()
         {
@@ -181,5 +184,7 @@ namespace DiscUtils.SquashFs
             _currentOffset += len;
             return result;
         }
+#pragma warning restore CS8604
+#pragma warning restore CS8602
     }
 }

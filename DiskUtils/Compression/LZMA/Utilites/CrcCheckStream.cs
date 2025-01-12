@@ -1,10 +1,7 @@
-using System;
 using System.Diagnostics;
-using System.IO;
 
 namespace SharpCompress.Compressors.LZMA.Utilites;
 
-[CLSCompliant(false)]
 public class CrcCheckStream : Stream
 {
     private readonly uint _mExpectedCrc;

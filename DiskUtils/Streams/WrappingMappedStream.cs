@@ -20,9 +20,11 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-using System.Collections.Generic;
-using System.IO;
-
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8603
+#pragma warning disable CS8604
+#pragma warning disable CS8625
 namespace DiscUtils.Streams
 {
     /// <summary>
@@ -36,7 +38,7 @@ namespace DiscUtils.Streams
     public class WrappingMappedStream<T> : MappedStream
         where T : Stream
     {
-        private readonly List<StreamExtent> _extents;
+        private readonly List<StreamExtent>? _extents;
         private readonly Ownership _ownership;
 
         public WrappingMappedStream(T toWrap, Ownership ownership, IEnumerable<StreamExtent> extents)

@@ -23,6 +23,10 @@
 using System;
 using System.IO;
 
+#pragma warning disable CS8600
+#pragma warning disable CS8602
+#pragma warning disable CS8603
+#pragma warning disable CS8604
 namespace DiscUtils.Internal
 {
     internal sealed class LocalFileLocator : FileLocator

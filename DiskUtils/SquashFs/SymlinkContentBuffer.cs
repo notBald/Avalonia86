@@ -2,6 +2,8 @@
 using DiscUtils.Streams;
 using System.Text;
 
+#pragma warning disable CS8602
+#pragma warning disable CS8604
 namespace DiskUtils.SquashFs
 {
 
@@ -72,3 +74,5 @@ namespace DiskUtils.SquashFs
         }
     }
 }
+#pragma warning restore CS8602
+#pragma warning restore CS8604

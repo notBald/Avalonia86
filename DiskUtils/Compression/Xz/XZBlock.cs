@@ -8,7 +8,7 @@ using SharpCompress.Compressors.Xz.Filters;
 
 namespace SharpCompress.Compressors.Xz;
 
-[CLSCompliant(false)]
+#pragma warning disable CA2022
 public sealed class XZBlock : XZReadOnlyStream
 {
     public int BlockHeaderSize => (_blockHeaderSizeByte + 1) * 4;

@@ -1,10 +1,7 @@
-using System;
 using System.Buffers.Binary;
-using System.IO;
 
 namespace SharpCompress.Compressors.Xz;
 
-[CLSCompliant(false)]
 public static class BinaryUtils
 {
     public static int ReadLittleEndianInt32(this BinaryReader reader)

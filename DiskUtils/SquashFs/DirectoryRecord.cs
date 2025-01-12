@@ -28,7 +28,9 @@ namespace DiscUtils.SquashFs
     internal class DirectoryRecord : IByteArraySerializable
     {
         public short InodeNumber;
+#pragma warning disable CS8618
         public string Name;
+#pragma warning restore CS8618
         public ushort Offset;
         public InodeType Type;
 

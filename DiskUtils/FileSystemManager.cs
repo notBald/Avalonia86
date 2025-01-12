@@ -27,6 +27,7 @@ using System.Reflection;
 using DiscUtils.CoreCompat;
 using DiscUtils.Vfs;
 
+#pragma warning disable CS8625
 namespace DiscUtils
 {
     /// <summary>
@@ -97,11 +98,14 @@ namespace DiscUtils
         {
             foreach (Type type in assembly.GetTypes())
             {
-                Attribute attrib = ReflectionHelper.GetCustomAttribute(type, typeof(VfsFileSystemFactoryAttribute), false);
+                var attrib = ReflectionHelper.GetCustomAttribute(type, typeof(VfsFileSystemFactoryAttribute), false);
                 if (attrib == null)
                     continue;
 
-                yield return (VfsFileSystemFactory)Activator.CreateInstance(type);
+                var v = Activator.CreateInstance(type) as VfsFileSystemFactory;
+
+                if (v != null)
+                    yield return v;
             }
         }
 
