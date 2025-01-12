@@ -356,6 +356,34 @@ namespace _86BoxManager.Views
 
         public string Version { get => CurrentApp.VersionString; }
 
+        public string Lisence
+        {
+            get
+            {
+                try
+                {
+                    var startupPath = CurrentApp.StartupPath;
+                    var txt = Path.Combine(startupPath, "Resources", "LICENSE");
+                    return File.ReadAllText(txt);
+                }
+                catch { return "MIT Lisence file not loaded."; }
+            }
+        }
+
+        public string Authors
+        {
+            get
+            {
+                try
+                {
+                    var startupPath = CurrentApp.StartupPath;
+                    var txt = Path.Combine(startupPath, "Resources", "AUTHORS");
+                    return File.ReadAllText(txt);
+                }
+                catch { return "Author file not loaded."; }
+            }
+        }
+
         public bool HasChanges
         {
             get 

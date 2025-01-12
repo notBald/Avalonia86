@@ -93,10 +93,20 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Message Text="Copying libmessagebox.so from $(ProjectDir)Resources\Linux\libmessagebox.so to $(TargetDir)" Importance="high" />
     <Copy SourceFiles="$(ProjectDir)Resources\Linux\libmessagebox.so" DestinationFolder="$(TargetDir)" />
+    <Message Text="Copying LICENSE from $(ProjectDir)..\LICENSE to $(TargetDir)Resources" Importance="high" />
+    <Copy SourceFiles="$(ProjectDir)..\LICENSE" DestinationFolder="$(TargetDir)Resources" />
+    <Message Text="Copying AUTHORS from $(ProjectDir)..\AUTHORS to $(TargetDir)Resources" Importance="high" />
+    <Copy SourceFiles="$(ProjectDir)..\AUTHORS" DestinationFolder="$(TargetDir)Resources" />
   </Target>
   <Target Name="PostPublish" AfterTargets="Publish">
+    <Message Text="Copying libmessagebox.so from $(ProjectDir)Resources\Linux\libmessagebox.so to $(PublishDir)" Importance="high" />
     <Copy SourceFiles="$(ProjectDir)Resources\Linux\libmessagebox.so" DestinationFolder="$(PublishDir)" />
+    <Message Text="Copying LICENSE from $(ProjectDir)..\LICENSE to $(PublishDir)Resources" Importance="high" />
+    <Copy SourceFiles="$(ProjectDir)..\LICENSE" DestinationFolder="$(PublishDir)Resources" />
+    <Message Text="Copying AUTHORS from $(ProjectDir)..\AUTHORS to $(PublishDir)Resources" Importance="high" />
+    <Copy SourceFiles="$(ProjectDir)..\AUTHORS" DestinationFolder="$(PublishDir)Resources" />
   </Target>
 
 </Project>

@@ -185,22 +185,40 @@
 					</StackPanel>
 				</TabItem>
 				<TabItem Header="About" Theme="{StaticResource CustomTabItm}">
-					<StackPanel Margin="0,0,0,50">
-						<StackPanel Orientation="Horizontal">
-							<Image Name="aboutImg" Margin="8" Source="/Assets/86Box-gray.sm.png" Width="48" Height="48" />
-							<TextBlock Margin="8,8,8,8" VerticalAlignment="Center" FontSize="18" FontWeight="Bold">Avalonia 86</TextBlock>
+					<DockPanel >
+						<StackPanel DockPanel.Dock="Top">
+							<DockPanel>
+								<Image Name="aboutImg" Margin="8" Source="/Assets/86Box-gray.sm.png" Width="48" Height="48" DockPanel.Dock="Left" />
+								<StackPanel Margin="8" VerticalAlignment="Center">
+									<TextBlock VerticalAlignment="Center" FontSize="18" FontWeight="Bold">Avalonia 86</TextBlock>
+									<TextBlock FontSize="9" FontStyle="Italic">
+										Version: <Run Text="{Binding Version}" />
+									</TextBlock>
+									<TextBlock FontSize="9" FontStyle="Italic" Text="Copyright © 2018-2022 David Simunič" />
+								</StackPanel>
+							</DockPanel>
+							<TextBlock Margin="0, 11, 0, 0" Text="Lisence and contributors:" />
 						</StackPanel>
-						<TextBlock Margin="11" Text="A configuration manager for the 86Box emulator" />
-						<TextBlock Margin="11,13,11,2">
-							Version: <Run Text="{Binding Version}" />
-						</TextBlock>
-						<TextBlock Margin="11,28,8,4" Text="Copyright © 2018-2022 David Simunič" />
-						<TextBlock Margin="11,4,8,4" Text="Licensed under the MIT License. See the LICENSE file for" />
-						<TextBlock Margin="11,4,8,28" Text="license information and AUTHORS for a list of contributors." />
-						<controls:Hyperlink Name="lnkGithub" Margin="11" Url="https://github.com/86Box/86Box" />
-						<controls:Hyperlink Name="lnkGithub2" Margin="11,4,11,11" Url="https://github.com/RetBox/86BoxManagerX" />
-						<controls:Hyperlink Margin="11,4,11,11" Url="https://github.com/notBald/Avalonia86" />
-					</StackPanel>
+
+						<StackPanel DockPanel.Dock="Bottom" Margin="0, 10">
+							<TextBlock Text="Source code and related projects:" />
+							<controls:Hyperlink Margin="10, 0" Url="https://github.com/86Box/86Box" />
+							<controls:Hyperlink Margin="10, 0" Url="https://github.com/RetBox/86BoxManagerX" />
+							<controls:Hyperlink Margin="10, 0" Url="https://github.com/notBald/Avalonia86" />
+						</StackPanel>
+						
+						<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" MinHeight="100">
+							<Border BorderBrush="#f0f0f0" BorderThickness="0, 0, 1, 1">
+								<ScrollViewer>
+									<StackPanel Margin="10">
+										<TextBlock Text="{Binding Lisence}" />
+										<TextBlock Text="- Contributors -" TextAlignment="Center" />
+										<TextBlock Margin="0, 15, 0, 0" Text="{Binding Authors}" />
+									</StackPanel>
+								</ScrollViewer>
+							</Border>
+						</Border>
+					</DockPanel>
 				</TabItem>
 			</TabControl>
 	</DockPanel>
