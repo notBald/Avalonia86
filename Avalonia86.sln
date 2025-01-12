@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Avalonia86", "86BoxManager\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroupBox.Avalonia", "GroupBox.Avalonia\GroupBox.Avalonia.csproj", "{AB93427C-3EB7-40F0-921E-78CF58998608}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskUtils", "DiskUtils\DiskUtils.csproj", "{45C56B38-96A7-416B-BA26-CA648D8949F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{AB93427C-3EB7-40F0-921E-78CF58998608}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB93427C-3EB7-40F0-921E-78CF58998608}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB93427C-3EB7-40F0-921E-78CF58998608}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45C56B38-96A7-416B-BA26-CA648D8949F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45C56B38-96A7-416B-BA26-CA648D8949F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45C56B38-96A7-416B-BA26-CA648D8949F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45C56B38-96A7-416B-BA26-CA648D8949F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,6 +89,7 @@ Global
 		{64F8FA04-E8AF-4787-9C70-68EF6A289D5A} = {11633D7A-1FCE-4BA3-A616-EBD2A5742B1D}
 		{AC773A3C-59A7-449E-8196-55D078C3E0DB} = {FB9C017E-A47B-457A-B860-A22E607F7BDA}
 		{AB93427C-3EB7-40F0-921E-78CF58998608} = {FB9C017E-A47B-457A-B860-A22E607F7BDA}
+		{45C56B38-96A7-416B-BA26-CA648D8949F0} = {FE40DF74-77EB-454F-9CFC-1474A694C634}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65AD1D82-0EF3-4020-8253-8731951B1749}

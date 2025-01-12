@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Compression\Common\Rar\Headers\" />
+    <Folder Include="Compression\Common\SevenZip\" />
+    <Folder Include="Compression\Common\Tar\Headers\" />
+    <Folder Include="Compression\LZMA\LZ\" />
+    <Folder Include="Compression\LZMA\Utilites\" />
+    <Folder Include="Compression\LZMA\RangeCoder\" />
+    <Folder Include="Compression\IO\" />
+    <Folder Include="Compression\Crypto\" />
+    <Folder Include="Compression\Helpers\" />
+    <Folder Include="Compression\BZip2\" />
+    <Folder Include="Compression\Deflate\" />
+    <Folder Include="Compression\Filters\" />
+    <Folder Include="Compression\Algorithms\" />
+    <Folder Include="Compression\PPMd\H\" />
+    <Folder Include="Compression\PPMd\I1\" />
+    <Folder Include="Compression\Rar\UnpackV1\Decode\" />
+    <Folder Include="Compression\Rar\UnpackV1\PPM\" />
+    <Folder Include="Compression\Rar\VM\" />
+    <Folder Include="Compression\Rar\UnpackV2017\" />
+    <Folder Include="Compression\Readers\" />
+    <Folder Include="Compression\Xz\Filters\" />
+    <Folder Include="Internal\" />
+    <Folder Include="CoreCompat\" />
+    <Folder Include="Raw\" />
+    <Folder Include="Partitions\" />
+    <Folder Include="Setup\" />
+    <Folder Include="Streams\Builder\" />
+    <Folder Include="System\" />
+    <Folder Include="Streams\Buffer\" />
+    <Folder Include="Streams\Block\" />
+    <Folder Include="Utilities\" />
+    <Folder Include="Vfs\" />
+    <Folder Include="Streams\Util\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ZstdSharp.Port" Version="0.8.4" />
+  </ItemGroup>
+
+</Project>

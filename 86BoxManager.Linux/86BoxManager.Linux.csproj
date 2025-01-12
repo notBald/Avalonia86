@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\86BoxManager.Unix\86BoxManager.Unix.csproj" />
+    <ProjectReference Include="..\DiskUtils\DiskUtils.csproj" />
   </ItemGroup>
 
 </Project>
