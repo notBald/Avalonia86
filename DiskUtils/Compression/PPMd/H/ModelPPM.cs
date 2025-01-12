@@ -1,9 +1,6 @@
 #nullable disable
 
-using System;
-using System.IO;
 using System.Text;
-using SharpCompress.Compressors.Rar;
 using Decoder = SharpCompress.Compressors.LZMA.RangeCoder.Decoder;
 
 namespace SharpCompress.Compressors.PPMd.H;
@@ -275,60 +272,6 @@ internal class ModelPpm
     {
         _escCount = 1;
         new Span<int>(_charMask).Clear();
-    }
-
-    internal bool DecodeInit(IRarUnpack unpackRead, int escChar)
-    {
-        var maxOrder = unpackRead.Char & 0xff;
-        var reset = ((maxOrder & 0x20) != 0);
-
-        var maxMb = 0;
-        if (reset)
-        {
-            maxMb = unpackRead.Char;
-        }
-        else
-        {
-            if (SubAlloc.GetAllocatedMemory() == 0)
-            {
-                return (false);
-            }
-        }
-        if ((maxOrder & 0x40) != 0)
-        {
-            escChar = unpackRead.Char;
-            unpackRead.PpmEscChar = escChar;
-        }
-        Coder = new RangeCoder(unpackRead);
-        if (reset)
-        {
-            maxOrder = (maxOrder & 0x1f) + 1;
-            if (maxOrder > 16)
-            {
-                maxOrder = 16 + ((maxOrder - 16) * 3);
-            }
-            if (maxOrder == 1)
-            {
-                SubAlloc.StopSubAllocator();
-                return (false);
-            }
-            SubAlloc.StartSubAllocator((maxMb + 1) << 20);
-            _minContext = new PpmContext(Heap);
-
-            //medContext = new PPMContext(Heap);
-            _maxContext = new PpmContext(Heap);
-            FoundState = new State(Heap);
-            _dummySee2Cont = new See2Context();
-            for (var i = 0; i < 25; i++)
-            {
-                for (var j = 0; j < 16; j++)
-                {
-                    _see2Cont[i][j] = new See2Context();
-                }
-            }
-            StartModelRare(maxOrder);
-        }
-        return (_minContext.Address != 0);
     }
 
     public virtual int DecodeChar()

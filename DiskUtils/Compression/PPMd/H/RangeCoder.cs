@@ -2,7 +2,6 @@
 
 using System.IO;
 using System.Text;
-using SharpCompress.Compressors.Rar;
 
 namespace SharpCompress.Compressors.PPMd.H;
 
@@ -16,14 +15,7 @@ internal class RangeCoder
     private long _low,
         _code,
         _range;
-    private readonly IRarUnpack _unpackRead;
     private readonly Stream _stream;
-
-    internal RangeCoder(IRarUnpack unpackRead)
-    {
-        _unpackRead = unpackRead;
-        Init();
-    }
 
     internal RangeCoder(Stream stream)
     {
@@ -56,10 +48,6 @@ internal class RangeCoder
     {
         get
         {
-            if (_unpackRead != null)
-            {
-                return (_unpackRead.Char);
-            }
             if (_stream != null)
             {
                 return _stream.ReadByte();
