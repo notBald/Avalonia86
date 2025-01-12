@@ -110,11 +110,18 @@
 									The way this works is that if a executable is set as the default, but is not found, 
 									the app falls back to using the "path to the default 86Box executable".
 								</TextBlock>
-								<DataGrid>
+								<DataGrid GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit">
 									<DataGrid.Columns>
-										<DataGridTextColumn Header="Is default" />
-										<DataGridTextColumn Header="Path" Width="*" />
-										<DataGridTextColumn Header="Version" />
+										<DataGridTemplateColumn Header="Use">
+											<DataGridTemplateColumn.CellTemplate>
+												<DataTemplate>
+													<RadioButton GroupName="Executable" />
+												</DataTemplate>
+											</DataGridTemplateColumn.CellTemplate>
+										</DataGridTemplateColumn>
+										<DataGridTextColumn Header="Name" Width="*"/>
+										<DataGridTextColumn Header="Path" Width="2*" IsReadOnly="True" />
+										<DataGridTextColumn Header="Version" IsReadOnly="True" />
 									</DataGrid.Columns>
 								</DataGrid>
 							</DockPanel>

@@ -84,6 +84,15 @@ namespace _86BoxManager.Views
             }
         }
 
+        private void DataGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            // We want to make the first row (index 0) not editable
+            if (e.Row.Index == 0)
+            {
+                e.Cancel = true;
+            }
+        }
+
         private async void btnApply_Click(object sender, RoutedEventArgs e)
         {
             var success = await SaveSettings();

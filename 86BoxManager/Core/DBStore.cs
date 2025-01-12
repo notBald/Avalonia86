@@ -130,12 +130,12 @@ namespace _86BoxManager.Core
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
                 if (current_minor != -1)
                 {
-                    using var cmd = new SQLiteCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}', Version = 1.1, Minor = {minor_version}", db);
+                    using var cmd = new SQLiteCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}', Version = 1.{minor_version}, Minor = {minor_version}", db);
                     cmd.ExecuteNonQuery();
                 }
                 else
                 {
-                    using var cmd = new SQLiteCommand($"INSERT INTO FileInfo(Creator, Version, Minor) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 1.1, 1.{minor_version})", db);
+                    using var cmd = new SQLiteCommand($"INSERT INTO FileInfo(Creator, Version, Minor) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 1.{minor_version}, 1.{minor_version})", db);
                     cmd.ExecuteNonQuery();
                 }
 
