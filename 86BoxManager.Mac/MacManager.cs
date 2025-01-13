@@ -12,7 +12,7 @@ namespace _86BoxManager.Mac
     {
         public MacManager() : base(GetTmpDir()) { }
 
-        protected override ExeInfo Get86BoxInfo(string path)
+        public override ExeInfo Get86BoxInfo(string path)
         {
             var ei = new ExeInfo();
             if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))

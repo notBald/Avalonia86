@@ -3,8 +3,7 @@
 CREATE TABLE FileInfo (
     Creator TEXT NOT NULL PRIMARY KEY,
     Updater TEXT,
-    Version NUMERIC NOT NULL,
-    Minor INTEGER NOT NULL
+    Version NUMERIC NOT NULL
 ) WITHOUT ROWID;
 --§
 CREATE TABLE Window (
@@ -48,12 +47,11 @@ CREATE TABLE VMSettings (
 CREATE TABLE FileInfo_new (
     Creator TEXT NOT NULL PRIMARY KEY,
     Updater TEXT,
-    Version NUMERIC NOT NULL,
-    Minor INTEGER NOT NULL
+    Version NUMERIC NOT NULL
 ) WITHOUT ROWID;
 --§
-INSERT INTO FileInfo_new (Creator, Version, Minor)
-SELECT Creator, Version, 0 FROM FileInfo;
+INSERT INTO FileInfo_new (Creator, Version)
+SELECT Creator, Version FROM FileInfo;
 --§
 DROP TABLE FileInfo;
 --§

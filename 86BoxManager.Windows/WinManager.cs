@@ -50,7 +50,7 @@ namespace _86BoxManager.Windows
             return false;
         }
 
-        protected override ExeInfo Get86BoxInfo(string path)
+        public override ExeInfo Get86BoxInfo(string path)
         {
             var ei = new ExeInfo();
             if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))

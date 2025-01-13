@@ -71,7 +71,7 @@ namespace _86BoxManager.Common
         }
 
         protected abstract bool IsExecutable(FileInfo fi);
-        protected abstract ExeInfo Get86BoxInfo(string path);
+        public abstract ExeInfo Get86BoxInfo(string path);
 
         public abstract IVerInfo GetBoxVersion(string exeDir);
         public abstract IMessageLoop GetLoop(IMessageReceiver callback);

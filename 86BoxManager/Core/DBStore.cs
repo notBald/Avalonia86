@@ -1,6 +1,7 @@
 ﻿using _86BoxManager.Xplat;
 using Avalonia.Controls;
 using DynamicData;
+using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -40,22 +41,29 @@ namespace _86BoxManager.Core
 
         public static int DBVersion
         {
-            get
+            get => GetDBVersion(_db);
+            set => SetDBVersion(value, _db);
+        }
+
+        private static int GetDBVersion(SQLiteConnection db)
+        {
+            using (var cmd = new SQLiteCommand("PRAGMA user_version", db))
             {
-                using (var cmd = new SQLiteCommand("PRAGMA user_version"))
+                using (var r = cmd.ExecuteReader())
                 {
-                    using (var r = cmd.ExecuteReader())
-                    {
+                    if (r.Read())
                         return r.GetInt32(0);
-                    }
+
+                    return -1;
                 }
             }
-            set
+        }
+
+        private static void SetDBVersion(int value, SQLiteConnection db)
+        {
+            using (var cmd = new SQLiteCommand($"PRAGMA user_version = {value}", db))
             {
-                using (var cmd = new SQLiteCommand($"PRAGMA user_version = {value}"))
-                {
-                    cmd.ExecuteNonQuery();
-                }
+                cmd.ExecuteNonQuery();
             }
         }
 
@@ -151,14 +159,16 @@ namespace _86BoxManager.Core
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
                 if (current_minor != -1)
                 {
-                    using var cmd = new SQLiteCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}', Version = 1.{minor_version}, Minor = {minor_version}", db);
+                    using var cmd = new SQLiteCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}'", db);
                     cmd.ExecuteNonQuery();
                 }
                 else
                 {
-                    using var cmd = new SQLiteCommand($"INSERT INTO FileInfo(Creator, Version, Minor) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 1.{minor_version}, 1.{minor_version})", db);
+                    using var cmd = new SQLiteCommand($"INSERT INTO FileInfo(Creator, Version) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 1.0)", db);
                     cmd.ExecuteNonQuery();
                 }
+
+                SetDBVersion(CUR_MINOR_DB_VER, db);
 
                 return true;
             }
@@ -240,11 +250,7 @@ namespace _86BoxManager.Core
                         {
                             if (test_db)
                             {
-                                var fetch = new SQLiteCommand(db)
-                                {
-                                    CommandText =
-                                        @"select Version from FileInfo"
-                                };
+                                var fetch = new SQLiteCommand(@"select Version from FileInfo", db);
 
                                 float major;
                                 using (fetch)
@@ -260,15 +266,13 @@ namespace _86BoxManager.Core
                                 }
 
                                 //First version of the DB, does not have the "Minor" column.
-                                if (major == 1.0)
+                                if (GetDBVersion(db) < CUR_MINOR_DB_VER)
                                 {
                                     //We got to upgrade.
-                                    using (var t = db.BeginTransaction())
-                                    {
-                                        if (!InitDB(db, 0))
-                                            throw new Exception("DB create failed.");
-                                        t.Commit();
-                                    }
+                                    using var t = db.BeginTransaction();
+                                    if (!InitDB(db, GetDBVersion(db)))
+                                        throw new Exception("DB create failed.");
+                                    t.Commit();
                                 }
                             }
                             
