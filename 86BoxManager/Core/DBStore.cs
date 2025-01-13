@@ -38,6 +38,27 @@ namespace _86BoxManager.Core
             }
         }
 
+        public static int DBVersion
+        {
+            get
+            {
+                using (var cmd = new SQLiteCommand("PRAGMA user_version"))
+                {
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        return r.GetInt32(0);
+                    }
+                }
+            }
+            set
+            {
+                using (var cmd = new SQLiteCommand($"PRAGMA user_version = {value}"))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
         internal static void CloseDatabase()
         {
             if (_db != null)
