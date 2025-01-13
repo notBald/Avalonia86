@@ -61,7 +61,7 @@ namespace DiscUtils.SquashFs
             // 4 = xz
             // 5 = lz4                
             // 6 = zstd               
-            if (_context.SuperBlock.Compression != 1 && _context.SuperBlock.Compression != 4)
+            if (_context.SuperBlock.Compression < 1 || _context.SuperBlock.Compression > 6)
             {
                 throw new IOException("Unsupported compression used");
             }
@@ -297,8 +297,12 @@ namespace DiscUtils.SquashFs
                         //https://github.com/MiloszKrajewski/lz4net
                         throw new NotImplementedException("LZ4 AppImage compression");
                     case 6:
-                        //https://github.com/oleg-st/ZstdSharp/tree/master (This libary is already imported)
-                        throw new NotImplementedException("Zstd AppImage compression");
+                        //https://github.com/oleg-st/ZstdSharp/tree/master
+                        using (var zstd = new ZstdSharp.DecompressionStream(new MemoryStream(_ioBuffer, 0, readLen, false)))
+                        {
+                            block.Available = StreamUtilities.ReadMaximum(zstd, block.Data, 0, (int)_context.SuperBlock.BlockSize);
+                        }
+                        break;
                     default:
                         throw new NotImplementedException("Compression method: " + _context.SuperBlock.Compression);
                 }
@@ -365,6 +369,12 @@ namespace DiscUtils.SquashFs
                         using (var s = new SharpCompress.Compressors.Xz.XZStream(new MemoryStream(_ioBuffer, 0, readLen, false)))
                         {
                             block.Available = StreamUtilities.ReadMaximum(s, block.Data, 0, MetadataBufferSize);
+                        }
+                        break;
+                    case 6:
+                        using (var zstd = new ZstdSharp.DecompressionStream(new MemoryStream(_ioBuffer, 0, readLen, false)))
+                        {
+                            block.Available = StreamUtilities.ReadMaximum(zstd, block.Data, 0, MetadataBufferSize);
                         }
                         break;
                     default:
