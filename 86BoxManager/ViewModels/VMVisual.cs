@@ -227,9 +227,6 @@ namespace _86BoxManager.ViewModels
             {
                 if (value != null && _uptime != null && value.TimeDifference < _uptime.TimeDifference)
                 {
-                    //This is a bug
-                    Debug.Assert(false);
-
                     //We ignore the update
                     return;
                 }

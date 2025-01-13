@@ -57,20 +57,6 @@ DROP TABLE FileInfo;
 --§
 ALTER TABLE FileInfo_new RENAME TO FileInfo;
 --§Main
-CREATE TABLE Tag (
-    name TEXT NOT NULL UNIQUE,
-    description TEXT,
-    created DATETIME DEFAULT CURRENT_TIMESTAMP
-);
---§
-CREATE TABLE TagAttachment (
-    vmid INTEGER NOT NULL,
-    tag INTEGER NOT NULL,
-    PRIMARY KEY (vmid, tag),
-    FOREIGN KEY (tag) REFERENCES Tag(rowid),
-    FOREIGN KEY (vmid) REFERENCES VMs(id)
-) WITHOUT ROWID;
---§
 CREATE TABLE Executables (
     ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     IsDef BOOLEAN NOT NULL DEFAULT FALSE,
