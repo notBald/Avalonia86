@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
+using System.Collections.Generic;
 using _86BoxManager.API;
 
 namespace _86BoxManager.Common
@@ -39,7 +39,7 @@ namespace _86BoxManager.Common
             return processes.Length > 0;
         }
 
-        public virtual string Find(string[] folders, string[] exeNames)
+        public virtual string FindFolderFor86Box(string[] folders, string[] exeNames)
         {
             foreach (var folder in folders)
                 foreach (var exeName in exeNames)
@@ -51,6 +51,27 @@ namespace _86BoxManager.Common
                 }
             return null;
         }
+
+        public virtual string[] List86BoxExecutables(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                var di = new DirectoryInfo(path);
+                var files = new List<string>();
+                foreach(var exeName in di.GetFiles("86box*", new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false }))
+                {
+                    if (IsExecutable(exeName))
+                        files.Add(exeName.FullName);
+                }
+
+                return files.ToArray();
+            }
+
+            return null;
+        }
+
+        protected abstract bool IsExecutable(FileInfo fi);
+        protected abstract ExeInfo Get86BoxInfo(string path);
 
         public abstract IVerInfo GetBoxVersion(string exeDir);
         public abstract IMessageLoop GetLoop(IMessageReceiver callback);

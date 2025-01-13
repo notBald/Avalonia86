@@ -1,5 +1,6 @@
 using _86BoxManager.API;
 using _86BoxManager.Common;
+using Mono.Unix;
 using System.IO;
 
 namespace _86BoxManager.Unix
@@ -29,8 +30,18 @@ namespace _86BoxManager.Unix
         {
             return _exec;
         }
+        protected sealed override bool IsExecutable(FileInfo fileInfo)
+        {
+            if (fileInfo == null)
+                return false;
 
-        public override string Find(string[] folders, string[] exeNames)
+            UnixFileInfo unixFileInfo = new UnixFileInfo(fileInfo.FullName);
+            return (unixFileInfo.FileAccessPermissions & FileAccessPermissions.UserExecute) != 0 ||
+                   (unixFileInfo.FileAccessPermissions & FileAccessPermissions.GroupExecute) != 0 ||
+                   (unixFileInfo.FileAccessPermissions & FileAccessPermissions.OtherExecute) != 0;
+        }
+
+        public override string FindFolderFor86Box(string[] folders, string[] exeNames)
         {
             foreach (var folder in folders)
             {

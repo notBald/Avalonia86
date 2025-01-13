@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using _86BoxManager.API;
 using _86BoxManager.Common;
@@ -30,6 +31,33 @@ namespace _86BoxManager.Windows
 
             hWnd = FindWindow(null, handleTitle);
             return hWnd;
+        }
+
+        protected override bool IsExecutable(FileInfo fileInfo)
+        {
+            if (fileInfo == null)
+                return false;
+
+            string[] executableExtensions = { ".exe", ".bat", ".cmd", ".com" };
+            string fileExtension = fileInfo.Extension.ToLower();
+
+            foreach (string extension in executableExtensions)
+            {
+                if (fileExtension == extension)
+                    return true;
+            }
+
+            return false;
+        }
+
+        protected override ExeInfo Get86BoxInfo(string path)
+        {
+            var ei = new ExeInfo();
+            if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            {
+                ei.VerInfo = new WinVerInfo(FileVersionInfo.GetVersionInfo(path));
+            }
+            return ei;
         }
 
         public override IVerInfo GetBoxVersion(string exeDir)

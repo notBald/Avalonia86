@@ -4,13 +4,51 @@ using _86BoxManager.API;
 using _86BoxManager.Common;
 using _86BoxManager.Unix;
 using System;
-using DiscUtils.SquashFs;
+using Mono.Unix;
+using System.Reflection;
 
 namespace _86BoxManager.Linux
 {
     public sealed class LinuxManager : UnixManager
     {
         public LinuxManager() : base(GetTmpDir()) { }
+
+        protected override ExeInfo Get86BoxInfo(string path)
+        {
+            var ei = new ExeInfo();
+            if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            {
+                if (AppImageChecker.TryGetAppInfo(path, out var info))
+                {
+                    //Todo: parse version string
+                }
+
+                if (ei.VerInfo == null)
+                {
+                    var full = Path.GetFileNameWithoutExtension(path);
+                    var split = full.Split('-');
+                    if (split.Length > 1)
+                    {
+                        var build = split.LastOrDefault();
+
+                        //We try getting it from the filename
+                        if (build.StartsWith('b') && build.Length > 2 && int.TryParse(build.AsSpan(1), out int build_nr))
+                        {
+                            ei.VerInfo = new CommonVerInfo
+                            {
+                                FilePrivatePart = build_nr,
+
+                                // We can't read the info
+                                FileMinorPart = -1,
+                                FileMajorPart = -1,
+                                FileBuildPart = -1
+                            };
+                        }
+                    }
+                }
+            }
+            return ei;
+        }
 
         public override IVerInfo GetBoxVersion(string exeDir)
         {
