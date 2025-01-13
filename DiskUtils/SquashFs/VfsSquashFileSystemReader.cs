@@ -279,9 +279,15 @@ namespace DiscUtils.SquashFs
                             block.Available = StreamUtilities.ReadMaximum(zlibStream, block.Data, 0, (int)_context.SuperBlock.BlockSize);
                         }
                         break;
-                    case 2:
-                        //There is a Lzma decomprssor in the libary, but I'm not sure how to configure it.
-                        throw new NotImplementedException("Lzma AppImage compression");
+                    case 2: //Lzma
+                        var ba = new byte[13];
+                        Array.Copy(_ioBuffer, ba, ba.Length);
+
+                        using (var s = new SharpCompress.Compressors.LZMA.LzmaStream(ba, new MemoryStream(_ioBuffer, ba.Length, readLen - ba.Length, false)))
+                        {
+                            block.Available = StreamUtilities.ReadMaximum(s, block.Data, 0, (int)_context.SuperBlock.BlockSize);
+                        }
+                        break;
 
                     case 3:
                         //https://github.com/zivillian/lzo.net (Mit lisenced)
@@ -351,17 +357,20 @@ namespace DiscUtils.SquashFs
                 switch(_context.SuperBlock.Compression)
                 {
                     case 1: //deflate
-                        //using (
-                        //    ZlibStream zlibStream = new ZlibStream(new MemoryStream(_ioBuffer, 0, readLen, false),
-                        //        CompressionMode.Decompress, true))
-                        //{
-                        //    block.Available = StreamUtilities.ReadMaximum(zlibStream, block.Data, 0, MetadataBufferSize);
-                        //}
                         using (
                             var zlibStream = new SharpCompress.Compressors.Deflate.ZlibStream(new MemoryStream(_ioBuffer, 0, readLen, false),
                                 SharpCompress.Compressors.CompressionMode.Decompress))
                         {
                             block.Available = StreamUtilities.ReadMaximum(zlibStream, block.Data, 0, MetadataBufferSize);
+                        }
+                        break;
+                    case 2: //Lzma
+                        var ba = new byte[13];
+                        Array.Copy(_ioBuffer, ba, ba.Length);
+
+                        using (var s = new SharpCompress.Compressors.LZMA.LzmaStream(ba, new MemoryStream(_ioBuffer, ba.Length, readLen - ba.Length, false)))
+                        {
+                            block.Available = StreamUtilities.ReadMaximum(s, block.Data, 0, MetadataBufferSize);
                         }
                         break;
 
