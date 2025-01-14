@@ -22,6 +22,7 @@ CREATE TABLE AppSettings (
 CREATE TABLE VMs (
     ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     VMPath TEXT NOT NULL UNIQUE,
+    VMRoms Text,
     Name TEXT NOT NULL,
     Created TEXT NOT NULL,
     Category TEXT,
@@ -29,7 +30,9 @@ CREATE TABLE VMs (
     LastRun TEXT,
     Uptime TEXT,
     RunCount INTEGER NOT NULL DEFAULT 0,
-    Linked BOOLEAN NOT NULL DEFAULT FALSE 
+    Linked BOOLEAN NOT NULL DEFAULT FALSE,
+    Exe TEXT,
+    FOREIGN KEY (Exe) REFERENCES Executables(ID)
 );
 --§
 CREATE TABLE VMSettings (
@@ -56,6 +59,29 @@ SELECT Creator, Version FROM FileInfo;
 DROP TABLE FileInfo;
 --§
 ALTER TABLE FileInfo_new RENAME TO FileInfo;
+--§
+CREATE TABLE VMs_new (
+    ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    VMPath TEXT NOT NULL UNIQUE,
+    VMRoms Text,
+    Name TEXT NOT NULL,
+    Created TEXT NOT NULL,
+    Category TEXT,
+    IconPath TEXT,
+    LastRun TEXT,
+    Uptime TEXT,
+    RunCount INTEGER NOT NULL DEFAULT 0,
+    Linked BOOLEAN NOT NULL DEFAULT FALSE,
+    ExeID INTEGER,
+    FOREIGN KEY (ExeID) REFERENCES Executables(ID)
+);
+--§
+INSERT INTO VMs_new (ID, VMPath, Name, Created, Category, IconPath, LastRun, Uptime, RunCount, Linked)
+SELECT ID, VMPath, Name, Created, Category, IconPath, LastRun, Uptime, RunCount, Linked FROM VMs;
+--§
+DROP TABLE VMs;
+--§
+ALTER TABLE VMs_new RENAME TO VMs;
 --§Main
 CREATE TABLE Tag (
     name TEXT NOT NULL UNIQUE,
@@ -75,6 +101,7 @@ CREATE TABLE Executables (
     ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     IsDef BOOLEAN NOT NULL DEFAULT FALSE,
     Name TEXT,
-    Path86 TEXT NOT NULL UNIQUE,
+    VMPath TEXT NOT NULL UNIQUE,
+    VMRoms Text,
     Comment Text
 );

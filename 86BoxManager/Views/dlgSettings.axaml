@@ -74,7 +74,7 @@
 					<StackPanel Orientation="Vertical">
 						<gb:GroupBox Header="Paths"
 									 Theme="{StaticResource GroupBoxClassic}">
-							<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+							<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto">
 								<Label Content="Path to the default 86Box executable:" 
 									   Target="{Binding ElementName=tbPath}"
 									   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
@@ -97,14 +97,23 @@
 									   Grid.Row="4" Grid.Column="0"/>
 								<Button Click="btnBrowse2_Click" Name="btnBrowse2" Content="Browse..."
 										Grid.Row="4" Grid.Column="2"/>
+
+								<Label Content="Path to roms:"
+									   Target="{Binding ElementName=tbROM}"
+									   Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"/>
+								<TextBox Text="{Binding CFGDir}" Name="tbROM" Watermark="Default is roms folder in 86Box's folder"
+									   Grid.Row="6" Grid.Column="0"/>
+								<Button Content="Browse..."
+										Grid.Row="6" Grid.Column="2"/>
 							</Grid>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Alternative 86Box executables"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<DockPanel Margin="9">
-								<StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+								<StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,2" Spacing="2">
 									<Button>Add</Button>
 									<Button>Remove</Button>
+									<Button>Edit</Button>
 								</StackPanel>
 								<TextBlock DockPanel.Dock="Bottom" TextWrapping="Wrap" FontStyle="Italic" Margin="0, 5, 0, 0">
 									The way this works is that if a executable is set as the default, but is not found, 
