@@ -55,7 +55,7 @@
 							<Label Content="Path to the 86Box executable:"
 								   Target="{Binding ElementName=tbPath}"
 								   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
-							<TextBox Name="tbPath" Grid.Row="1" Grid.Column="0" />
+							<TextBox Name="tbPath" Grid.Row="1" Grid.Column="0" Text="{Binding ExePath}" />
 							<Button Content="Browse..." Click="btnPathBrowse_click"
 									Grid.Row="1" Grid.Column="2"/>
 							<StackPanel Orientation="Horizontal" Margin="5, 5, 5, 10" Spacing="5"

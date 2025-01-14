@@ -181,7 +181,9 @@ namespace _86BoxManager.Views
             }
         }
 
-        // Obtains the 86Box version from 86Box executable
+        /// <summary>
+        /// Obtains the 86Box version from 86Box executable
+        /// </summary>
         private void Get86BoxVersion()
         {
             _m.ExeValid = false;
@@ -340,7 +342,10 @@ namespace _86BoxManager.Views
 
         private async void btnAddExe_Click(object sender, RoutedEventArgs e)
         {
-            var win = new dlgAddExe();
+            var win = new dlgAddExe()
+            {
+                DefExePath = _m.ExeDir
+            };
             await Tools.Dialogs.RunDialog(this, win);
         }
     }

@@ -6,6 +6,7 @@ using _86BoxManager.Unix;
 using System;
 using Mono.Unix;
 using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace _86BoxManager.Linux
 {
@@ -20,7 +21,17 @@ namespace _86BoxManager.Linux
             {
                 if (AppImageChecker.TryGetAppInfo(path, out var info))
                 {
-                    //Todo: parse version string
+                    if (info.Version != null)
+                    {
+                        var version = AppImageInfo.ParseVersion(info.Version);
+                        ei.VerInfo = new CommonVerInfo()
+                        {
+                            FilePrivatePart = version[3],
+                            FileMajorPart = version[0],
+                            FileMinorPart = version[1],
+                            FileBuildPart = version[2]
+                        };
+                    }
                 }
 
                 if (ei.VerInfo == null)

@@ -13,6 +13,7 @@ namespace _86BoxManager.Tools
     internal static class NativeMSG
     {
         public static bool IsLinux { get => RuntimeInformation.IsOSPlatform(OSPlatform.Linux); }
+        public static bool IsWindows { get => RuntimeInformation.IsOSPlatform(OSPlatform.Windows); }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);

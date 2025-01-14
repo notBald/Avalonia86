@@ -17,8 +17,8 @@ public class AppImageChecker
 
     public static bool TryGetAppInfo(Stream s, out AppImageInfo info)
     {
-        string? exe_name = null, version = null, arch = null;
-        SquashFileSystemReader? squash;
+        string exe_name = null, version = null, arch = null;
+        SquashFileSystemReader squash;
 
         TryOpenAppImage(s, out squash);
 
@@ -79,7 +79,7 @@ public class AppImageChecker
         return squash != null;
     }
 
-    public static bool TryOpenAppImage(Stream stream, out SquashFileSystemReader? squash)
+    public static bool TryOpenAppImage(Stream stream, out SquashFileSystemReader squash)
     {
         var (buffer, position) = IsAppImageType2(stream);
         squash = null;
@@ -130,7 +130,7 @@ public class AppImageChecker
         return FindMagicNumber(source, Type2SqshNumber, data, pos);
     }
 
-    public static (byte[] buffer, int position) FindMagicNumber(Stream stream, byte[] magicNumber, byte[]? buffer = null, int pos = 0)
+    public static (byte[] buffer, int position) FindMagicNumber(Stream stream, byte[] magicNumber, byte[] buffer = null, int pos = 0)
     {
         const int NUM_TRIES = 32;
         const int bufferSize = 32 * 1024; // 32 KB

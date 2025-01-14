@@ -70,6 +70,11 @@ namespace _86BoxManager.Common
             return null;
         }
 
+        public bool IsExecutable(string path)
+        {
+            return path != null && File.Exists(path) && IsExecutable(new FileInfo(path));
+        }
+
         protected abstract bool IsExecutable(FileInfo fi);
         public abstract ExeInfo Get86BoxInfo(string path);
 

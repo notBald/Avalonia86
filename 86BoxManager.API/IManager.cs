@@ -15,6 +15,8 @@ namespace _86BoxManager.API
 
         IVerInfo GetBoxVersion(string exeDir);
 
+        bool IsExecutable(string path);
+
         /// <summary>
         /// List paths to executables. 
         /// </summary>

@@ -168,7 +168,7 @@ namespace _86BoxManager.Tools
 
             if (res.Count == 1)
             {
-                file = res[0].Path.AbsolutePath;
+                file = res[0].Path.LocalPath;
             }
 
             if (string.IsNullOrWhiteSpace(file))
