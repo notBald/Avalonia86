@@ -260,8 +260,8 @@ namespace _86BoxManager.Core
                                         return false;
                                     major = r.GetFloat("Version");
 
-                                    //Tests if the file is a Version 1.x format.
-                                    if (major >= 2)
+                                    //Tests if the file is a Version 1.x format, but version also supports the comming 2.0 format.
+                                    if (major > 2)
                                         return false;
                                 }
 

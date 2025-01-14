@@ -292,6 +292,7 @@ namespace _86BoxManager.Core
         public void RemoveVM(long id)
         {
             var p = new SQLParam("id", id);
+            _store.Execute("DELETE FROM TagAttachment where vmid = @id", p);
             _store.Execute("DELETE FROM VMSettings where vmid = @id", p);
             _store.Execute("DELETE FROM VMs where id = @id", p);
         }
