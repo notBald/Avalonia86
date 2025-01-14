@@ -337,6 +337,12 @@ namespace _86BoxManager.Views
             _was_cancled = true;
             Close(ResponseType.Cancel);
         }
+
+        private async void btnAddExe_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new dlgAddExe();
+            await Tools.Dialogs.RunDialog(this, win);
+        }
     }
 
     internal class dlgSettingsModel : ReactiveObject

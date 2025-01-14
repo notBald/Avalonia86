@@ -1,0 +1,96 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:gb="using:GroupBox.Avalonia.Controls"
+		xmlns:v="clr-namespace:_86BoxManager.Views"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="350"
+		Width="500" Height="350"
+        x:Class="_86BoxManager.Views.dlgAddExe"
+		x:DataType="v:dlgAddExeModel"
+        Title="Add 86Box Executable"
+		Background="#f0f0f0">
+	<Window.Styles>
+		<Style Selector="Button">
+			<Setter Property="Background" Value="#e1e1e1"/>
+			<Setter Property="BorderBrush" Value="#adadad"/>
+			<Setter Property="BorderThickness" Value="1"/>
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="BorderBrush" Value="{StaticResource CustomTextBoxBrush}"/>
+		</Style>
+
+		<Style Selector="SelectableTextBlock.version">
+			<Setter Property="Foreground" Value="Gray" />
+			<Setter Property="FontWeight" Value="Bold" />
+			<Setter Property="FontSize" Value="14" />
+
+			<Style Selector="^.error">
+				<Setter Property="Foreground" Value="Red" />
+			</Style>
+			<Style Selector="^.warn">
+				<Setter Property="Foreground" Value="Orange" />
+			</Style>
+			<Style Selector="^.valid">
+				<Setter Property="Foreground" Value="Green" />
+			</Style>
+		</Style>
+
+		<Style Selector="gb|GroupBox">
+			<Setter Property="BorderBrush" Value="{StaticResource TabCtrlBorderBrush}" />
+		</Style>
+	</Window.Styles>
+	<Grid>
+		<DockPanel Margin="12">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0" Spacing="4" DockPanel.Dock="Bottom">
+				<Button Content="OK"   />
+				<Button Content="Cancel" Click="btnCancel_Click" />
+			</StackPanel>
+			<TabControl Theme="{StaticResource CustomTabCtrl}" >
+				<TabItem Header="Register" Theme="{StaticResource CustomTabItm}">
+					<gb:GroupBox Header="Paths" Margin="0, 0, 0, 20"
+									 Theme="{StaticResource GroupBoxClassic}">
+						<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
+							<Label Content="Path to the 86Box executable:"
+								   Target="{Binding ElementName=tbPath}"
+								   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
+							<TextBox Name="tbPath" Grid.Row="1" Grid.Column="0" />
+							<Button Content="Browse..." Click="btnPathBrowse_click"
+									Grid.Row="1" Grid.Column="2"/>
+							<StackPanel Orientation="Horizontal" Margin="5, 5, 5, 10" Spacing="5"
+										Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+								<TextBlock Text="86Box version:" FontSize="14"/>
+								<SelectableTextBlock Classes="version" Classes.error="{Binding ExeError}"
+										Classes.warn="{Binding ExeWarn}" Classes.valid="{Binding ExeValid}"
+										Text="{Binding ExeVersion, Mode=OneWay, TargetNullValue='Not set'}"/>
+							</StackPanel>
+
+							<Label Content="Path to roms:"
+								   Target="{Binding ElementName=tbROM}"
+								   Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"/>
+							<TextBox Text="{Binding RomDir}" Name="tbROM" Watermark="Default is roms folder in 86Box's folder"
+								   Grid.Row="4" Grid.Column="0"/>
+							<Button Content="Browse..."
+									Grid.Row="4" Grid.Column="2"/>
+							<TextBlock Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="3" Margin="0, 2, 0, 0">
+								The way roms are prioritized:<LineBreak />
+								<Run xml:space="preserve"> 1. Use the path above, if set.</Run><LineBreak />
+								<Run xml:space="preserve"> 2. Use the "roms" folder in the 86Box directory.</Run><LineBreak />
+								<Run xml:space="preserve"> 3. Use the default roms folder for the application.</Run>
+							</TextBlock>
+						</Grid>
+					</gb:GroupBox>
+				</TabItem>
+			</TabControl>
+		</DockPanel>
+		<Canvas>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="2"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="2"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="8" Canvas.Bottom="2"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="5"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="5"/>
+			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="8"/>
+		</Canvas>
+	</Grid>
+</Window>

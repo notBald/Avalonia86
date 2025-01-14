@@ -111,7 +111,7 @@
 									 Theme="{StaticResource GroupBoxClassic}">
 							<DockPanel Margin="9">
 								<StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,2" Spacing="2">
-									<Button>Add</Button>
+									<Button Click="btnAddExe_Click">Add</Button>
 									<Button>Remove</Button>
 									<Button>Edit</Button>
 								</StackPanel>

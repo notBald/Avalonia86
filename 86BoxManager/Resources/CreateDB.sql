@@ -103,5 +103,6 @@ CREATE TABLE Executables (
     Name TEXT,
     VMPath TEXT NOT NULL UNIQUE,
     VMRoms Text,
+    "Version" Text,
     Comment Text
 );

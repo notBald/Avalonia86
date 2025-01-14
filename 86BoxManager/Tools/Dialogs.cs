@@ -124,8 +124,7 @@ namespace _86BoxManager.Tools
         public static async Task<string> SaveFile(string title, string dir, string filter,
             Window parent, string ext = null)
         {
-            //Todo: figure out how the file type filtering is supposed to work. This is a get it to compile impl:
-            FilePickerFileType[] fpft = ext == null ? Array.Empty<FilePickerFileType>() : [ new FilePickerFileType(ext) { Patterns = [ "*.log "], MimeTypes = [ "*/* "] }, FilePickerFileTypes.All ];
+            FilePickerFileType[] fpft = ext == null ? Array.Empty<FilePickerFileType>() : [ new FilePickerFileType(ext) { Patterns = [ $"*{ext}"], MimeTypes = [ "*/*"] }, FilePickerFileTypes.All ];
 
             Uri.TryCreate("file://" + dir, UriKind.Absolute, out var uri);
             var tl = TopLevel.GetTopLevel(parent);
@@ -137,15 +136,6 @@ namespace _86BoxManager.Tools
                 FileTypeChoices = fpft
             });
 
-            //if (filter != null)
-            //{
-            //    var tmp = filter.Split('|', 2);
-            //    dialog.Filters = new List<FileDialogFilter>
-            //    {
-            //        new() { Name = tmp.First(), Extensions = new List<string> { tmp.Last() } }
-            //    };
-            //}
-
             string fld = null;
 
             if (res != null)
@@ -156,6 +146,34 @@ namespace _86BoxManager.Tools
             if (string.IsNullOrWhiteSpace(fld))
                 return null;
             return fld;
+        }
+
+        public static async Task<string> OpenFile(string title, string dir, string filter,
+            Window parent, string ext = null)
+        {
+            FilePickerFileType[] fpft = ext == null ? Array.Empty<FilePickerFileType>() : [new FilePickerFileType(ext) { Patterns = [$"*{ext}"], MimeTypes = ["*/*"] }, FilePickerFileTypes.All];
+
+            Uri.TryCreate("file://" + dir, UriKind.Absolute, out var uri);
+            var tl = TopLevel.GetTopLevel(parent);
+            var folder = await tl.StorageProvider.TryGetFolderFromPathAsync(uri);
+            var res = await tl.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = title,
+                SuggestedStartLocation = folder,
+                AllowMultiple = false,
+                FileTypeFilter = fpft
+            });
+
+            string file = null;
+
+            if (res.Count == 1)
+            {
+                file = res[0].Path.AbsolutePath;
+            }
+
+            if (string.IsNullOrWhiteSpace(file))
+                return null;
+            return file;
         }
     }
 
