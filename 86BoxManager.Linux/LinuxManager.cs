@@ -14,9 +14,9 @@ namespace _86BoxManager.Linux
     {
         public LinuxManager() : base(GetTmpDir()) { }
 
-        public override ExeInfo Get86BoxInfo(string path)
+        public override IVerInfo Get86BoxInfo(string path)
         {
-            var ei = new ExeInfo();
+            CommonVerInfo ei = null;
             if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
             {
                 if (AppImageChecker.TryGetAppInfo(path, out var info))
@@ -24,7 +24,7 @@ namespace _86BoxManager.Linux
                     if (info.Version != null)
                     {
                         var version = AppImageInfo.ParseVersion(info.Version);
-                        ei.VerInfo = new CommonVerInfo()
+                        ei = new CommonVerInfo()
                         {
                             FilePrivatePart = version[3],
                             FileMajorPart = version[0],
@@ -34,7 +34,7 @@ namespace _86BoxManager.Linux
                     }
                 }
 
-                if (ei.VerInfo == null)
+                if (ei == null)
                 {
                     var full = Path.GetFileNameWithoutExtension(path);
                     var split = full.Split('-');
@@ -45,7 +45,7 @@ namespace _86BoxManager.Linux
                         //We try getting it from the filename
                         if (build.StartsWith('b') && build.Length > 2 && int.TryParse(build.AsSpan(1), out int build_nr))
                         {
-                            ei.VerInfo = new CommonVerInfo
+                            ei = new CommonVerInfo
                             {
                                 FilePrivatePart = build_nr,
 

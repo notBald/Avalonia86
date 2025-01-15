@@ -11,43 +11,14 @@ using MsBox.Avalonia.Dto;
 using System.Linq;
 using StartLoc = Avalonia.Controls.WindowStartupLocation;
 using Avalonia.Platform.Storage;
-using System.Runtime.CompilerServices;
+using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 using Avalonia.Threading;
 
 namespace _86BoxManager.Tools
 {
     internal static class Dialogs
     {
-        //private static Task<ButtonResult> ShowMessageBox(string msg, Icon icon, Window parent,
-        //    ButtonEnum buttons = ButtonEnum.Ok, string title = "Attention")
-        //{
-        //    var loc = parent == null ? StartLoc.CenterScreen : StartLoc.CenterOwner;
-        //    var opts = new MessageBoxStandardParams
-        //    {
-        //        ButtonDefinitions = buttons,
-        //        ContentTitle = title,
-        //        ContentMessage = msg,
-        //        Icon = icon,
-        //        CanResize = false,
-        //        WindowStartupLocation = loc,
-        //        SizeToContent = SizeToContent.WidthAndHeight
-        //    };
-        //    var window = MessageBoxManager.GetMessageBoxStandard(opts);
-        //    var raw = parent != null ? window.ShowWindowDialogAsync(parent) : window.ShowAsync();
-
-        //    //Todo: This code is key to getting it running
-        //    //if (Application.Current is var app)
-        //    //{
-        //    //    var flags = BindingFlags.NonPublic | BindingFlags.Instance;
-        //    //    var windowField = window.GetType().GetField("_window", flags)!;
-        //    //    var windowObj = (Window)windowField.GetValue(window)!;
-        //    //    if (parent?.Icon is { } wi)
-        //    //        windowObj.Icon = wi;
-        //    //    app.Run(windowObj);
-        //    //}
-
-        //    return raw;
-        //}
+        public delegate void DialogResult(ResponseType? result);
 
         public static void DispatchMSGBox(string msg, Icon icon, Window parent,
             ButtonEnum buttons = ButtonEnum.Ok, string title = "Attention")
@@ -77,14 +48,14 @@ namespace _86BoxManager.Tools
         }
 
         [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
-        public static async Task RunDialog(this Window parent, Window dialog, Action func = null)
+        public static async Task RunDialog(this Window parent, Window dialog, DialogResult func = null)
         {
             dialog.WindowStartupLocation = StartLoc.CenterOwner;
             dialog.Icon = parent.Icon;
 
-            var raw = dialog.ShowDialog(parent);
+            var raw = dialog.ShowDialog<object>(parent);
             await raw;
-            func?.Invoke();
+            func?.Invoke(raw.Result as ResponseType?);
             (dialog as IDisposable)?.Dispose();
         }
 

@@ -39,6 +39,11 @@ public partial class dlgAddExe : Window
         Close(ResponseType.Cancel);
     }
 
+    private void btnOK_Click(object sender, RoutedEventArgs e)
+    {
+        Close(ResponseType.Ok);
+    }
+
     private async void btnPathBrowse_click(object sender, RoutedEventArgs e)
     {
         var text = "Select an 86Box executable";
@@ -73,21 +78,24 @@ public partial class dlgAddExe : Window
         _m.ExeError = false;
         _m.ExeWarn = false;
         _m.ExeVersion = "86Box executable not found!";
+        _m._sugested_name = null;
+        _m._sugested_ver = null;
 
         try
         {
-            var v = Platforms.Manager.Get86BoxInfo(_m.ExePath);
-            if (v != null && v.VerInfo != null)
+            var vi = Platforms.Manager.Get86BoxInfo(_m.ExePath);
+            if (vi != null)
             {
-                var vi = v.VerInfo;
+                var ver_str = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}";
+
                 if (vi.FilePrivatePart >= 3541) //Officially supported builds
                 {
-                    _m.ExeVersion = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - fully compatible";
+                    _m.ExeVersion = $"{ver_str}.{vi.FilePrivatePart} - fully compatible";
                     _m.ExeValid = true;
                 }
                 else if (vi.FilePrivatePart >= 3333 && vi.FilePrivatePart < 3541) //Should mostly work...
                 {
-                    _m.ExeVersion = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - partially compatible";
+                    _m.ExeVersion = $"{ver_str}.{vi.FilePrivatePart} - partially compatible";
                     _m.ExeWarn = true;
                 }
                 else //Completely unsupported, since version info can't be obtained anyway
@@ -95,13 +103,18 @@ public partial class dlgAddExe : Window
                     _m.ExeVersion = "Unknown - may not be compatible";
                     _m.ExeError = true;
                 }
+
+                _m._sugested_name = $"86Box {ver_str} - build {vi.FilePrivatePart}";
+                _m._sugested_ver = $"{ver_str}";
             }
         }
         catch { }
 
-        _m.RaisePropertyChanged(nameof(dlgSettingsModel.ExeError));
-        _m.RaisePropertyChanged(nameof(dlgSettingsModel.ExeWarn));
-        _m.RaisePropertyChanged(nameof(dlgSettingsModel.ExeValid));
+        _m.RaisePropertyChanged(nameof(dlgAddExeModel.ExeError));
+        _m.RaisePropertyChanged(nameof(dlgAddExeModel.ExeWarn));
+        _m.RaisePropertyChanged(nameof(dlgAddExeModel.ExeValid));
+        _m.RaisePropertyChanged(nameof(dlgAddExeModel.NameMark));
+        _m.RaisePropertyChanged(nameof(dlgAddExeModel.VerMark));
     }
 }
 
@@ -109,10 +122,32 @@ internal class dlgAddExeModel : ReactiveObject
 {
     dlgAddExeModel _me;
     private string _rom_dir, _exe_path, _exe_ver;
+    internal string _sugested_name, _sugested_ver;
+
+    const string NO_PATH_WATERMARK = "< Select a path, please >";
+    const string PATH_WATERMARK = "< Fill this out, please >";
 
     public bool ExeValid { get; set; }
     public bool ExeWarn { get; set; }
     public bool ExeError { get; set; }
+
+    public string NameMark
+    {
+        get
+        {
+            return _sugested_name == null ? (HasPath ? PATH_WATERMARK : NO_PATH_WATERMARK) : _sugested_name;
+        }
+    }
+
+    public string VerMark
+    {
+        get
+        {
+            return _sugested_ver == null ? (HasPath ? PATH_WATERMARK : NO_PATH_WATERMARK) : _sugested_ver;
+        }
+    }
+
+    public bool HasPath => _exe_path != null;
 
     public bool HasChanges
     {
@@ -121,7 +156,8 @@ internal class dlgAddExeModel : ReactiveObject
             if (_me == null)
                 return false;
 
-            return false;
+            return _me._exe_path != _exe_path ||
+                   _me._rom_dir != _rom_dir;
         }
     }
 
@@ -134,6 +170,7 @@ internal class dlgAddExeModel : ReactiveObject
             {
                 this.RaiseAndSetIfChanged(ref _exe_path, value);
                 this.RaisePropertyChanged(nameof(HasChanges));
+                this.RaisePropertyChanged(nameof(HasPath));
             }
         }
     }
@@ -146,7 +183,6 @@ internal class dlgAddExeModel : ReactiveObject
             if (_exe_ver != value)
             {
                 this.RaiseAndSetIfChanged(ref _exe_ver, value);
-                this.RaisePropertyChanged(nameof(HasChanges));
             }
         }
     }

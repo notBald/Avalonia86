@@ -50,14 +50,13 @@ namespace _86BoxManager.Windows
             return false;
         }
 
-        public override ExeInfo Get86BoxInfo(string path)
+        public override IVerInfo Get86BoxInfo(string path)
         {
-            var ei = new ExeInfo();
             if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
             {
-                ei.VerInfo = new WinVerInfo(FileVersionInfo.GetVersionInfo(path));
+                return new WinVerInfo(FileVersionInfo.GetVersionInfo(path));
             }
-            return ei;
+            return null;
         }
 
         public override IVerInfo GetBoxVersion(string exeDir)

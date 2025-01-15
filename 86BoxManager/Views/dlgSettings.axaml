@@ -71,8 +71,8 @@
 			</StackPanel>
 			<TabControl SelectedIndex="0" Theme="{StaticResource CustomTabCtrl}" >
 				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
-					<StackPanel Orientation="Vertical">
-						<gb:GroupBox Header="Paths"
+					<DockPanel>
+						<gb:GroupBox Header="Paths" DockPanel.Dock="Top"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto">
 								<Label Content="Path to the default 86Box executable:" 
@@ -116,26 +116,31 @@
 									<Button>Edit</Button>
 								</StackPanel>
 								<TextBlock DockPanel.Dock="Bottom" TextWrapping="Wrap" FontStyle="Italic" Margin="0, 5, 0, 0">
-									The way this works is that if a executable is set as the default, but is not found, 
-									the app falls back to using the "path to the default 86Box executable".
+									Note, if a executable is not found the app falls back to using the "path to the default 86Box executable".
 								</TextBlock>
-								<DataGrid GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit">
+								<DataGrid RowBackground="White"
+									GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}">
+									<DataGrid.Styles>
+										<Style Selector="ScrollBar">
+											<Setter Property="AllowAutoHide" Value="False"/>
+										</Style>
+									</DataGrid.Styles>
 									<DataGrid.Columns>
 										<DataGridTemplateColumn Header="Use">
 											<DataGridTemplateColumn.CellTemplate>
 												<DataTemplate>
-													<RadioButton GroupName="Executable" />
+													<RadioButton GroupName="Executable" IsChecked="{Binding IsDefault}" HorizontalAlignment="Center" />
 												</DataTemplate>
 											</DataGridTemplateColumn.CellTemplate>
 										</DataGridTemplateColumn>
-										<DataGridTextColumn Header="Name" Width="*"/>
-										<DataGridTextColumn Header="Path" Width="2*" IsReadOnly="True" />
+										<DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Name}" />
+										<DataGridTextColumn Header="Path" Width="2*" IsReadOnly="True" Binding="{Binding VMPath}" />
 										<DataGridTextColumn Header="Version" IsReadOnly="True" />
 									</DataGrid.Columns>
 								</DataGrid>
 							</DockPanel>
 						</gb:GroupBox>
-					</StackPanel>
+					</DockPanel>
 				</TabItem>
 				<TabItem Header="Behaviour" Theme="{StaticResource CustomTabItm}">
 					<StackPanel Orientation="Vertical">

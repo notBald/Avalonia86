@@ -1,14 +1,18 @@
 using _86BoxManager.Core;
 using _86BoxManager.Tools;
+using _86BoxManager.ViewModels;
 using _86BoxManager.Xplat;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using DynamicData;
 using ReactiveUI;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using static _86BoxManager.Views.dlgAddExeModel;
 using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
 using IOPath = System.IO.Path;
 using MessageType = MsBox.Avalonia.Enums.Icon;
@@ -25,11 +29,17 @@ namespace _86BoxManager.Views
         {
             InitializeComponent();
             Closing += dlgSettings_FormClosing;
+            Closed += dlgSettings_Closed;
 
             _m = new dlgSettingsModel();
             DataContext = _m;
 
             _m.PropertyChanged += _m_PropertyChanged;
+        }
+
+        private void dlgSettings_Closed(object sender, EventArgs e)
+        {
+            _m.Dispose();
         }
 
         private void _m_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -89,7 +99,7 @@ namespace _86BoxManager.Views
             // We want to make the first row (index 0) not editable
             if (e.Row.Index == 0)
             {
-                e.Cancel = true;
+                //e.Cancel = true;
             }
         }
 
@@ -193,25 +203,34 @@ namespace _86BoxManager.Views
 
             try
             {
-                var vi = Platforms.Manager.GetBoxVersion(_m.ExeDir);
-                if (vi != null)
+                var files = Platforms.Manager.List86BoxExecutables(_m.ExeDir);
+                foreach (var file in files)
                 {
-                    if (vi.FilePrivatePart >= 3541) //Officially supported builds
+                    if (Platforms.Manager.IsExecutable(file))
                     {
-                        _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - fully compatible";
-                        _m.ExeValid = true;
+                        var vi = Platforms.Manager.Get86BoxInfo(file);
+                        if (vi != null)
+                        {
+                            if (vi.FilePrivatePart >= 3541) //Officially supported builds
+                            {
+                                _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - fully compatible";
+                                _m.ExeValid = true;
+                            }
+                            else if (vi.FilePrivatePart >= 3333 && vi.FilePrivatePart < 3541) //Should mostly work...
+                            {
+                                _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - partially compatible";
+                                _m.ExeWarn = true;
+                            }
+                            else //Completely unsupported, since version info can't be obtained anyway
+                            {
+                                _m.ExePath = "Unknown - may not be compatible";
+                                _m.ExeError = true;
+                            }
+
+                            break;
+                        }
                     }
-                    else if (vi.FilePrivatePart >= 3333 && vi.FilePrivatePart < 3541) //Should mostly work...
-                    {
-                        _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - partially compatible";
-                        _m.ExeWarn = true;
-                    }
-                    else //Completely unsupported, since version info can't be obtained anyway
-                    {
-                        _m.ExePath = "Unknown - may not be compatible";
-                        _m.ExeError = true;
-                    }
-                }
+                }                
             }
             catch { }
 
@@ -346,11 +365,25 @@ namespace _86BoxManager.Views
             {
                 DefExePath = _m.ExeDir
             };
-            await Tools.Dialogs.RunDialog(this, win);
+            var m = ((dlgAddExeModel)win.DataContext);
+            m.Commit();
+            await Tools.Dialogs.RunDialog(this, win, (dr) =>
+            {
+                if (dr == ResponseType.Ok)
+                {
+                    _m.Executables.Add(new dlgSettingsModel.ExeEntery() { 
+                        VMPath = m.ExePath, 
+                        VMRoms = m.RomDir,
+                        Name = "Random"
+                    });
+
+                    //Todo: determine name and that sort of fun stuff
+                }
+            });
         }
     }
 
-    internal class dlgSettingsModel : ReactiveObject
+    internal class dlgSettingsModel : ReactiveObject, IDisposable
     {
         private string _exe_dir, _exe_path, _cfg_dir;
         private bool _min_start, _min_tray, _close_tray;
@@ -358,6 +391,11 @@ namespace _86BoxManager.Views
         private string _log_path;
         private bool _allow_instances, _enable_console;
         private bool _compact_list;
+
+        public SourceList<ExeEntery> Executables = new SourceList<ExeEntery>();
+        private readonly ReadOnlyObservableCollection<ExeEntery> _filtered_executables;
+        public ReadOnlyObservableCollection<ExeEntery> FilteredExecutables => _filtered_executables;
+        readonly IDisposable _exe_sub;
 
         dlgSettingsModel _me;
 
@@ -565,6 +603,19 @@ namespace _86BoxManager.Views
             }
         }
 
+        public dlgSettingsModel()
+        {
+            _exe_sub = Executables.Connect()
+                .Filter(x => !x.IsDeleted)
+                .Bind(out _filtered_executables)
+                .Subscribe();
+        }
+
+        public void Dispose()
+        {
+            _exe_sub.Dispose();
+        }
+
         public void NotifyPropertyChange(AppSettings s)
         {
             if (s.PropertyChanged != null)
@@ -579,6 +630,20 @@ namespace _86BoxManager.Views
             _me = (dlgSettingsModel) MemberwiseClone();
 
             this.RaisePropertyChanged(nameof(HasChanges));
+        }
+
+        public class ExeEntery : ReactiveObject
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public string VMPath { get; set; }
+            public string VMRoms { get; set; }
+            public string Version { get; set; }
+            public string Comment { get; set; }
+
+            public bool IsDeleted { get; set; }
+
+            public bool IsDefault { get; set; }
         }
     }
 }

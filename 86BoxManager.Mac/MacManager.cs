@@ -12,12 +12,11 @@ namespace _86BoxManager.Mac
     {
         public MacManager() : base(GetTmpDir()) { }
 
-        public override ExeInfo Get86BoxInfo(string path)
+        public override IVerInfo Get86BoxInfo(string path)
         {
-            var ei = new ExeInfo();
             if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
-                ei.VerInfo = GetBoxVersion(Path.GetDirectoryName(path));
-            return ei;
+                return GetBoxVersion(Path.GetDirectoryName(path));
+            return null;
         }
 
         public override IVerInfo GetBoxVersion(string exeDir)

@@ -11,7 +11,7 @@ namespace _86BoxManager.API
 
         bool IsProcessRunning(string name);
 
-        ExeInfo Get86BoxInfo(string path);
+        IVerInfo Get86BoxInfo(string path);
 
         IVerInfo GetBoxVersion(string exeDir);
 
