@@ -86,7 +86,7 @@
 	<Grid>
 		<DockPanel Margin="12">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0" Spacing="4" DockPanel.Dock="Bottom">
-				<Button Content="Add" Click="btnAdd_Click" IsEnabled="{Binding CanAdd}" />
+				<Button Content="Add" Click="btnAdd_Click" IsEnabled="{Binding CanAdd}" IsDefault="True" />
 				<Button Name="btnCancel" Content="Cancel" Click="btnCancel_OnClick" />
 			</StackPanel>
 			<TabControl Name="tbc" SelectedIndex="{Binding TabIndex}" Theme="{StaticResource CustomTabCtrl}" >
@@ -139,7 +139,7 @@
 									<Grid Margin="12, 6, 0, 4"
 										  ColumnDefinitions="auto, 5, *" RowDefinitions="auto, 5, auto">
 										<TextBlock Text="Name:" Margin="2, 0, 2, 2" Grid.Column="0" Grid.Row="0" />
-										<TextBox Watermark="Enter name" Grid.Column="2" Grid.Row="0" Text="{Binding VMName}" />
+										<TextBox Name="tbName" Watermark="Enter name" Grid.Column="2" Grid.Row="0" Text="{Binding VMName}" />
 										<TextBlock Text="Category:" Margin="2" Grid.Column="0" Grid.Row="2" />
 										<AutoCompleteBox Grid.Column="2" Grid.Row="2"
 											 IsTextCompletionEnabled="True"

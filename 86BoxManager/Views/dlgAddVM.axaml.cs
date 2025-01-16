@@ -48,6 +48,12 @@ namespace _86BoxManager.Views
             _s = AppSettings.Settings;
 
             Closing += DlgAddVM_Closing;
+            Loaded += DlgAddVM_Loaded;
+        }
+
+        private void DlgAddVM_Loaded(object sender, RoutedEventArgs e)
+        {
+            tbName.Focus();
         }
 
         private void DlgAddVM_Closing(object sender, WindowClosingEventArgs e)

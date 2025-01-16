@@ -39,8 +39,8 @@
 	<Grid>
 		<DockPanel Margin="12">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
-				<Button Name="btnApply" Content="Apply" HorizontalAlignment="Stretch" Click="btnApply_Click" Margin="0,0,20,0"/>
-				<Button Name="btnCancel" Content="Cancel" HorizontalAlignment="Stretch" Click="btnCancel_Click" Margin="0,0,20,0" IsDefault="True"/>
+				<Button Name="btnApply" Content="Apply" HorizontalAlignment="Stretch" Click="btnApply_Click" Margin="0,0,20,0" IsDefault="True"/>
+				<Button Name="btnCancel" Content="Cancel" HorizontalAlignment="Stretch" Click="btnCancel_Click" Margin="0,0,20,0"/>
 			</StackPanel>
 			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10">
 				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
