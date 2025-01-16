@@ -41,6 +41,29 @@ public partial class dlgAddExe : Window
 
     private void btnOK_Click(object sender, RoutedEventArgs e)
     {
+        if (string.IsNullOrWhiteSpace(_m.Name))
+        {
+            if (!string.IsNullOrWhiteSpace(_m._sugested_name))
+                _m.Name = _m._sugested_name;
+            else
+                _m.Name = System.IO.Path.GetFileName(_m.ExePath);
+        }
+        if (string.IsNullOrWhiteSpace(_m.Version))
+        {
+            if (!string.IsNullOrWhiteSpace(_m._sugested_ver))
+                _m.Version = _m._sugested_ver;
+            else
+                _m.Version = "Unknown";
+        }
+        if (string.IsNullOrWhiteSpace(_m.RomDir))
+            _m.RomDir = null;
+        if (string.IsNullOrWhiteSpace(_m.Comment))
+            _m.Comment = null;
+        if (string.IsNullOrWhiteSpace(_m.RomDir))
+            _m.RomDir = null;
+        if (string.IsNullOrWhiteSpace(_m.Arch))
+            _m.Arch = null;
+
         Close(ResponseType.Ok);
     }
 
@@ -66,6 +89,19 @@ public partial class dlgAddExe : Window
             }
 
             _m.ExePath = file_name; 
+        }
+    }
+
+    private async void btnRomBrowse_click(object sender, RoutedEventArgs e)
+    {
+        var text = "Select a ROM folder for 86Box";
+
+        string path = string.IsNullOrWhiteSpace(DefExePath) ? "" : DefExePath;
+        var folder_name = await Dialogs.SelectFolder(path, text, this);
+
+        if (folder_name != null)
+        {
+            _m.RomDir = folder_name;
         }
     }
 
@@ -106,6 +142,8 @@ public partial class dlgAddExe : Window
 
                 _m._sugested_name = $"86Box {ver_str} - build {vi.FilePrivatePart}";
                 _m._sugested_ver = $"{ver_str}";
+
+                _m.Arch = vi.Arch;
             }
         }
         catch { }
@@ -122,6 +160,7 @@ internal class dlgAddExeModel : ReactiveObject
 {
     dlgAddExeModel _me;
     private string _rom_dir, _exe_path, _exe_ver;
+    private string _name, _version, _comment, _arch;
     internal string _sugested_name, _sugested_ver;
 
     const string NO_PATH_WATERMARK = "< Select a path, please >";
@@ -139,12 +178,64 @@ internal class dlgAddExeModel : ReactiveObject
         }
     }
 
+    public string Name 
+    { 
+        get => _name;
+        set
+        {
+            if (value != _name)
+            {
+                this.RaiseAndSetIfChanged(ref _name, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        } 
+    }
+
     public string VerMark
     {
         get
         {
             return _sugested_ver == null ? (HasPath ? PATH_WATERMARK : NO_PATH_WATERMARK) : _sugested_ver;
         }
+    }
+
+    public string Version 
+    { 
+        get => _version;
+        set
+        {
+            if (value != _version)
+            {
+                this.RaiseAndSetIfChanged(ref _version, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
+
+    public string Comment 
+    { 
+        get => _comment;
+        set
+        {
+            if (value != _comment)
+            {
+                this.RaiseAndSetIfChanged(ref _comment, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
+
+    public string Arch 
+    { 
+        get => _arch; 
+        set
+        {
+            if (value != _arch)
+            {
+                this.RaiseAndSetIfChanged(ref _arch, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        } 
     }
 
     public bool HasPath => _exe_path != null;
@@ -157,7 +248,11 @@ internal class dlgAddExeModel : ReactiveObject
                 return false;
 
             return _me._exe_path != _exe_path ||
-                   _me._rom_dir != _rom_dir;
+                   _me._rom_dir != _rom_dir ||
+                   _me._arch != _arch ||
+                   _me._name != _name ||
+                   _me._comment != _comment ||
+                   _me._version != _version;
         }
     }
 

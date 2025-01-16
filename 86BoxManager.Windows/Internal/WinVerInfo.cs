@@ -17,6 +17,8 @@ namespace _86BoxManager.Windows.Internal
         public int FileMinorPart => _info.FileMinorPart;
         public int FileBuildPart => _info.FileBuildPart;
 
+        public string Arch { get; set; }
+
         public override string ToString() => _info.ToString();
     }
 }

@@ -230,7 +230,7 @@ namespace _86BoxManager.Views
                             break;
                         }
                     }
-                }                
+                }
             }
             catch { }
 
@@ -347,8 +347,11 @@ namespace _86BoxManager.Views
                 {
                     _m.CFGDir = cfgPath;
                 }
-            
+
             }
+
+            //Todo:
+            _m.IsDefChecked = true;
 
             _m.Commit();
         }
@@ -367,17 +370,84 @@ namespace _86BoxManager.Views
             };
             var m = ((dlgAddExeModel)win.DataContext);
             m.Commit();
+            await Tools.Dialogs.RunDialog(this, win, async (dr) =>
+            {
+                if (dr == ResponseType.Ok)
+                {
+                    bool add = true;
+
+                    foreach (var exe in _m.FilteredExecutables)
+                    {
+                        if (exe.VMPath == m.ExePath)
+                        {
+                            var r = await Dialogs.ShowMessageBox(
+                                $"{m.Name} is already in the list under the name \"{exe.Name}\".\n\nDo you wish to add it anyway?", MessageType.Question, this,
+                                ButtonsType.YesNo, $"Is already in the list");
+                            add = r == ResponseType.Yes;
+                            break;
+                        }
+                    }
+
+                    if (add)
+                    {
+                        _m.Executables.AddOrUpdate(new dlgSettingsModel.ExeEntery()
+                        {
+                            ID = -1 - _m.Executables.Count,
+                            VMPath = m.ExePath,
+                            VMRoms = m.RomDir,
+                            Name = m.Name,
+                            Version = m.Version,
+                            Comment = m.Comment,
+                            Arch = m.Arch
+                        });
+                    }
+                }
+            });
+        }
+
+        private void btnRemove_Click(object sender, RoutedEventArgs e)
+        {
+            if (_m.SelectedExe != null) 
+            {
+                //We don't delete as that would mess up the "id" generating algo
+                _m.SelectedExe.IsDeleted = true;
+                if (_m.SelectedExe.IsDefault)
+                    _m.IsDefChecked = true;
+
+                //Deleted items are filtered away
+                _m.Executables.Refresh();
+            }
+        }
+
+        private async void btnEdit_Click(object sender, RoutedEventArgs e)
+        {
+            if (_m.SelectedExe == null)
+                return;
+            var sel = _m.SelectedExe;
+
+            var win = new dlgAddExe()
+            {
+                DefExePath = _m.ExeDir
+            };
+            var m = ((dlgAddExeModel)win.DataContext);
+            m.Arch = sel.Arch;
+            m.Version = sel.Version;
+            m.Comment = sel.Comment;
+            m.Name = sel.Name;
+            m.RomDir = sel.VMRoms;
+            m.ExePath = sel.VMPath;
+            m.Commit();
             await Tools.Dialogs.RunDialog(this, win, (dr) =>
             {
                 if (dr == ResponseType.Ok)
                 {
-                    _m.Executables.Add(new dlgSettingsModel.ExeEntery() { 
-                        VMPath = m.ExePath, 
-                        VMRoms = m.RomDir,
-                        Name = "Random"
-                    });
-
-                    //Todo: determine name and that sort of fun stuff
+                    sel.Arch = m.Arch;
+                    sel.Version = m.Version;
+                    sel.Comment = m.Comment;
+                    sel.Name = m.Name;
+                    sel.VMRoms = m.RomDir;
+                    sel.VMPath = m.ExePath;
+                    sel.SetChanged();   
                 }
             });
         }
@@ -388,16 +458,39 @@ namespace _86BoxManager.Views
         private string _exe_dir, _exe_path, _cfg_dir;
         private bool _min_start, _min_tray, _close_tray;
         private bool _enable_logging;
+        private bool _is_default_selected;
         private string _log_path;
         private bool _allow_instances, _enable_console;
         private bool _compact_list;
+        private ExeEntery _sel_exe;
 
-        public SourceList<ExeEntery> Executables = new SourceList<ExeEntery>();
+        public SourceCache<ExeEntery, int> Executables = new(o => o.ID);
         private readonly ReadOnlyObservableCollection<ExeEntery> _filtered_executables;
         public ReadOnlyObservableCollection<ExeEntery> FilteredExecutables => _filtered_executables;
         readonly IDisposable _exe_sub;
 
         dlgSettingsModel _me;
+
+        public ExeEntery SelectedExe 
+        { 
+            get => _sel_exe;
+            set
+            {
+                if (_sel_exe != value)
+                {
+                    _sel_exe = value;
+                    this.RaisePropertyChanged(nameof(HasSelectedExe));
+                }
+            }
+        }
+
+        public bool IsDefChecked
+        {
+            get => _is_default_selected;
+            set => this.RaiseAndSetIfChanged(ref _is_default_selected, value);
+        }
+
+        public bool HasSelectedExe => _sel_exe != null;
 
         public bool ExeValid { get; set; }
         public bool ExeWarn { get; set; }
@@ -614,6 +707,7 @@ namespace _86BoxManager.Views
         public void Dispose()
         {
             _exe_sub.Dispose();
+            Executables.Dispose();
         }
 
         public void NotifyPropertyChange(AppSettings s)
@@ -634,6 +728,11 @@ namespace _86BoxManager.Views
 
         public class ExeEntery : ReactiveObject
         {
+            public readonly bool IsNew;
+            public bool IsChanged { get; private set; }
+
+            public ExeEntery(bool is_new = true) { IsNew = is_new; }
+
             public int ID { get; set; }
             public string Name { get; set; }
             public string VMPath { get; set; }
@@ -641,9 +740,23 @@ namespace _86BoxManager.Views
             public string Version { get; set; }
             public string Comment { get; set; }
 
+            public string Arch { get; set; }
+
             public bool IsDeleted { get; set; }
 
             public bool IsDefault { get; set; }
+
+            public void SetChanged()
+            {
+                IsChanged = true;
+                this.RaisePropertyChanged(nameof(Name));
+                this.RaisePropertyChanged(nameof(VMPath));
+                this.RaisePropertyChanged(nameof(VMRoms));
+                this.RaisePropertyChanged(nameof(Version));
+                this.RaisePropertyChanged(nameof(Comment));
+                this.RaisePropertyChanged(nameof(Arch));
+                this.RaisePropertyChanged(nameof(IsChanged));
+            }
         }
     }
 }

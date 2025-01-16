@@ -79,7 +79,7 @@
 									   Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"/>
 								<TextBox Text="{Binding RomDir}" Name="tbROM" Watermark="Default is roms folder in 86Box's folder"
 									   Grid.Row="4" Grid.Column="0"/>
-								<Button Content="Browse..."
+								<Button Content="Browse..." Click="btnRomBrowse_click"
 										Grid.Row="4" Grid.Column="2"/>
 								<TextBlock Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="3" Margin="0, 2, 0, 0">
 									The way roms are prioritized:<LineBreak />
@@ -94,12 +94,12 @@
 							<DockPanel Margin="9">
 								<StackPanel DockPanel.Dock="Top">
 									<Label Content="Descriptive name:" Target="{Binding ElementName=tbName}" />
-									<TextBox Name="tbName" IsEnabled="{Binding HasPath}" Watermark="{Binding NameMark}" />
+									<TextBox Name="tbName" Text="{Binding Name}" IsEnabled="{Binding HasPath}" Watermark="{Binding NameMark, Mode=OneWay}" />
 									<Label Content="Correct version:" Target="{Binding ElementName=tbVersion}" />
-									<TextBox Name="tbVersion" IsEnabled="{Binding HasPath}" Watermark="{Binding VerMark}" />
+									<TextBox Name="tbVersion" Text="{Binding Version}" IsEnabled="{Binding HasPath}" Watermark="{Binding VerMark, Mode=OneWay}" />
 									<Label Content="Comment:" Target="{Binding ElementName=tbComment}" />
 								</StackPanel>
-								<TextBox Name="tbComment" AcceptsReturn="True" />
+								<TextBox Name="tbComment" Text="{Binding Comment}" AcceptsReturn="True" />
 							</DockPanel>
 						</gb:GroupBox>
 					</DockPanel>

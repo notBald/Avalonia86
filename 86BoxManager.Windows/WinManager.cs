@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
+using System.Reflection.PortableExecutable;
 using System.Threading;
 using _86BoxManager.API;
 using _86BoxManager.Common;
@@ -54,7 +54,18 @@ namespace _86BoxManager.Windows
         {
             if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
             {
-                return new WinVerInfo(FileVersionInfo.GetVersionInfo(path));
+                var vi = new WinVerInfo(FileVersionInfo.GetVersionInfo(path));
+
+                using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    using (var reader = new PEReader(stream))
+                    {
+                        var headers = reader.PEHeaders;
+                        vi.Arch = headers.CoffHeader.Machine.ToString();
+                    }
+                }
+
+                return vi;
             }
             return null;
         }

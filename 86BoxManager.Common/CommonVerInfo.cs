@@ -11,5 +11,7 @@ namespace _86BoxManager.Common
         public int FileMinorPart { get; set; }
 
         public int FileBuildPart { get; set; }
+
+        public string Arch { get; set; }
     }
 }

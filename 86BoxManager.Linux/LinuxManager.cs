@@ -29,7 +29,8 @@ namespace _86BoxManager.Linux
                             FilePrivatePart = version[3],
                             FileMajorPart = version[0],
                             FileMinorPart = version[1],
-                            FileBuildPart = version[2]
+                            FileBuildPart = version[2],
+                            Arch = info.Arch
                         };
                     }
                 }

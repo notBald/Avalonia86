@@ -99,10 +99,11 @@ CREATE TABLE TagAttachment (
 --§
 CREATE TABLE Executables (
     ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    Name TEXT,
     IsDef BOOLEAN NOT NULL DEFAULT FALSE,
-    VMPath TEXT NOT NULL UNIQUE,
+    Name TEXT,
+    VMPath TEXT NOT NULL,
     VMRoms Text,
     "Version" Text,
-    Comment Text
+    Comment Text,
+    Arch Text,
 );

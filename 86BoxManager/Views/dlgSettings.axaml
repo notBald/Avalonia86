@@ -107,37 +107,55 @@
 										Grid.Row="6" Grid.Column="2"/>
 							</Grid>
 						</gb:GroupBox>
-						<gb:GroupBox Header="Alternative 86Box executables"
-									 Theme="{StaticResource GroupBoxClassic}">
-							<DockPanel Margin="9">
+						<gb:GroupBox Header="Alternative 86Box executables" Margin="0, 0, 0, 10"
+									 Theme="{StaticResource GroupBoxClassic}">						
+							<DockPanel Margin="9, 9, 9, 5">
 								<StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,2" Spacing="2">
 									<Button Click="btnAddExe_Click">Add</Button>
-									<Button>Remove</Button>
-									<Button>Edit</Button>
+									<Button Click="btnRemove_Click" IsEnabled="{Binding HasSelectedExe}">Remove</Button>
+									<Button Click="btnEdit_Click" IsEnabled="{Binding HasSelectedExe}">Edit</Button>
 								</StackPanel>
-								<TextBlock DockPanel.Dock="Bottom" TextWrapping="Wrap" FontStyle="Italic" Margin="0, 5, 0, 0">
-									Note, if a executable is not found the app falls back to using the "path to the default 86Box executable".
-								</TextBlock>
-								<DataGrid RowBackground="White"
-									GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}">
-									<DataGrid.Styles>
-										<Style Selector="ScrollBar">
-											<Setter Property="AllowAutoHide" Value="False"/>
-										</Style>
-									</DataGrid.Styles>
-									<DataGrid.Columns>
-										<DataGridTemplateColumn Header="Use">
-											<DataGridTemplateColumn.CellTemplate>
-												<DataTemplate>
-													<RadioButton GroupName="Executable" IsChecked="{Binding IsDefault}" HorizontalAlignment="Center" />
-												</DataTemplate>
-											</DataGridTemplateColumn.CellTemplate>
-										</DataGridTemplateColumn>
-										<DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Name}" />
-										<DataGridTextColumn Header="Path" Width="2*" IsReadOnly="True" Binding="{Binding VMPath}" />
-										<DataGridTextColumn Header="Version" IsReadOnly="True" />
-									</DataGrid.Columns>
-								</DataGrid>
+								<DockPanel>
+									<Grid DockPanel.Dock="Bottom" ColumnDefinitions="32, *" Margin="0, 4, 0, 0">
+										<RadioButton GroupName="Executable" IsChecked="{Binding IsDefChecked}" HorizontalAlignment="Center">
+											<RadioButton.Styles>
+												<Style Selector="RadioButton /template/ Ellipse#checkMark">
+													<Setter Property="Fill" Value="Green" />
+												</Style>
+											</RadioButton.Styles>
+										</RadioButton>
+										<TextBlock Grid.Column="1">Prefer default executable</TextBlock>
+									</Grid>
+									<DataGrid RowBackground="White" SelectedItem="{Binding SelectedExe}, Mode=OneWayToSource" BorderThickness="0"
+										GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}">
+										<DataGrid.Styles>
+											<Style Selector="ScrollBar">
+												<Setter Property="AllowAutoHide" Value="False"/>
+											</Style>
+										</DataGrid.Styles>
+										<DataGrid.Columns>
+											<DataGridTemplateColumn Header="Use">
+												<DataGridTemplateColumn.CellTemplate>
+													<DataTemplate>
+														<RadioButton GroupName="Executable" IsChecked="{Binding IsDefault}" HorizontalAlignment="Center" Foreground="Red">
+															<RadioButton.Styles>
+																<Style Selector="RadioButton /template/ Ellipse#checkMark">
+																	<Setter Property="Fill" Value="Green" />
+																</Style>
+																<Style Selector="DataGridRow:selected RadioButton /template/ Ellipse#checkMark">
+																	<Setter Property="Fill" Value="LightGreen" />
+																</Style>
+															</RadioButton.Styles>
+														</RadioButton>
+													</DataTemplate>
+												</DataGridTemplateColumn.CellTemplate>
+											</DataGridTemplateColumn>
+											<DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Name}" />
+											<DataGridTextColumn Header="Path" Width="2*" IsReadOnly="True" Binding="{Binding VMPath}" />
+											<DataGridTextColumn Header="Version" IsReadOnly="True" Binding="{Binding Version}" />
+										</DataGrid.Columns>
+									</DataGrid>
+								</DockPanel>
 							</DockPanel>
 						</gb:GroupBox>
 					</DockPanel>

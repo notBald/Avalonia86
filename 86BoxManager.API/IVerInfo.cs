@@ -9,5 +9,7 @@
         int FileMinorPart { get; }
 
         int FileBuildPart { get; }
+
+        string Arch {  get; }
     }
 }
