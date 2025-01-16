@@ -101,9 +101,9 @@
 								<Label Content="Path to roms:"
 									   Target="{Binding ElementName=tbROM}"
 									   Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"/>
-								<TextBox Text="{Binding CFGDir}" Name="tbROM" Watermark="Default is roms folder in 86Box's folder"
+								<TextBox Text="{Binding ROMDir}" Name="tbROM" Watermark="Default is roms folder in 86Box's folder"
 									   Grid.Row="6" Grid.Column="0"/>
-								<Button Content="Browse..."
+								<Button Content="Browse..." Click="btnBrowse_rom_Click"
 										Grid.Row="6" Grid.Column="2"/>
 							</Grid>
 						</gb:GroupBox>

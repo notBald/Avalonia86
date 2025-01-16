@@ -102,7 +102,7 @@ CREATE TABLE Executables (
     ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     IsDef BOOLEAN NOT NULL DEFAULT FALSE,
     Name TEXT,
-    VMPath TEXT NOT NULL,
+    VMExe TEXT NOT NULL,
     VMRoms Text,
     "Version" Text,
     Comment Text,

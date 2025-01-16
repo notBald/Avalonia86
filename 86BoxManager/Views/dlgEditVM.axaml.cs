@@ -18,6 +18,7 @@ using System.ComponentModel;
 using ReactiveUI;
 using Mono.Unix.Native;
 using System.Xml.Linq;
+using System.IO;
 
 namespace _86BoxManager.Views
 {
@@ -27,7 +28,6 @@ namespace _86BoxManager.Views
         /// VM to be edited
         /// </summary>
         private VMVisual _vm;
-        private string originalName; //Original name of the VM
         private readonly dlgEditModel _m;
 
         internal VMVisual VM { get { return _vm; } set { _vm = value; } }
@@ -59,7 +59,6 @@ namespace _86BoxManager.Views
         {
             if (_vm != null)
             {
-                originalName = _vm.Name;
                 txtName.Text = _vm.Name;
                 txtDesc.Text = _vm.Desc;
                 txtComment.Text = _vm.Comment;
@@ -116,16 +115,36 @@ namespace _86BoxManager.Views
     internal class dlgEditModel : ReactiveObject
     {
         private readonly List<string> _img_list;
+        private ExeModel _exeModel;
 
         private int _index = -1;
 
         private string _cat;
 
         public string DefaultCategory { get; private set; }
+        public string Default86BoxFolder { get; private set; }
+        public string Default86BoxRoms { get; private set; }
 
         public string Category { get => _cat; set => this.RaiseAndSetIfChanged(ref _cat, value); }
 
         public List<string> Categories { get; } = new();
+        public List<ExeModel> ExeFiles { get; } = new();
+
+        public ExeModel SelectedItem
+        {
+            get => _exeModel;
+            set
+            {
+                if (!ReferenceEquals(value, _exeModel))
+                {
+                    this.RaiseAndSetIfChanged(ref _exeModel, value);
+                    this.RaisePropertyChanged(nameof(SelExeRomDir));
+                    this.RaisePropertyChanged(nameof(SelExePath));
+                }
+            }
+        }
+
+        public int SelectedIndex { get; set; }
 
         public string VMIcon
         {
@@ -166,6 +185,11 @@ namespace _86BoxManager.Views
         public dlgEditModel(AppSettings s)
         {
             _img_list = AppSettings.GetIconAssets();
+            var exeModel = new ExeModel()
+            {
+                Name = "Default 86Box executable"
+            };
+            ExeFiles.Add(exeModel);
 
             if (s == null)
             {
@@ -174,6 +198,11 @@ namespace _86BoxManager.Views
                 Categories.Add(DefaultCategory);
                 Categories.Add("DOS machines");
                 Categories.Add("OS/2 machines");
+
+                ExeFiles.Add(new ExeModel()
+                {
+                    Name = "86Box 3.11"
+                });
             }
             else
             {
@@ -183,7 +212,107 @@ namespace _86BoxManager.Views
                 Categories.Sort();
 
                 DefaultCategory = s.DefaultCat.Name;
+                Default86BoxFolder = s.EXEdir;
+                Default86BoxRoms = s.ROMdir;
+
+                foreach (var r in s.ListExecutables())
+                {
+                    ExeFiles.Add(new ExeModel()
+                    {
+                        ID = (long)r["ID"],
+                        Name = r["Name"] as string,
+                        VMExe = r["VMExe"] as string,
+                        VMRoms = r["VMRoms"] as string,
+                        Version = r["Version"] as string,
+                        Comment = r["Comment"] as string,
+                        Arch = r["Arch"] as string,
+                    });
+                }
+
+                //Todo: find default 86Box...
+                // 1. Get the default entery from the Exe table, if it exists
+                // 2. Get the list of EXE from the default path
+                // 3. Get the first executable
+
+                //Todo: find the default 86Box rompath
+                // 1. Get the default entery from the Exe table, if it exists
+                // 2. Check if there's a rom path in the 86Box folder
+                // 3. Get the default rom path, if it exits
+                // 4. Get the rom path of the default 86Box exe (even if another default exe has been choosen)
             }
+
+            SelectedItem = exeModel;
+        }
+
+        public string SelExePath
+        {
+            get
+            {
+                try
+                {
+                    if (SelectedItem != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(SelectedItem.VMExe))
+                            return SelectedItem.VMExe;
+
+                        if (!string.IsNullOrWhiteSpace(Default86BoxFolder))
+                        {
+                            return Path.Combine(Default86BoxFolder, "< 86Box >");
+                        }
+                    }
+                }
+                catch { }
+
+                return "";
+            }
+        }
+
+        public string SelExeRomDir
+        {
+            get
+            {
+                try
+                {
+                    if (SelectedItem != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(SelectedItem.VMRoms))
+                            return SelectedItem.VMRoms;
+
+                        if (!string.IsNullOrWhiteSpace(SelectedItem.VMExe))
+                        {
+                            var dir = Path.Combine(Path.GetDirectoryName(SelectedItem.VMExe), "roms");
+                            if (Directory.Exists(dir))
+                                return dir;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(Default86BoxRoms))
+                        {
+                            if (Directory.Exists(Default86BoxRoms))
+                                return Default86BoxRoms;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(Default86BoxFolder))
+                        {
+                            var dir = Path.Combine(Path.GetDirectoryName(Default86BoxFolder), "roms");
+                            if (Directory.Exists(dir))
+                                return dir;
+                        }
+                    }
+                } catch { }
+
+                return "";
+            }
+        }
+
+        public class ExeModel
+        {
+            public long? ID { get; set; }
+            public string Name { get; set; }
+            public string Version { get; set; }
+            public string VMExe { get; set; }
+            public string VMRoms { get; set; }
+            public string Arch {  get; set; }
+            public string Comment { get; set; }
         }
     }
 }

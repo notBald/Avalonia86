@@ -300,7 +300,7 @@
 				<Rectangle Fill="#8a8a8a" Width="1" Margin="1,2,0,2"/>
 				<Rectangle Fill="#FFFFFF" Opacity=".3" Width="1" Margin="0,2,1,2"/>
 				<ComboBox SelectedIndex="{Binding CategoryIndex}" Background="transparent" Width="150" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Center" ItemsSource="{Binding Categories}" />
-		</StackPanel>
+			</StackPanel>
 		</StackPanel>
 		<Grid DockPanel.Dock="Bottom" Background="#f0f0f0">
 			<Grid.ColumnDefinitions>

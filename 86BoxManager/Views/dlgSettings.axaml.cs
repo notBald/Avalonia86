@@ -153,6 +153,7 @@ namespace _86BoxManager.Views
             var (cfgPath, exePath) = VMCenter.FindPaths();
             _m.CFGDir = cfgPath;
             _m.ExeDir = exePath;
+            _m.ROMDir = null;
             _m.MinOnStart = false;
             _m.EnableConsole = true;
             _m.MinToTray = false;
@@ -179,12 +180,42 @@ namespace _86BoxManager.Views
         private async void btnBrowse2_Click(object sender, RoutedEventArgs e)
         {
             var text = "Select a folder where your virtual machines (configs, nvr folders, etc.) will be located";
+            var dir = _m.CFGDir;
+            if (string.IsNullOrWhiteSpace(dir))
+            {
+                var exe = _m.ExeDir;
+                if (!string.IsNullOrWhiteSpace(exe))
+                {
+                    try { dir = Path.GetDirectoryName(exe); } catch { }
+                }
+            }
 
-            var fileName = await Dialogs.SelectFolder(_m.CFGDir, text, parent: this);
+            var fileName = await Dialogs.SelectFolder(dir, text, parent: this);
 
             if (!string.IsNullOrWhiteSpace(fileName))
             {
                 _m.CFGDir = fileName.CheckTrail();
+            }
+        }
+
+        private async void btnBrowse_rom_Click(object sender, RoutedEventArgs e)
+        {
+            var text = "Select the folder where 86Box can find firmware and bios files";
+            var dir = _m.ROMDir;
+            if (string.IsNullOrWhiteSpace(dir))
+            {
+                var exe = _m.ExeDir;
+                if (!string.IsNullOrWhiteSpace(exe))
+                {
+                    try { dir = Path.GetDirectoryName(exe); } catch { }
+                }
+            }
+
+            var fileName = await Dialogs.SelectFolder(dir, text, parent: this);
+
+            if (!string.IsNullOrWhiteSpace(fileName))
+            {
+                _m.ROMDir = fileName.CheckTrail();
             }
         }
 
@@ -201,30 +232,33 @@ namespace _86BoxManager.Views
             try
             {
                 var files = Platforms.Manager.List86BoxExecutables(_m.ExeDir);
-                foreach (var file in files)
+                if (files != null)
                 {
-                    if (Platforms.Manager.IsExecutable(file))
+                    foreach (var file in files)
                     {
-                        var vi = Platforms.Manager.Get86BoxInfo(file);
-                        if (vi != null)
+                        if (Platforms.Manager.IsExecutable(file))
                         {
-                            if (vi.FilePrivatePart >= 3541) //Officially supported builds
+                            var vi = Platforms.Manager.Get86BoxInfo(file);
+                            if (vi != null)
                             {
-                                _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - fully compatible";
-                                _m.ExeValid = true;
-                            }
-                            else if (vi.FilePrivatePart >= 3333 && vi.FilePrivatePart < 3541) //Should mostly work...
-                            {
-                                _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - partially compatible";
-                                _m.ExeWarn = true;
-                            }
-                            else //Completely unsupported, since version info can't be obtained anyway
-                            {
-                                _m.ExePath = "Unknown - may not be compatible";
-                                _m.ExeError = true;
-                            }
+                                if (vi.FilePrivatePart >= 3541) //Officially supported builds
+                                {
+                                    _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - fully compatible";
+                                    _m.ExeValid = true;
+                                }
+                                else if (vi.FilePrivatePart >= 3333 && vi.FilePrivatePart < 3541) //Should mostly work...
+                                {
+                                    _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - partially compatible";
+                                    _m.ExeWarn = true;
+                                }
+                                else //Completely unsupported, since version info can't be obtained anyway
+                                {
+                                    _m.ExePath = "Unknown - may not be compatible";
+                                    _m.ExeError = true;
+                                }
 
-                            break;
+                                break;
+                            }
                         }
                     }
                 }
@@ -263,9 +297,17 @@ namespace _86BoxManager.Views
                         dir = dir.CheckTrail();
                     s.EXEdir = dir;
                     dir = _m.CFGDir;
-                    if (dir != null)
+                    if (string.IsNullOrWhiteSpace(dir))
+                        dir = null;
+                    else if (dir != null)
                         dir = dir.CheckTrail();
                     s.CFGdir = dir;
+                    dir = _m.ROMDir;
+                    if (string.IsNullOrWhiteSpace(dir))
+                        dir = null;
+                    else if (dir != null)
+                        dir = dir.CheckTrail();
+                    s.ROMdir = dir;
                     s.MinimizeOnVMStart = _m.MinOnStart;
                     s.ShowConsole = _m.EnableConsole;
                     s.MinimizeToTray = _m.MinToTray;
@@ -330,6 +372,7 @@ namespace _86BoxManager.Views
 
             _m.ExeDir = s.EXEdir;
             _m.CFGDir = s.CFGdir;
+            _m.ROMDir = s.ROMdir;
             _m.LogPath = s.LogPath;
             _m.MinOnStart = s.MinimizeOnVMStart;
             _m.EnableConsole = s.ShowConsole;
@@ -361,7 +404,7 @@ namespace _86BoxManager.Views
                 {
                     ID = (long) r["ID"],
                     Name = r["Name"] as string,
-                    VMPath = r["VMPath"] as string,
+                    VMPath = r["VMExe"] as string,
                     VMRoms = r["VMRoms"] as string,
                     Version = r["Version"] as string,
                     Comment = r["Comment"] as string,
@@ -496,7 +539,7 @@ namespace _86BoxManager.Views
 
     internal class dlgSettingsModel : ReactiveObject, IDisposable
     {
-        private string _exe_dir, _exe_path, _cfg_dir;
+        private string _exe_dir, _exe_path, _cfg_dir, _rom_dir;
         private bool _min_start, _min_tray, _close_tray;
         private bool _enable_logging;
         private bool _is_default_selected, _is_exe_list_changed;
@@ -590,6 +633,7 @@ namespace _86BoxManager.Views
                 return IsExeListChanged ||
                        _me.ExeDir != ExeDir ||
                        _me.CFGDir != CFGDir ||
+                       _me.ROMDir != ROMDir ||
                        _me.MinToTray != MinToTray ||
                        _me.MinOnStart != MinOnStart ||
                        _me.EnableLogging != EnableLogging ||
@@ -642,6 +686,19 @@ namespace _86BoxManager.Views
                 if (_cfg_dir != value)
                 {
                     this.RaiseAndSetIfChanged(ref _cfg_dir, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public string ROMDir
+        {
+            get => _rom_dir;
+            set
+            {
+                if (_rom_dir != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _rom_dir, value);
                     this.RaisePropertyChanged(nameof(HasChanges));
                 }
             }

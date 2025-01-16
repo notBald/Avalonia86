@@ -104,6 +104,33 @@
 						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>
+				<TabItem Header="Advanced" Theme="{StaticResource CustomTabItm}">
+					<gb:GroupBox Header="Prefered 86Box executable" Margin="0,0,0,10"
+							     Theme="{StaticResource GroupBoxClassic}"
+								 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+						<StackPanel Margin="20, 10">
+							<ComboBox ItemsSource="{Binding ExeFiles}" SelectedItem="{Binding SelectedItem}" HorizontalAlignment="Stretch">
+								<ComboBox.ItemTemplate>
+									<DataTemplate>
+										<TextBlock Text="{Binding Name}" />
+									</DataTemplate>
+								</ComboBox.ItemTemplate>
+							</ComboBox>
+							<Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+								<TextBlock Text="Version:" Grid.Column="0" Grid.Row="0" />
+								<SelectableTextBlock Text="{Binding SelectedItem.Version}" Grid.Column="1" Grid.Row="0" />
+								<TextBlock Text="CPU architecture:" Grid.Column="0" Grid.Row="1" />
+								<SelectableTextBlock Text="{Binding SelectedItem.Arch}" Grid.Column="1" Grid.Row="1" />
+								<TextBlock Text="86Box executable:" Grid.Column="0" Grid.Row="2" />
+								<SelectableTextBlock Text="{Binding SelExePath}" Grid.Column="1" Grid.Row="2" />
+								<TextBlock Text="Firmware folder:" Grid.Column="0" Grid.Row="3" />
+								<SelectableTextBlock Text="{Binding SelExeRomDir}" Grid.Column="1" Grid.Row="3" />
+								<TextBlock Text="Comment:" Grid.Column="0" Grid.Row="4" />
+								<SelectableTextBlock Text="{Binding SelectedItem.Comment}" Grid.Column="1" Grid.Row="4" />
+							</Grid>
+						</StackPanel>
+					</gb:GroupBox>
+				</TabItem>
 			</TabControl>
 		</DockPanel>
 		<Canvas>

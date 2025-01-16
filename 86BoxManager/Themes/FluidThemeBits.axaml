@@ -102,6 +102,8 @@
 	<x:Double x:Key="ScrollBarButtonArrowIconFontSize">8</x:Double>
 
 	<!-- Resources for ComboBox.xaml -->
+	<Color x:Key="SystemAltMediumLowColor">#66FFFFFF</Color>
+	<SolidColorBrush x:Key="SystemControlBackgroundAltMediumLowBrush" Color="{StaticResource SystemAltMediumLowColor}" />
 	<x:Double x:Key="ComboBoxThemeMinWidth">64</x:Double>
 	<Thickness x:Key="ComboBoxBorderThemeThickness">1</Thickness>
 	<Thickness x:Key="ComboBoxDropdownBorderThickness">1</Thickness>
