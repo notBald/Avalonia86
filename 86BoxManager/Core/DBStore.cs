@@ -271,7 +271,10 @@ namespace _86BoxManager.Core
                                     //We got to upgrade.
                                     using var t = db.BeginTransaction();
                                     if (!InitDB(db, GetDBVersion(db)))
+                                    {
+                                        t.Rollback();
                                         throw new Exception("DB create failed.");
+                                    }
                                     t.Commit();
                                 }
                             }

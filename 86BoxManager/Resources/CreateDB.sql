@@ -84,6 +84,7 @@ DROP TABLE VMs;
 ALTER TABLE VMs_new RENAME TO VMs;
 --§Main
 CREATE TABLE Tag (
+    ROWID INTEGER NOT NULL PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     description TEXT,
     created DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -105,5 +106,5 @@ CREATE TABLE Executables (
     VMRoms Text,
     "Version" Text,
     Comment Text,
-    Arch Text,
+    Arch Text
 );
