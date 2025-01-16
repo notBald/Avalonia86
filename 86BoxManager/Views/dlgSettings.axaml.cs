@@ -1,6 +1,5 @@
 using _86BoxManager.Core;
 using _86BoxManager.Tools;
-using _86BoxManager.ViewModels;
 using _86BoxManager.Xplat;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -10,11 +9,8 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using static _86BoxManager.Views.dlgAddExeModel;
 using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
-using IOPath = System.IO.Path;
 using MessageType = MsBox.Avalonia.Enums.Icon;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 
@@ -23,7 +19,7 @@ namespace _86BoxManager.Views
     public partial class dlgSettings : Window
     {
         private readonly dlgSettingsModel _m;
-        private bool _was_cancled;
+        private bool _cancel_or_ok;
 
         public dlgSettings()
         {
@@ -73,7 +69,7 @@ namespace _86BoxManager.Views
 
         private async void dlgSettings_FormClosing(object sender, WindowClosingEventArgs e)
         {
-            if (!_m.HasChanges || _was_cancled)
+            if (!_m.HasChanges || _cancel_or_ok)
                 return;
 
             e.Cancel = true;
@@ -114,6 +110,7 @@ namespace _86BoxManager.Views
             {
                 await SaveSettings();
             }
+            _cancel_or_ok = true;
             Close(ResponseType.Ok);
         }
 
@@ -255,21 +252,6 @@ namespace _86BoxManager.Views
                 }
             }
 
-            //var exeName = Platforms.Env.ExeNames.First();
-            //var boxExe = IOPath.Combine(_m.ExeDir, exeName);
-            //if (!File.Exists(boxExe) && _m.ExeDirChanged)
-            //{
-            //    var result = await Dialogs.ShowMessageBox(
-            //        "86Box executable could not be found in the directory you specified, so " +
-            //        "you won't be able to use any virtual machines. Are you sure you want " +
-            //        "to use this path?",
-            //        MessageType.Warning, this, ButtonsType.YesNo, "Warning");
-            //    if (result == ResponseType.No)
-            //    {
-            //        return false;
-            //    }
-            //}
-
             try
             {
                 //Store the new values, close the key, changes are saved
@@ -292,6 +274,27 @@ namespace _86BoxManager.Views
                     s.LogPath = _m.LogPath;
                     s.AllowInstances = _m.AllowInstances;
                     s.CompactMachineList = _m.CompactList;
+
+                    foreach (var exe in _m.Executables.Items)
+                    {
+                        if (exe.IsDeleted)
+                        {
+                            if (exe.IsNew)
+                                continue;
+
+                            try { s.RemoveExe(exe.ID); }
+                            catch { }
+                        }
+                        else if (exe.IsNew) {
+                            try { s.AddExe(exe.Name, exe.VMPath, exe.VMRoms, exe.Comment, exe.Version, exe.Arch, exe.IsDefault); }
+                            catch { }
+                        }
+                        else if(exe.IsChanged)
+                        {
+                            try { s.UpdateExe(exe.ID, exe.Name, exe.VMPath, exe.VMRoms, exe.Comment, exe.Version, exe.Arch, exe.IsDefault); }
+                            catch { }
+                        }
+                    }
 
                     t.Commit();
                 }
@@ -350,15 +353,36 @@ namespace _86BoxManager.Views
 
             }
 
-            //Todo:
-            _m.IsDefChecked = true;
+            bool is_def = true;
+
+            foreach(var r in s.ListExecutables())
+            {
+                var exe = new dlgSettingsModel.ExeEntery(false)
+                {
+                    ID = (long) r["ID"],
+                    Name = r["Name"] as string,
+                    VMPath = r["VMPath"] as string,
+                    VMRoms = r["VMRoms"] as string,
+                    Version = r["Version"] as string,
+                    Comment = r["Comment"] as string,
+                    Arch = r["Arch"] as string,
+                    IsDefault = (bool) r["IsDef"]
+                };
+
+                if (exe.IsDefault)
+                    is_def = false;
+
+                _m.Executables.AddOrUpdate(exe);
+            }
+
+            _m.IsDefChecked = is_def;
 
             _m.Commit();
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            _was_cancled = true;
+            _cancel_or_ok = true;
             Close(ResponseType.Cancel);
         }
 
@@ -400,6 +424,8 @@ namespace _86BoxManager.Views
                             Comment = m.Comment,
                             Arch = m.Arch
                         });
+
+                        _m.IsExeListChanged = true;
                     }
                 }
             });
@@ -413,6 +439,7 @@ namespace _86BoxManager.Views
                 _m.SelectedExe.IsDeleted = true;
                 if (_m.SelectedExe.IsDefault)
                     _m.IsDefChecked = true;
+                _m.IsExeListChanged = true;
 
                 //Deleted items are filtered away
                 _m.Executables.Refresh();
@@ -447,9 +474,23 @@ namespace _86BoxManager.Views
                     sel.Name = m.Name;
                     sel.VMRoms = m.RomDir;
                     sel.VMPath = m.ExePath;
-                    sel.SetChanged();   
+                    sel.SetChanged();
+
+                    _m.IsExeListChanged = true;
                 }
             });
+        }
+
+        /// <summary>
+        /// Handles both checked and unchecked.
+        /// </summary>
+        private void RadioButton_Checked(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            _m.IsExeListChanged = true;
+            if (sender is RadioButton radio && radio.DataContext is dlgSettingsModel.ExeEntery exe)
+            {
+                exe.SetChanged();
+            }
         }
     }
 
@@ -458,13 +499,13 @@ namespace _86BoxManager.Views
         private string _exe_dir, _exe_path, _cfg_dir;
         private bool _min_start, _min_tray, _close_tray;
         private bool _enable_logging;
-        private bool _is_default_selected;
+        private bool _is_default_selected, _is_exe_list_changed;
         private string _log_path;
         private bool _allow_instances, _enable_console;
         private bool _compact_list;
         private ExeEntery _sel_exe;
 
-        public SourceCache<ExeEntery, int> Executables = new(o => o.ID);
+        public SourceCache<ExeEntery, long> Executables = new(o => o.ID);
         private readonly ReadOnlyObservableCollection<ExeEntery> _filtered_executables;
         public ReadOnlyObservableCollection<ExeEntery> FilteredExecutables => _filtered_executables;
         readonly IDisposable _exe_sub;
@@ -497,6 +538,19 @@ namespace _86BoxManager.Views
         public bool ExeError { get; set; }
 
         public string Version { get => CurrentApp.VersionString; }
+
+        public bool IsExeListChanged
+        {
+            get => _is_exe_list_changed;
+            set
+            {
+                if (value != _is_exe_list_changed)
+                {
+                    _is_exe_list_changed = value;
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
 
         public string Lisence
         {
@@ -533,7 +587,8 @@ namespace _86BoxManager.Views
                 if (_me == null)
                     return false;
 
-                return _me.ExeDir != ExeDir ||
+                return IsExeListChanged ||
+                       _me.ExeDir != ExeDir ||
                        _me.CFGDir != CFGDir ||
                        _me.MinToTray != MinToTray ||
                        _me.MinOnStart != MinOnStart ||
@@ -721,6 +776,7 @@ namespace _86BoxManager.Views
 
         public void Commit()
         {
+            _is_exe_list_changed = false;
             _me = (dlgSettingsModel) MemberwiseClone();
 
             this.RaisePropertyChanged(nameof(HasChanges));
@@ -733,7 +789,7 @@ namespace _86BoxManager.Views
 
             public ExeEntery(bool is_new = true) { IsNew = is_new; }
 
-            public int ID { get; set; }
+            public long ID { get; set; }
             public string Name { get; set; }
             public string VMPath { get; set; }
             public string VMRoms { get; set; }

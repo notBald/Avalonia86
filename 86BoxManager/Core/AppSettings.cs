@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
+using static _86BoxManager.Core.DBStore;
 
 namespace _86BoxManager.Core
 {
@@ -295,6 +296,37 @@ namespace _86BoxManager.Core
             _store.Execute("DELETE FROM TagAttachment where vmid = @id", p);
             _store.Execute("DELETE FROM VMSettings where vmid = @id", p);
             _store.Execute("DELETE FROM VMs where id = @id", p);
+        }
+
+        public void RemoveExe(long id)
+        {
+            var p = new SQLParam("id", id);
+            _store.Execute("UPDATE VMs SET ExeID = NULL where ExeID = @id", p);
+            _store.Execute("DELETE FROM Executables where ID = @id", p);
+        }
+
+        public void AddExe(string name, string vm_path, string vm_roms, string comment, string version, string arch, bool def)
+        {
+            _store.Execute("INSERT INTO Executables (IsDef, Name, VMPath, VMRoms, \"Version\", Comment, Arch) "+
+                           " VALUES "+
+                           "(@def, @name, @vmpath, @vmroms, @vers, @comment, @arch)",
+                           new SQLParam("name", name), new SQLParam("vmpath", vm_path), new SQLParam("vmroms", vm_roms),
+                           new SQLParam("comment", comment), new SQLParam("vers", version), new SQLParam("arch", arch),
+                           new SQLParam("def", def));
+        }
+
+        public void UpdateExe(long id, string name, string vm_path, string vm_roms, string comment, string version, string arch, bool def)
+        {
+            _store.Execute("UPDATE Executables SET IsDef = @def, Name = @name, VMPath = @vmpath, VMRoms = @vmroms, \"Version\" = @vers, Comment = @comment, Arch = @arch "+
+                           "WHERE ID = @id",
+                           new SQLParam("name", name), new SQLParam("vmpath", vm_path), new SQLParam("vmroms", vm_roms),
+                           new SQLParam("comment", comment), new SQLParam("vers", version), new SQLParam("arch", arch),
+                           new SQLParam("def", def), new SQLParam("id", id));
+        }
+
+        public IEnumerable<DataReader> ListExecutables()
+        {
+            return _store.Query("SELECT ID, IsDef, Name, VMPath, VMRoms, \"Version\", Comment, Arch FROM Executables");
         }
 
         /// <summary>

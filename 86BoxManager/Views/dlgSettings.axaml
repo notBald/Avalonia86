@@ -117,7 +117,10 @@
 								</StackPanel>
 								<DockPanel>
 									<Grid DockPanel.Dock="Bottom" ColumnDefinitions="32, *" Margin="0, 4, 0, 0">
-										<RadioButton GroupName="Executable" IsChecked="{Binding IsDefChecked}" HorizontalAlignment="Center">
+										<RadioButton GroupName="Executable" 
+													 IsChecked="{Binding IsDefChecked}" 
+													 HorizontalAlignment="Center"
+													 Checked="RadioButton_Checked">
 											<RadioButton.Styles>
 												<Style Selector="RadioButton /template/ Ellipse#checkMark">
 													<Setter Property="Fill" Value="Green" />
@@ -137,7 +140,11 @@
 											<DataGridTemplateColumn Header="Use">
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate>
-														<RadioButton GroupName="Executable" IsChecked="{Binding IsDefault}" HorizontalAlignment="Center" Foreground="Red">
+														<RadioButton GroupName="Executable" 
+																	 IsChecked="{Binding IsDefault}" 
+																	 HorizontalAlignment="Center"
+																	 Checked="RadioButton_Checked"
+																	 Unchecked="RadioButton_Checked">
 															<RadioButton.Styles>
 																<Style Selector="RadioButton /template/ Ellipse#checkMark">
 																	<Setter Property="Fill" Value="Green" />
