@@ -10,6 +10,10 @@ namespace _86BoxManager.API
 
         string VmPath { get; }
 
+        long? Build { get; }
+
+        string Arch { get; }
+
         IVm Vm { get; }
 
         (string id, string hWnd)? Handle { get; }

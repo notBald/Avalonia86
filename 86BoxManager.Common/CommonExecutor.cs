@@ -9,7 +9,7 @@ namespace _86BoxManager.Common
         {
             var info = new ProcessStartInfo(args.FileName);
             var ops = info.ArgumentList;
-            if (!string.IsNullOrWhiteSpace(args.RomPath))
+            if (!string.IsNullOrWhiteSpace(args.RomPath) && args.Build >= 3333)
             {
                 ops.Add("-R");
                 ops.Add(args.RomPath);
@@ -21,8 +21,11 @@ namespace _86BoxManager.Common
             }
             ops.Add("-P");
             ops.Add(args.VmPath);
-            ops.Add("-V");
-            ops.Add(args.Vm.Title);
+            if (args.Build >= 3333)
+            {
+                ops.Add("-V");
+                ops.Add(args.Vm.Title);
+            }
             info.WorkingDirectory = args.VmPath;
             return info;
         }

@@ -626,16 +626,20 @@ namespace _86BoxManager.Core
         {
             var hWndHex = ui.hWndHex;
             var vmPath = vm.Path;
-            var exePath = Sett.EXEdir;
-            var exeName = Platforms.Shell.DetermineExeName(exePath, Platforms.Env.ExeNames);
-
             if (vmPath != null)
                 vmPath = vmPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
+            var paths = DeterminePaths(vm);
+            if (paths == null)
+                throw new Exception("No 86Box executable found.");
+
             var vars = new CommonExecVars
             {
-                FileName = IOPath.Combine(exePath, exeName),
+                FileName = paths.ExePath,
+                RomPath = paths.RomPath,
                 VmPath = vmPath,
+                Build = paths.Build,
+                Arch = paths.Arch,
                 Vm = vm.Tag,
                 LogFile = ui.Settings.EnableLogging ? ui.Settings.LogPath : null,
                 Handle = idString != null ? (idString, hWndHex) : null
@@ -727,14 +731,15 @@ namespace _86BoxManager.Core
             dir = AppSettings.Settings.EXEdir;
             if (!string.IsNullOrWhiteSpace(dir)) 
             {
-                foreach(var exe in Platforms.Manager.List86BoxExecutables(dir))
+                var exes = Platforms.Manager.List86BoxExecutables(dir);
+                if (exes != null)
                 {
-                    if (Platforms.Manager.IsExecutable(exe))
+                    foreach (var exe in exes)
                     {
                         var info = Platforms.Manager.Get86BoxInfo(exe);
                         paths = new ExePaths(exe, AppSettings.Settings.ROMdir, "" + info.FilePrivatePart, info.Arch);
                         if (!Directory.Exists(paths.RomPath))
-                            paths = null;
+                            paths.RomPath = null;
 
                         return paths;
                     }
@@ -757,8 +762,6 @@ namespace _86BoxManager.Core
 
                 if (vis.Status == MachineStatus.STOPPED)
                 {
-                    var paths = DeterminePaths(vis);
-
                     var exec = Platforms.Manager.GetExecutor();
                     var info = exec.BuildStartInfo(GetExecArgs(ui, vis, idString));
                     if (!ui.Settings.ShowConsole)

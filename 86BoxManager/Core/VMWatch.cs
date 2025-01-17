@@ -39,7 +39,7 @@ namespace _86BoxManager.Core
         public void CommitUptime(DateTime d) => _vis.CommitUptime(d);
 
         // Wait for the associated window of a VM to close
-        private async void background_DoWork(object sender, DoWorkEventArgs e)
+        private void background_DoWork(object sender, DoWorkEventArgs e)
         {
             var vm = e.Argument as VMVisual;
             try
@@ -52,9 +52,12 @@ namespace _86BoxManager.Core
             }
             catch (Exception ex)
             {
-                await Dialogs.ShowMessageBox("An error has occurred. Please provide the following details" +
-                                       $" to the developer:\n{ex.Message}\n{ex.StackTrace}",
-                    MessageType.Error, null, ButtonsType.Ok, "Error");
+                Dispatcher.UIThread.Post(async () =>
+                {
+                    await Dialogs.ShowMessageBox("An error has occurred. Please provide the following details" +
+                                           $" to the developer:\n{ex.Message}\n{ex.StackTrace}",
+                        MessageType.Error, null, ButtonsType.Ok, "Error");
+                });
             }
             e.Result = vm;
         }

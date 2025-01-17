@@ -9,6 +9,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.Intrinsics.X86;
 using System.Threading.Tasks;
 using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
 using MessageType = MsBox.Avalonia.Enums.Icon;
@@ -236,30 +237,32 @@ namespace _86BoxManager.Views
                 {
                     foreach (var file in files)
                     {
-                        if (Platforms.Manager.IsExecutable(file))
+                        var vi = Platforms.Manager.Get86BoxInfo(file);
+                        if (vi != null)
                         {
-                            var vi = Platforms.Manager.Get86BoxInfo(file);
-                            if (vi != null)
+                            if (vi.FilePrivatePart >= 3541) //Officially supported builds
                             {
-                                if (vi.FilePrivatePart >= 3541) //Officially supported builds
-                                {
-                                    _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - fully compatible";
-                                    _m.ExeValid = true;
-                                }
-                                else if (vi.FilePrivatePart >= 3333 && vi.FilePrivatePart < 3541) //Should mostly work...
-                                {
-                                    _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - partially compatible";
-                                    _m.ExeWarn = true;
-                                }
-                                else //Completely unsupported, since version info can't be obtained anyway
-                                {
-                                    _m.ExePath = "Unknown - may not be compatible";
-                                    _m.ExeError = true;
-                                }
-
-                                break;
+                                _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - fully compatible";
+                                _m.ExeValid = true;
                             }
-                        }
+                            else if (vi.FilePrivatePart >= 3333) //Should mostly work...
+                            {
+                                _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - partially compatible";
+                                _m.ExeWarn = true;
+                            }
+                            else if (vi.FilePrivatePart >= 2000) //Should work...
+                            {
+                                _m.ExePath = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}.{vi.FilePrivatePart} - limited compatibility";
+                                _m.ExeWarn = true;
+                            }
+                            else //Completely unsupported, since version info can't be obtained anyway
+                            {
+                                _m.ExePath = "Unknown - may not be compatible";
+                                _m.ExeError = true;
+                            }
+
+                            break;
+                        }  
                     }
                 }
             }
