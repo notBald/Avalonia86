@@ -138,7 +138,7 @@ public partial class dlgAddExe : Window
                 }
                 else if (vi.FilePrivatePart >= 2000) //Should work...
                 {
-                    _m.ExePath = $"{ver_str} - limited compatibility";
+                    _m.ExeVersion = $"{ver_str} - limited compatibility";
                     _m.ExeWarn = true;
                 }
                 else //Completely unsupported, since version info can't be obtained anyway
