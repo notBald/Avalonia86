@@ -10,11 +10,11 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Runtime.Intrinsics.X86;
 using System.Threading.Tasks;
 using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
 using MessageType = MsBox.Avalonia.Enums.Icon;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
+using Avalonia.Styling;
 
 namespace _86BoxManager.Views
 {
@@ -36,10 +36,10 @@ namespace _86BoxManager.Views
         }
 
 
-        private void label_default_released(object sender, PointerReleasedEventArgs args)
+        private void label_default_tapped(object sender, TappedEventArgs args)
         {
             //Wasn't able to get Label's "target" function to work. Tried both using x:Name and Elementname=
-            _m.IsDefChecked = !_m.IsDefChecked;
+            _m.IsDefChecked = true;
         }
 
         private void dlgSettings_Closed(object sender, EventArgs e)
@@ -172,6 +172,7 @@ namespace _86BoxManager.Views
             _m.LogPath = "";
             _m.AllowInstances = false;
             _m.CompactList = false;
+            _m.SelectedTheme = ThemeVariant.Default;
             _m.RaisePropertyChanged(nameof(dlgSettingsModel.HasChanges));
         }
 
@@ -329,6 +330,7 @@ namespace _86BoxManager.Views
                     s.LogPath = _m.LogPath;
                     s.AllowInstances = _m.AllowInstances;
                     s.CompactMachineList = _m.CompactList;
+                    s.Theme = _m.SelectedTheme;
 
                     foreach (var exe in _m.Executables.Items)
                     {
@@ -395,6 +397,7 @@ namespace _86BoxManager.Views
             _m.EnableLogging = s.EnableLogging;
             _m.AllowInstances = s.AllowInstances;
             _m.CompactList = s.CompactMachineList;
+            _m.SelectedTheme = s.Theme;
 
             if (string.IsNullOrWhiteSpace(_m.ExeDir) || string.IsNullOrWhiteSpace(_m.CFGDir))
             {
@@ -565,6 +568,7 @@ namespace _86BoxManager.Views
         private bool _allow_instances, _enable_console;
         private bool _compact_list;
         private ExeEntery _sel_exe;
+        private ThemeVariant _theme;
 
         public SourceCache<ExeEntery, long> Executables = new(o => o.ID);
         private readonly ReadOnlyObservableCollection<ExeEntery> _filtered_executables;
@@ -659,7 +663,8 @@ namespace _86BoxManager.Views
                        _me.EnableConsole != EnableConsole ||
                        _me.AllowInstances != AllowInstances ||
                        _me.LogPath != LogPath ||
-                       _me.CompactList != CompactList;
+                       _me.CompactList != CompactList ||
+                       !ReferenceEquals(_me.SelectedTheme, SelectedTheme);
             }
         }
 
@@ -839,12 +844,29 @@ namespace _86BoxManager.Views
             }
         }
 
+        public ThemeVariant SelectedTheme
+        {
+            get => _theme;
+            set
+            {
+                if (!ReferenceEquals(value, _theme))
+                {
+                    this.RaiseAndSetIfChanged(ref _theme, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public ThemeVariant[] Themes { get; private set; }
+
         public dlgSettingsModel()
         {
             _exe_sub = Executables.Connect()
                 .Filter(x => !x.IsDeleted)
                 .Bind(out _filtered_executables)
                 .Subscribe();
+
+            Themes = [ThemeVariant.Default, ThemeVariant.Light, ThemeVariant.Dark];
         }
 
         public void Dispose()
@@ -861,6 +883,8 @@ namespace _86BoxManager.Views
                     s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.CompactMachineList)));
                 if (_me.IsTrayEnabled !=  IsTrayEnabled)
                     s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.IsTrayEnabled)));
+                if (!ReferenceEquals(_me.SelectedTheme, SelectedTheme))
+                    s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.Theme)));
             }
         }
 

@@ -2,8 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:avalonia="clr-namespace:HyperText.Avalonia;assembly=HyperText.Avalonia"
 			 xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
-             x:Class="_86BoxManager.App"
-			 RequestedThemeVariant="Light">	
+             x:Class="_86BoxManager.App">	
     <Application.Styles>
         <avalonia:HyperLinkStyle/>
         <!--<FluentTheme />-->

@@ -171,6 +171,8 @@ namespace _86BoxManager.ViewModels
 
         public bool IsTrayEnabled { get => Settings.IsTrayEnabled; }
 
+        public string ApplicationTheme { get => Settings.Theme.ToString(); }
+
         private frmMain _ui;
         public frmMain UI {  get => _ui; set { if (_ui == null) _ui = value; } }
 
@@ -234,6 +236,10 @@ namespace _86BoxManager.ViewModels
             else if (e.PropertyName == nameof(AppSettings.IsTrayEnabled))
             {
                 this.RaisePropertyChanged(nameof(IsTrayEnabled));
+            }
+            else if (e.PropertyName == nameof(AppSettings.Theme))
+            {
+                this.RaisePropertyChanged(nameof(ApplicationTheme));
             }
         }
 

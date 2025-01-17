@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 
 namespace _86BoxManager
 {
@@ -28,8 +29,11 @@ namespace _86BoxManager
 
         public override void Initialize()
         {
-            Me = this;
+            var s = AppSettings.Settings;
+            if (s != null)
+                RequestedThemeVariant = s.Theme;
 
+            Me = this;
             AvaloniaXamlLoader.Load(this);
         }
 
@@ -42,9 +46,24 @@ namespace _86BoxManager
                 desktop.MainWindow = main;
                 desktop.Exit += Desktop_Exit;
                 desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
+
+                if (main.DataContext is MainModel mm)
+                {
+                    mm.PropertyChanged += Mm_PropertyChanged;
+                }
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private void Mm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(MainModel.ApplicationTheme))
+            {
+                var s = AppSettings.Settings;
+                if (s != null)
+                    RequestedThemeVariant = s.Theme;
+            }
         }
 
         private void Desktop_Exit(object sender, ControlledApplicationLifetimeExitEventArgs e)
