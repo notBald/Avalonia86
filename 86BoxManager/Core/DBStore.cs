@@ -159,12 +159,12 @@ namespace _86BoxManager.Core
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
                 if (current_minor != -1)
                 {
-                    using var cmd = new SQLiteCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}'", db);
+                    using var cmd = new SQLiteCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}', Version = 2.0", db);
                     cmd.ExecuteNonQuery();
                 }
                 else
                 {
-                    using var cmd = new SQLiteCommand($"INSERT INTO FileInfo(Creator, Version) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 1.0)", db);
+                    using var cmd = new SQLiteCommand($"INSERT INTO FileInfo(Creator, Version) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 2.0)", db);
                     cmd.ExecuteNonQuery();
                 }
 
@@ -260,8 +260,7 @@ namespace _86BoxManager.Core
                                         return false;
                                     major = r.GetFloat("Version");
 
-                                    //Tests if the file is a Version 1.x format, but this version also supports the comming 2.0 format.
-                                    if (major > 2)
+                                    if (major >= 3)
                                         return false;
                                 }
 

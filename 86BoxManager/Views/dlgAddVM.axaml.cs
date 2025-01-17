@@ -188,7 +188,7 @@ namespace _86BoxManager.Views
                 {
                     var created = FolderHelper.FetchACreationDate(p);
 
-                    VMCenter.Add(vm.Name, p, null, null, null, created, false, false, Owner as Window);
+                    VMCenter.Add(vm.Name, p, null, null, null, created, _m.ExeModel.SelectedItem.ID, false, false, Owner as Window);
 
                     got_imported++;
                 }
@@ -246,7 +246,7 @@ namespace _86BoxManager.Views
                 if (cat == dc.DefaultCategory)
                     cat = null;
 
-                VMCenter.Add(_m.VMName, _m.InstallPath, txtDescription.Text, cat, icon, created, cbxOpenCFG.IsActive(), cbxStartVM.IsActive(), Owner as Window);
+                VMCenter.Add(_m.VMName, _m.InstallPath, txtDescription.Text, cat, icon, created, _m.ExeModel.SelectedItem.ID, cbxOpenCFG.IsActive(), cbxStartVM.IsActive(), Owner as Window);
                 t.Commit();
             }
 
@@ -307,6 +307,7 @@ namespace _86BoxManager.Views
 
         private bool _is_working = false;
 
+        public ctrlSetExecutableModel ExeModel { get; private set; }
         public bool IsWorking 
         { 
             get => _is_working; set
@@ -443,6 +444,7 @@ namespace _86BoxManager.Views
         {
             _img_list = AppSettings.GetIconAssets();
             SetIcon(AppSettings.DefaultIcon);
+            ExeModel = new ctrlSetExecutableModel(s);
 
             if (s == null)
             {

@@ -169,11 +169,11 @@ namespace _86BoxManager.Core
 
         // Creates a new VM from the data received and adds it to the listview
         
-        public static void Add(string name, string vm_path, string desc, string cat, string icon_path, DateTime created, bool openCFG, bool startVM, Window parent)
+        public static void Add(string name, string vm_path, string desc, string cat, string icon_path, DateTime created, long? exe_id, bool openCFG, bool startVM, Window parent)
         {
             var m = Program.Root.Model;
 
-            var id = Sett.RegisterVM(name, vm_path, icon_path, cat, created);
+            var id = Sett.RegisterVM(name, vm_path, icon_path, cat, created, exe_id);
 
             var visual = Sett.RefreshVisual(id);
             if (visual == null)

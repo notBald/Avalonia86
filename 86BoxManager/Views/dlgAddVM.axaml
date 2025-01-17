@@ -211,6 +211,9 @@
 						</DataGrid>
 					</DockPanel>
 				</TabItem>
+				<TabItem Header="Advanced" Theme="{StaticResource CustomTabItm}">
+					<v:ctrlSetExecutable DataContext="{Binding ExeModel}" />
+				</TabItem>
 			</TabControl>
 			</DockPanel>
 		<Canvas>

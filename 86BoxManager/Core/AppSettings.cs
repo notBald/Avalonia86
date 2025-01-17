@@ -237,7 +237,7 @@ namespace _86BoxManager.Core
 
         public DBStore.Transaction BeginTransaction() => _store.BeginTransaction();
 
-        public long RegisterVM(string name, string vm_path, string icon_path, string cat, DateTime created)
+        public long RegisterVM(string name, string vm_path, string icon_path, string cat, DateTime created, long? exe_id)
         {
             if (name == null || vm_path == null)
                 throw new ArgumentNullException();
@@ -255,9 +255,9 @@ namespace _86BoxManager.Core
 
             bool is_linked = !FolderHelper.IsDirectChild(CFGdir, vm_path);
 
-            var r = _store.Execute("insert into VMs (VMPath, IconPath, Name, Created, Category, Linked) values (@p, @ip, @n, @cr, @ca, @link)",
+            var r = _store.Execute("insert into VMs (VMPath, IconPath, Name, Created, Category, Linked, ExeID) values (@p, @ip, @n, @cr, @ca, @link, @exe)",
                 new SQLParam("p", vm_path), new SQLParam("n", name), new SQLParam("cr", created_str), new SQLParam("ca", cat),
-                new SQLParam("link", is_linked), new SQLParam("ip", icon_path));
+                new SQLParam("link", is_linked), new SQLParam("ip", icon_path), new SQLParam("exe", exe_id));
 
             if (r != 1)
                 throw new Exception("Unexpected result of insert query.");

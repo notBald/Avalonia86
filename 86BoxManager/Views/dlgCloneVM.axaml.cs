@@ -153,7 +153,7 @@ namespace _86BoxManager.Views
                 {
                     var vis = _s.RefreshVisual(_uid);
 
-                    VMCenter.Add(sp.Name, sp.Path, vis.Desc, vis.Category, vis.IconPath, DateTime.Now, false, false, this);
+                    VMCenter.Add(sp.Name, sp.Path, vis.Desc, vis.Category, vis.IconPath, DateTime.Now, _s.IdToExeId(_uid), false, false, this);
 
                     var new_vis = _s.RefreshVisual(_s.PathToId(sp.Path));
 
