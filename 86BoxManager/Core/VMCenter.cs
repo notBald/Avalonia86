@@ -396,7 +396,7 @@ namespace _86BoxManager.Core
             }
         }
 
-        public static (string, IVerInfo) GetDefaultExeInfo()
+        public static (string, IVerInfo) GetPathExeInfo()
         {
             var m = Platforms.Manager;
             if (m != null)
@@ -650,6 +650,99 @@ namespace _86BoxManager.Core
                 Start(m.Machine, parent);
         }
 
+        private static ExePaths DeterminePaths(VMVisual vis)
+        {
+            string dir;
+
+            //1. The visual has a executable selected
+            var paths = vis.Paths;
+            if (paths != null && File.Exists(paths.ExePath))
+            {
+                if (paths.RomPath == null || !Directory.Exists(paths.RomPath))
+                {
+                    paths.RomPath = null;
+
+                    //1. If the rom path is not set, prefer the "roms" in the 86Box dir
+                    dir = Path.Combine(Path.GetDirectoryName(paths.ExePath), "roms");
+                    if (Directory.Exists(dir))
+                        return paths;
+
+                    //2. Next we prefer the default rom path
+                    paths.RomPath = AppSettings.Settings.ROMdir;
+
+                    //3. Then the rom path in the default 86Box dir
+                    if (!Directory.Exists(paths.RomPath))
+                    {
+                        dir = AppSettings.Settings.EXEdir;
+                        if (dir != null)
+                        {
+                            dir = Path.Combine(dir, "roms");
+                            if (Directory.Exists(dir))
+                                paths.RomPath = dir;
+                        }
+                    }
+                }
+
+                return paths;
+            }
+
+            //2. Using the selected default exe
+            foreach(var exe in AppSettings.Settings.GetDefExe())
+            {
+                paths = new ExePaths((string)exe["VMExe"],
+                    exe["VMRoms"] as string, exe["Build"] as string, exe["Arch"] as string);
+
+                if (File.Exists(paths.ExePath))
+                {
+                    if (paths.RomPath == null || !Directory.Exists(paths.RomPath))
+                    {
+                        paths.RomPath = null;
+
+                        //1. If the rom path is not set, prefer the "roms" in the 86Box dir
+                        dir = Path.Combine(Path.GetDirectoryName(paths.ExePath), "roms");
+                        if (Directory.Exists(dir))
+                            return paths;
+
+                        //2. Next we prefer the default rom path
+                        paths.RomPath = AppSettings.Settings.ROMdir;
+
+                        //3. Then the rom path in the default 86Box dir
+                        if (!Directory.Exists(paths.RomPath))
+                        {
+                            dir = AppSettings.Settings.EXEdir;
+                            if (dir != null)
+                            {
+                                dir = Path.Combine(dir, "roms");
+                                if (Directory.Exists(dir))
+                                    paths.RomPath = dir;
+                            }
+                        }
+                    }
+
+                    return paths;
+                }
+            }
+
+            //3. Using the default exe
+            dir = AppSettings.Settings.EXEdir;
+            if (!string.IsNullOrWhiteSpace(dir)) 
+            {
+                foreach(var exe in Platforms.Manager.List86BoxExecutables(dir))
+                {
+                    if (Platforms.Manager.IsExecutable(exe))
+                    {
+                        var info = Platforms.Manager.Get86BoxInfo(exe);
+                        paths = new ExePaths(exe, AppSettings.Settings.ROMdir, "" + info.FilePrivatePart, info.Arch);
+                        if (!Directory.Exists(paths.RomPath))
+                            paths = null;
+
+                        return paths;
+                    }
+                }
+            }
+            return null;
+        }
+
         // Starts the selected VM
         public static void Start(VMVisual vis, Window parent)
         {
@@ -664,6 +757,8 @@ namespace _86BoxManager.Core
 
                 if (vis.Status == MachineStatus.STOPPED)
                 {
+                    var paths = DeterminePaths(vis);
+
                     var exec = Platforms.Manager.GetExecutor();
                     var info = exec.BuildStartInfo(GetExecArgs(ui, vis, idString));
                     if (!ui.Settings.ShowConsole)

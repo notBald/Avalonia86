@@ -183,16 +183,32 @@ public class ctrlSetExecutableModel : ReactiveObject
                 });
             }
 
-            var (exe, info) = VMCenter.GetDefaultExeInfo();
-            if (info != null)
+            bool has_def = false;
+            foreach (var r in s.GetDefExe())
             {
-                if (info.FilePrivatePart > 0)
-                    exeModel.Build = "" + info.FilePrivatePart;
-                if (info.FileMajorPart > 0)
-                    exeModel.Version = $"{info.FileMajorPart}.{info.FileMinorPart}.{info.FileBuildPart}";
-                if (!string.IsNullOrWhiteSpace(info.Arch))
-                    exeModel.Arch = info.Arch;
-                exeModel.VMExe = exe;
+                exeModel.Build = r["Build"] as string;
+                exeModel.Version = r["Version"] as string;
+                exeModel.Arch = r["Arch"] as string;
+                exeModel.VMExe = (string)r["VMExe"];
+                exeModel.Comment = r["comment"] as string;
+
+                has_def = true;
+                break;
+            }
+
+            if (!has_def)
+            {
+                var (exe, info) = VMCenter.GetPathExeInfo();
+                if (info != null)
+                {
+                    if (info.FilePrivatePart > 0)
+                        exeModel.Build = "" + info.FilePrivatePart;
+                    if (info.FileMajorPart > 0)
+                        exeModel.Version = $"{info.FileMajorPart}.{info.FileMinorPart}.{info.FileBuildPart}";
+                    if (!string.IsNullOrWhiteSpace(info.Arch))
+                        exeModel.Arch = info.Arch;
+                    exeModel.VMExe = exe;
+                }
             }
         }
 

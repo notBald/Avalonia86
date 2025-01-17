@@ -123,6 +123,26 @@ namespace _86BoxManager.ViewModels
             get => _s.IdToExeId(_vm.UID);
         }
 
+        public ExePaths Paths
+        {
+            get
+            {
+                var id = ExeID;
+                if (id != null)
+                {
+                    foreach(var p in _s.GetExePaths(id.Value))
+                    {
+                        return new ExePaths(
+                            (string) p["VMExe"], 
+                            p["VMRoms"] as string,
+                            p["Build"] as string,
+                            p["Arch"] as string);
+                    }
+                }
+                return null;
+            }
+        }
+
         public string Name { get => _vm.Name; set => this.RaiseAndSetIfChanged(ref _vm.Name, value); }
         /// <summary>
         /// What sort of machine to categorize this as
