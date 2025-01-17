@@ -172,10 +172,10 @@
 						<gb:GroupBox Header="Apperance" VerticalAlignment="Top"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<Grid Margin="9" ColumnDefinitions="*, *">
-								<StackPanel Grid.Column="0">
-									<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" Margin="12" />	
+								<StackPanel Grid.Column="0" Margin="12">
+									<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" />	
 								</StackPanel>
-								<StackPanel Grid.Column="1">
+								<StackPanel Grid.Column="1" Margin="12">
 									<TextBlock Text="Application theme: " Margin="0, 0, 0, 5" />
 									<ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}" HorizontalAlignment="Stretch" />
 								</StackPanel>
