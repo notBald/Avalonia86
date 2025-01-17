@@ -2,6 +2,7 @@ using _86BoxManager.Core;
 using _86BoxManager.Tools;
 using _86BoxManager.Xplat;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using DynamicData;
 using ReactiveUI;
@@ -32,6 +33,13 @@ namespace _86BoxManager.Views
             DataContext = _m;
 
             _m.PropertyChanged += _m_PropertyChanged;
+        }
+
+
+        private void label_default_released(object sender, PointerReleasedEventArgs args)
+        {
+            //Wasn't able to get Label's "target" function to work. Tried both using x:Name and Elementname=
+            _m.IsDefChecked = !_m.IsDefChecked;
         }
 
         private void dlgSettings_Closed(object sender, EventArgs e)
@@ -157,6 +165,7 @@ namespace _86BoxManager.Views
             _m.ROMDir = null;
             _m.MinOnStart = false;
             _m.EnableConsole = true;
+            _m.IsTrayEnabled = false;
             _m.MinToTray = false;
             _m.CloseToTray = false;
             _m.EnableLogging = false;
@@ -313,6 +322,7 @@ namespace _86BoxManager.Views
                     s.ROMdir = dir;
                     s.MinimizeOnVMStart = _m.MinOnStart;
                     s.ShowConsole = _m.EnableConsole;
+                    s.IsTrayEnabled = _m.IsTrayEnabled;
                     s.MinimizeToTray = _m.MinToTray;
                     s.CloseTray = _m.CloseToTray;
                     s.EnableLogging = _m.EnableLogging;
@@ -379,6 +389,7 @@ namespace _86BoxManager.Views
             _m.LogPath = s.LogPath;
             _m.MinOnStart = s.MinimizeOnVMStart;
             _m.EnableConsole = s.ShowConsole;
+            _m.IsTrayEnabled = s.IsTrayEnabled;
             _m.MinToTray = s.MinimizeToTray;
             _m.CloseToTray = s.CloseTray;
             _m.EnableLogging = s.EnableLogging;
@@ -548,7 +559,7 @@ namespace _86BoxManager.Views
     {
         private string _exe_dir, _exe_path, _cfg_dir, _rom_dir;
         private bool _min_start, _min_tray, _close_tray;
-        private bool _enable_logging;
+        private bool _enable_logging, _enable_tray;
         private bool _is_default_selected, _is_exe_list_changed;
         private string _log_path;
         private bool _allow_instances, _enable_console;
@@ -641,6 +652,7 @@ namespace _86BoxManager.Views
                        _me.ExeDir != ExeDir ||
                        _me.CFGDir != CFGDir ||
                        _me.ROMDir != ROMDir ||
+                       _me.IsTrayEnabled != IsTrayEnabled ||
                        _me.MinToTray != MinToTray ||
                        _me.MinOnStart != MinOnStart ||
                        _me.EnableLogging != EnableLogging ||
@@ -706,6 +718,18 @@ namespace _86BoxManager.Views
                 if (_rom_dir != value)
                 {
                     this.RaiseAndSetIfChanged(ref _rom_dir, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+        public bool IsTrayEnabled
+        {
+            get => _enable_tray;
+            set
+            {
+                if (_enable_tray != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _enable_tray, value);
                     this.RaisePropertyChanged(nameof(HasChanges));
                 }
             }
@@ -835,6 +859,8 @@ namespace _86BoxManager.Views
             {
                 if (_me.CompactList != CompactList)
                     s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.CompactMachineList)));
+                if (_me.IsTrayEnabled !=  IsTrayEnabled)
+                    s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.IsTrayEnabled)));
             }
         }
 

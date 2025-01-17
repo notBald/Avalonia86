@@ -26,7 +26,7 @@
 
     <TrayIcon.Icons>
             <TrayIcons>
-				<TrayIcon Icon="/Assets/86Box-gray.ico" ToolTipText="Avalonia86" Clicked="trayIcon_MouseClick">
+				<TrayIcon Icon="/Assets/86Box-gray.ico" ToolTipText="Avalonia86" Clicked="trayIcon_MouseClick" IsVisible="False">
                     <TrayIcon.Menu>
                         <NativeMenu>
                             <NativeMenuItem Header="Show Avalonia86" Click="open86BoxManagerToolStripMenuItem_Click" />

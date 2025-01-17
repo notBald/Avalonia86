@@ -169,6 +169,8 @@ namespace _86BoxManager.ViewModels
             get => Settings.CompactMachineList;
         }
 
+        public bool IsTrayEnabled { get => Settings.IsTrayEnabled; }
+
         private frmMain _ui;
         public frmMain UI {  get => _ui; set { if (_ui == null) _ui = value; } }
 
@@ -228,6 +230,10 @@ namespace _86BoxManager.ViewModels
             if (e.PropertyName == nameof(AppSettings.CompactMachineList))
             {
                 this.RaisePropertyChanged(nameof(CompactList));
+            }
+            else if (e.PropertyName == nameof(AppSettings.IsTrayEnabled))
+            {
+                this.RaisePropertyChanged(nameof(IsTrayEnabled));
             }
         }
 

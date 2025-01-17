@@ -294,6 +294,10 @@ namespace _86BoxManager.Views
                 lstVMs.ItemTemplate = null;
                 lstVMs.ItemTemplate = hold;
             }
+            else if (e.PropertyName == nameof(MainModel.IsTrayEnabled))
+            {
+                trayIcon.MakeVisible(Model.IsTrayEnabled);
+            }
         }
 
         //private static bool CheckRunningEmulator()
@@ -499,7 +503,7 @@ namespace _86BoxManager.Views
             // So let's warn the user just in case and request confirmation.
 
             //Close to tray
-            if (Settings != null && Settings.CloseTray)
+            if (Settings != null && Settings.CloseTray && Settings.IsTrayEnabled)
             {
                 e.Cancel = true;
                 if (trayIcon != null)
@@ -775,7 +779,7 @@ namespace _86BoxManager.Views
         {
             if (e.Property == WindowStateProperty)
             {
-                if (WindowState == WindowState.Minimized && Settings.MinimizeToTray)
+                if (WindowState == WindowState.Minimized && Settings.MinimizeToTray && Settings.IsTrayEnabled)
                 {
                     trayIcon.MakeVisible(true);
                     Hide();
@@ -800,6 +804,9 @@ namespace _86BoxManager.Views
             if (trayIcon is { Menu: { } })
             {
                 cmsTrayIcon = trayIcon.Menu;
+
+                if (Settings.IsTrayEnabled)
+                    trayIcon.MakeVisible(true);
             }
         }
 

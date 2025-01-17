@@ -127,7 +127,7 @@
 												</Style>
 											</RadioButton.Styles>
 										</RadioButton>
-										<TextBlock Grid.Column="1">Prefer default executable</TextBlock>
+										<Label Grid.Column="1" Content="Prefer default executable" PointerReleased="label_default_released" />
 									</Grid>
 									<DataGrid RowBackground="White" SelectedItem="{Binding SelectedExe}, Mode=OneWayToSource" BorderThickness="0"
 										GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}">
@@ -169,29 +169,26 @@
 				</TabItem>
 				<TabItem Header="Behaviour" Theme="{StaticResource CustomTabItm}">
 					<StackPanel Orientation="Vertical">
-						<gb:GroupBox Header="List of machines" MaxHeight="70" VerticalAlignment="Top"
+						<gb:GroupBox Header="List of machines" VerticalAlignment="Top"
 									 Theme="{StaticResource GroupBoxClassic}">
-							<StackPanel>
-								<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" Margin="12" />
-							</StackPanel>
+							<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" Margin="21" />
 						</gb:GroupBox>
-						<gb:GroupBox Header="Behaviour"
+						<gb:GroupBox Header="Tray behaviour"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<Border Margin="9">
-								<StackPanel Orientation="Vertical">
-									<StackPanel Orientation="Horizontal">
-										<CheckBox IsChecked="{Binding MinToTray}" Content="Minimize Avalonia86 to tray icon" Margin="12" />
-										<CheckBox IsChecked="{Binding CloseToTray}" Content="Close Avalonia86 to tray icon" Margin="12" />
-									</StackPanel>
-									<StackPanel Orientation="Horizontal">
-										<CheckBox IsChecked="{Binding MinOnStart}" Content="Minimize Avalonia86 when a VM is started" Margin="12" />
-									</StackPanel>
-								</StackPanel>
+								<Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto, Auto">
+									<CheckBox IsChecked="{Binding IsTrayEnabled}" Content="Enable tray icon" Margin="12" Grid.Column="0" Grid.Row="0" />
+									<CheckBox IsChecked="{Binding MinToTray}" Content="Minimize Avalonia86 to tray icon" Margin="12" Grid.Column="1" Grid.Row="0" IsEnabled="{Binding IsTrayEnabled}" />
+									<CheckBox IsChecked="{Binding CloseToTray}" Content="Close Avalonia86 to tray icon" Margin="12" Grid.Column="0" Grid.Row="1" IsEnabled="{Binding IsTrayEnabled}" />
+								</Grid>
 							</Border>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Startup"
 									 Theme="{StaticResource GroupBoxClassic}">
-							<CheckBox IsChecked="{Binding AllowInstances}" Content="Allow multiple instances of Avalonia86" Margin="12" />
+							<StackPanel Margin="9">
+								<CheckBox IsChecked="{Binding AllowInstances}" Content="Allow multiple instances of Avalonia86" Margin="12" />
+								<CheckBox IsChecked="{Binding MinOnStart}" Content="Minimize Avalonia86 when a VM is started" Margin="12" />
+							</StackPanel>
 						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>

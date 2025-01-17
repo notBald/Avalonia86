@@ -58,6 +58,15 @@ namespace _86BoxManager.Core
         }
 
         /// <summary>
+        /// Whenever to use a sys tray or not
+        /// </summary>
+        public bool IsTrayEnabled
+        {
+            get => FetchProperty("tray_enabled", false);
+            set => SetProperty("tray_enabled", value);
+        }
+
+        /// <summary>
         /// Whenever to close the frontent to the sys tray
         /// </summary>
         public bool CloseTray
