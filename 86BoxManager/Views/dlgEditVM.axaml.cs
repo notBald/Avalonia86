@@ -1,24 +1,14 @@
-using System;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
-using _86BoxManager.ViewModels;
 using _86BoxManager.Core;
-using _86BoxManager.Models;
 using _86BoxManager.Tools;
-using IOPath = System.IO.Path;
-using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
+using _86BoxManager.ViewModels;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using ReactiveUI;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using MessageType = MsBox.Avalonia.Enums.Icon;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
-using Avalonia.Platform;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Reflection;
-using System.ComponentModel;
-using ReactiveUI;
-using Mono.Unix.Native;
-using System.Xml.Linq;
-using System.IO;
 
 namespace _86BoxManager.Views
 {
@@ -35,7 +25,6 @@ namespace _86BoxManager.Views
         public dlgEditVM()
         {
             InitializeComponent();
-            txtName.OnTextChanged(txtName_TextChanged);
             _m = new dlgEditModel(Program.Root != null ? Program.Root.Settings : null);
             DataContext = _m;
         }
@@ -59,32 +48,21 @@ namespace _86BoxManager.Views
         {
             if (_vm != null)
             {
-                txtName.Text = _vm.Name;
-                txtDesc.Text = _vm.Desc;
-                txtComment.Text = _vm.Comment;
+                _m.Name = _vm.Name;
+                _m.Description = _vm.Desc;
+                _m.Comment = _vm.Comment;
                 _m.Category = _vm.Category;
-                lblPath1.Text = _vm.Path;
+                _m.Path = _vm.Path;
 
                 var dc = DataContext as dlgEditModel;
                 if (dc != null)
+                {
                     dc.SetIcon(_vm.IconPath);
+                    dc.SetSelectedExe(_vm.Tag.UID);
+                    dc.Commit();
+                }
             }
             
-        }
-
-        private void txtName_TextChanged(object sender, TextInputEventArgs e)
-        {
-            // Check for empty strings etc.
-            if (string.IsNullOrWhiteSpace(txtName.Text))
-            {
-                btnApply.IsEnabled = false;
-                return;
-            }
-
-            var cfgPath = Program.Root.Settings.CFGdir;
-            btnApply.IsEnabled = true;
-            lblPath1.Text = cfgPath + txtName.Text;
-            lblPath1.SetToolTip(cfgPath + txtName.Text);
         }
 
         private async void btnApply_Click(object sender, RoutedEventArgs e)
@@ -93,7 +71,7 @@ namespace _86BoxManager.Views
 
             try
             {
-                VMCenter.Edit(_vm.Tag.UID, txtName.Text, txtDesc.Text, _m.Category, dc?.VMIcon, txtComment.Text, this);
+                VMCenter.Edit(_vm.Tag.UID, _m.Name, _m.Description, _m.Category, dc?.VMIcon, _m.Comment, _m.ExeModel.SelectedItem.ID, this);
             }
             catch (Exception ex)
             {
@@ -114,37 +92,91 @@ namespace _86BoxManager.Views
 
     internal class dlgEditModel : ReactiveObject
     {
+        private dlgEditModel _me;
+        private string _name, _desc, _com, _path = "< path goes here >";
+        private long? _exe_id;
+
         private readonly List<string> _img_list;
-        private ExeModel _exeModel;
 
         private int _index = -1;
 
         private string _cat;
 
-        public string DefaultCategory { get; private set; }
-        public string Default86BoxFolder { get; private set; }
-        public string Default86BoxRoms { get; private set; }
-
-        public string Category { get => _cat; set => this.RaiseAndSetIfChanged(ref _cat, value); }
-
-        public List<string> Categories { get; } = new();
-        public List<ExeModel> ExeFiles { get; } = new();
-
-        public ExeModel SelectedItem
+        public bool HasChanges
         {
-            get => _exeModel;
+            get
+            {
+                if (_me == null)
+                    return false;
+
+                return _name != _me._name ||
+                       _desc != _me._desc ||
+                       _cat != _me._cat ||
+                       _com != _me._com ||
+                       _exe_id != ExeModel.SelectedItem.ID;
+            }
+        }
+
+        public string Name
+        { 
+            get => _name;
             set
             {
-                if (!ReferenceEquals(value, _exeModel))
+                if (_name != value)
                 {
-                    this.RaiseAndSetIfChanged(ref _exeModel, value);
-                    this.RaisePropertyChanged(nameof(SelExeRomDir));
-                    this.RaisePropertyChanged(nameof(SelExePath));
+                    this.RaiseAndSetIfChanged(ref _name, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
                 }
             }
         }
 
-        public int SelectedIndex { get; set; }
+        public string Description
+        {
+            get => _desc;
+            set
+            {
+                if (_desc != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _desc, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public string Comment
+        {
+            get => _com;
+            set
+            {
+                if (_com != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _com, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public string Path { get => _path; set => this.RaiseAndSetIfChanged(ref _path, value); }
+
+        public string DefaultCategory { get; private set; }
+        public string Default86BoxFolder { get; private set; }
+        public string Default86BoxRoms { get; private set; }
+        public string Category 
+        { 
+            get => _cat;
+            set
+            {
+                if (_cat != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _cat, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public List<string> Categories { get; } = new();
+
+        public ctrlSetExecutableModel ExeModel { get; private set; }
 
         public string VMIcon
         {
@@ -152,6 +184,12 @@ namespace _86BoxManager.Views
             {
                 return _index != -1 ? _img_list[_index] : AppSettings.DefaultIcon;
             }
+        }
+
+        public void Commit()
+        {
+            _exe_id = ExeModel.SelectedItem.ID;
+            _me = (dlgEditModel)MemberwiseClone();
         }
 
         public void NextIndex()
@@ -182,14 +220,16 @@ namespace _86BoxManager.Views
             }
         }
 
+        public void SetSelectedExe(long uid)
+        {
+            ExeModel.SetSelectedExe(uid, AppSettings.Settings);
+        }
+
         public dlgEditModel(AppSettings s)
         {
             _img_list = AppSettings.GetIconAssets();
-            var exeModel = new ExeModel()
-            {
-                Name = "Default 86Box executable"
-            };
-            ExeFiles.Add(exeModel);
+            ExeModel = new ctrlSetExecutableModel(s);
+            ExeModel.PropertyChanged += ExeModel_PropertyChanged;
 
             if (s == null)
             {
@@ -198,11 +238,6 @@ namespace _86BoxManager.Views
                 Categories.Add(DefaultCategory);
                 Categories.Add("DOS machines");
                 Categories.Add("OS/2 machines");
-
-                ExeFiles.Add(new ExeModel()
-                {
-                    Name = "86Box 3.11"
-                });
             }
             else
             {
@@ -212,107 +247,13 @@ namespace _86BoxManager.Views
                 Categories.Sort();
 
                 DefaultCategory = s.DefaultCat.Name;
-                Default86BoxFolder = s.EXEdir;
-                Default86BoxRoms = s.ROMdir;
-
-                foreach (var r in s.ListExecutables())
-                {
-                    ExeFiles.Add(new ExeModel()
-                    {
-                        ID = (long)r["ID"],
-                        Name = r["Name"] as string,
-                        VMExe = r["VMExe"] as string,
-                        VMRoms = r["VMRoms"] as string,
-                        Version = r["Version"] as string,
-                        Comment = r["Comment"] as string,
-                        Arch = r["Arch"] as string,
-                    });
-                }
-
-                //Todo: find default 86Box...
-                // 1. Get the default entery from the Exe table, if it exists
-                // 2. Get the list of EXE from the default path
-                // 3. Get the first executable
-
-                //Todo: find the default 86Box rompath
-                // 1. Get the default entery from the Exe table, if it exists
-                // 2. Check if there's a rom path in the 86Box folder
-                // 3. Get the default rom path, if it exits
-                // 4. Get the rom path of the default 86Box exe (even if another default exe has been choosen)
-            }
-
-            SelectedItem = exeModel;
-        }
-
-        public string SelExePath
-        {
-            get
-            {
-                try
-                {
-                    if (SelectedItem != null)
-                    {
-                        if (!string.IsNullOrWhiteSpace(SelectedItem.VMExe))
-                            return SelectedItem.VMExe;
-
-                        if (!string.IsNullOrWhiteSpace(Default86BoxFolder))
-                        {
-                            return Path.Combine(Default86BoxFolder, "< 86Box >");
-                        }
-                    }
-                }
-                catch { }
-
-                return "";
             }
         }
 
-        public string SelExeRomDir
+        private void ExeModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            get
-            {
-                try
-                {
-                    if (SelectedItem != null)
-                    {
-                        if (!string.IsNullOrWhiteSpace(SelectedItem.VMRoms))
-                            return SelectedItem.VMRoms;
-
-                        if (!string.IsNullOrWhiteSpace(SelectedItem.VMExe))
-                        {
-                            var dir = Path.Combine(Path.GetDirectoryName(SelectedItem.VMExe), "roms");
-                            if (Directory.Exists(dir))
-                                return dir;
-                        }
-
-                        if (!string.IsNullOrWhiteSpace(Default86BoxRoms))
-                        {
-                            if (Directory.Exists(Default86BoxRoms))
-                                return Default86BoxRoms;
-                        }
-
-                        if (!string.IsNullOrWhiteSpace(Default86BoxFolder))
-                        {
-                            var dir = Path.Combine(Path.GetDirectoryName(Default86BoxFolder), "roms");
-                            if (Directory.Exists(dir))
-                                return dir;
-                        }
-                    }
-                } catch { }
-
-                return "";
-            }
-        }
-
-        public class ExeModel
-        {
-            public long? ID { get; set; }
-            public string Name { get; set; }
-            public string Version { get; set; }
-            public string VMExe { get; set; }
-            public string VMRoms { get; set; }
-            public string Arch {  get; set; }
-            public string Comment { get; set; }
+            if (e.PropertyName == nameof(ctrlSetExecutableModel.SelectedItem))
+                this.RaisePropertyChanged(nameof(HasChanges));
         }
     }
 }

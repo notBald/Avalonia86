@@ -63,6 +63,8 @@ public partial class dlgAddExe : Window
             _m.RomDir = null;
         if (string.IsNullOrWhiteSpace(_m.Arch))
             _m.Arch = null;
+        if (string.IsNullOrWhiteSpace(_m.Build))
+            _m.Arch = null;
 
         Close(ResponseType.Ok);
     }
@@ -144,6 +146,7 @@ public partial class dlgAddExe : Window
                 _m._sugested_ver = $"{ver_str}";
 
                 _m.Arch = vi.Arch;
+                _m.Build = "" + vi.FilePrivatePart;
             }
         }
         catch { }
@@ -160,7 +163,7 @@ internal class dlgAddExeModel : ReactiveObject
 {
     dlgAddExeModel _me;
     private string _rom_dir, _exe_path, _exe_ver;
-    private string _name, _version, _comment, _arch;
+    private string _name, _version, _comment, _arch, _build;
     internal string _sugested_name, _sugested_ver;
 
     const string NO_PATH_WATERMARK = "< Select a path, please >";
@@ -238,6 +241,19 @@ internal class dlgAddExeModel : ReactiveObject
         } 
     }
 
+    public string Build
+    {
+        get => _build;
+        set
+        {
+            if (value != _build)
+            {
+                this.RaiseAndSetIfChanged(ref _build, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
+
     public bool HasPath => _exe_path != null;
 
     public bool HasChanges
@@ -250,6 +266,7 @@ internal class dlgAddExeModel : ReactiveObject
             return _me._exe_path != _exe_path ||
                    _me._rom_dir != _rom_dir ||
                    _me._arch != _arch ||
+                   _me._build != _build ||
                    _me._name != _name ||
                    _me._comment != _comment ||
                    _me._version != _version;

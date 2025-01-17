@@ -328,12 +328,12 @@ namespace _86BoxManager.Views
                             catch { }
                         }
                         else if (exe.IsNew) {
-                            try { s.AddExe(exe.Name, exe.VMPath, exe.VMRoms, exe.Comment, exe.Version, exe.Arch, exe.IsDefault); }
+                            try { s.AddExe(exe.Name, exe.VMPath, exe.VMRoms, exe.Comment, exe.Version, exe.Arch, exe.Build, exe.IsDefault); }
                             catch { }
                         }
                         else if(exe.IsChanged)
                         {
-                            try { s.UpdateExe(exe.ID, exe.Name, exe.VMPath, exe.VMRoms, exe.Comment, exe.Version, exe.Arch, exe.IsDefault); }
+                            try { s.UpdateExe(exe.ID, exe.Name, exe.VMPath, exe.VMRoms, exe.Comment, exe.Version, exe.Arch, exe.Build, exe.IsDefault); }
                             catch { }
                         }
                     }
@@ -409,6 +409,7 @@ namespace _86BoxManager.Views
                     Version = r["Version"] as string,
                     Comment = r["Comment"] as string,
                     Arch = r["Arch"] as string,
+                    Build = r["Build"] as string,
                     IsDefault = (bool) r["IsDef"]
                 };
 
@@ -465,7 +466,8 @@ namespace _86BoxManager.Views
                             Name = m.Name,
                             Version = m.Version,
                             Comment = m.Comment,
-                            Arch = m.Arch
+                            Arch = m.Arch,
+                            Build = m.Build
                         });
 
                         _m.IsExeListChanged = true;
@@ -501,6 +503,7 @@ namespace _86BoxManager.Views
             };
             var m = ((dlgAddExeModel)win.DataContext);
             m.Arch = sel.Arch;
+            m.Build = sel.Build;
             m.Version = sel.Version;
             m.Comment = sel.Comment;
             m.Name = sel.Name;
@@ -512,6 +515,7 @@ namespace _86BoxManager.Views
                 if (dr == ResponseType.Ok)
                 {
                     sel.Arch = m.Arch;
+                    sel.Build = m.Build;
                     sel.Version = m.Version;
                     sel.Comment = m.Comment;
                     sel.Name = m.Name;
@@ -852,8 +856,8 @@ namespace _86BoxManager.Views
             public string VMRoms { get; set; }
             public string Version { get; set; }
             public string Comment { get; set; }
-
             public string Arch { get; set; }
+            public string Build { get; set; }
 
             public bool IsDeleted { get; set; }
 
@@ -868,6 +872,7 @@ namespace _86BoxManager.Views
                 this.RaisePropertyChanged(nameof(Version));
                 this.RaisePropertyChanged(nameof(Comment));
                 this.RaisePropertyChanged(nameof(Arch));
+                this.RaisePropertyChanged(nameof(Build));
                 this.RaisePropertyChanged(nameof(IsChanged));
             }
         }

@@ -31,8 +31,8 @@ CREATE TABLE VMs (
     Uptime TEXT,
     RunCount INTEGER NOT NULL DEFAULT 0,
     Linked BOOLEAN NOT NULL DEFAULT FALSE,
-    Exe TEXT,
-    FOREIGN KEY (Exe) REFERENCES Executables(ID)
+    ExeID INTEGER,
+    FOREIGN KEY (ExeID) REFERENCES Executables(ID)
 );
 --§
 CREATE TABLE VMSettings (
@@ -105,6 +105,7 @@ CREATE TABLE Executables (
     VMExe TEXT NOT NULL,
     VMRoms Text,
     "Version" Text,
+    Build Text,
     Comment Text,
     Arch Text
 );

@@ -39,7 +39,7 @@
 	<Grid>
 		<DockPanel Margin="12">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
-				<Button Name="btnApply" Content="Apply" HorizontalAlignment="Stretch" Click="btnApply_Click" Margin="0,0,20,0" IsDefault="True"/>
+				<Button Name="btnApply" Content="Apply" HorizontalAlignment="Stretch" Click="btnApply_Click" Margin="0,0,20,0" IsDefault="True" IsEnabled="{Binding HasChanges}"/>
 				<Button Name="btnCancel" Content="Cancel" HorizontalAlignment="Stretch" Click="btnCancel_Click" Margin="0,0,20,0"/>
 			</StackPanel>
 			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10">
@@ -69,7 +69,7 @@
 										<Border VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">
 											<TextBlock Text="Name:"/>
 										</Border>
-										<TextBox Name="txtName" Watermark="Enter name" Grid.Row="0" Grid.Column="2" />
+										<TextBox Text="{Binding Name}" Watermark="Enter name" Grid.Row="0" Grid.Column="2" />
 										<!-- Spacer row 1 -->
 										<Border VerticalAlignment="Center" Grid.Row="2" Grid.Column="0">
 											<TextBlock Text="Category:"/>
@@ -86,7 +86,7 @@
 										</AutoCompleteBox>
 										<!-- Spacer row 3 -->
 										<TextBlock Text="VM Path:"  Grid.Row="4" Grid.Column="0" FontSize="10" />
-										<TextBlock Name="lblPath1" Text="Path: &lt;path goes here&gt;" Grid.Row="4" Grid.Column="2" FontSize="10" FontStyle="Italic" />
+										<TextBlock Text="{Binding Path}" Grid.Row="4" Grid.Column="2" FontSize="10" FontStyle="Italic" />
 										<!-- Spacer row 5 -->
 									</Grid>
 								</Border>
@@ -94,42 +94,18 @@
 						</gb:GroupBox>
 						<gb:GroupBox Header="Description" Theme="{StaticResource GroupBoxClassic}">
 							<Border Padding="20, 10">
-								<TextBox Name="txtDesc" Watermark="Enter description" Height="120" AcceptsReturn="True" TextWrapping="Wrap"/>
+								<TextBox Text="{Binding Description}" Watermark="Enter description" Height="120" AcceptsReturn="True" TextWrapping="Wrap"/>
 							</Border>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Comment" Theme="{StaticResource GroupBoxClassic}">
 							<Border Padding="20, 10">
-								<TextBox Name="txtComment" Watermark="Enter comment" Height="120" AcceptsReturn="True" TextWrapping="Wrap"/>
+								<TextBox Text="{Binding Comment}" Watermark="Enter comment" Height="120" AcceptsReturn="True" TextWrapping="Wrap"/>
 							</Border>
 						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>
 				<TabItem Header="Advanced" Theme="{StaticResource CustomTabItm}">
-					<gb:GroupBox Header="Prefered 86Box executable" Margin="0,0,0,10"
-							     Theme="{StaticResource GroupBoxClassic}"
-								 BorderBrush="{StaticResource TabCtrlBorderBrush}">
-						<StackPanel Margin="20, 10">
-							<ComboBox ItemsSource="{Binding ExeFiles}" SelectedItem="{Binding SelectedItem}" HorizontalAlignment="Stretch">
-								<ComboBox.ItemTemplate>
-									<DataTemplate>
-										<TextBlock Text="{Binding Name}" />
-									</DataTemplate>
-								</ComboBox.ItemTemplate>
-							</ComboBox>
-							<Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
-								<TextBlock Text="Version:" Grid.Column="0" Grid.Row="0" />
-								<SelectableTextBlock Text="{Binding SelectedItem.Version}" Grid.Column="1" Grid.Row="0" />
-								<TextBlock Text="CPU architecture:" Grid.Column="0" Grid.Row="1" />
-								<SelectableTextBlock Text="{Binding SelectedItem.Arch}" Grid.Column="1" Grid.Row="1" />
-								<TextBlock Text="86Box executable:" Grid.Column="0" Grid.Row="2" />
-								<SelectableTextBlock Text="{Binding SelExePath}" Grid.Column="1" Grid.Row="2" />
-								<TextBlock Text="Firmware folder:" Grid.Column="0" Grid.Row="3" />
-								<SelectableTextBlock Text="{Binding SelExeRomDir}" Grid.Column="1" Grid.Row="3" />
-								<TextBlock Text="Comment:" Grid.Column="0" Grid.Row="4" />
-								<SelectableTextBlock Text="{Binding SelectedItem.Comment}" Grid.Column="1" Grid.Row="4" />
-							</Grid>
-						</StackPanel>
-					</gb:GroupBox>
+					<v:ctrlSetExecutable DataContext="{Binding ExeModel}" />
 				</TabItem>
 			</TabControl>
 		</DockPanel>

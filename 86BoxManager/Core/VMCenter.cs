@@ -359,7 +359,7 @@ namespace _86BoxManager.Core
         }
 
         // Changes a VM's name and/or description
-        public static void Edit(long uid, string name, string desc, string category, string icon, string comment, Window parent)
+        public static void Edit(long uid, string name, string desc, string category, string icon, string comment, long? exe_id, Window parent)
         {
             var m = Program.Root.Model;
             var current_cat = m.CategoryIndex != 0 ? m.CategoryName : null;
@@ -369,7 +369,7 @@ namespace _86BoxManager.Core
 
             using (var t = Sett.BeginTransaction())
             {
-                Sett.EditVM(uid, name, category, icon);
+                Sett.EditVM(uid, name, category, icon, exe_id);
                 vm = Sett.RefreshVisual(uid);
                 if (vm == null)
                     throw new Exception("Failed to refresh database");
@@ -394,6 +394,27 @@ namespace _86BoxManager.Core
                 m.CategoryName = category;
                 m.Machine = vm;
             }
+        }
+
+        public static (string, IVerInfo) GetDefaultExeInfo()
+        {
+            var m = Platforms.Manager;
+            if (m != null)
+            {
+                var files = m.List86BoxExecutables(Sett.EXEdir);
+                if (files != null)
+                {
+                    foreach (var exe in files)
+                    {
+                        if (m.IsExecutable(exe))
+                        {
+                            return (exe, m.Get86BoxInfo(exe));
+                        }
+                    }
+                }
+            }
+
+            return ("", null);
         }
 
         // Refreshes the VM counter in the status bar

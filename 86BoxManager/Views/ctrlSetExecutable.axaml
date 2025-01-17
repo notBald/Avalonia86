@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:v="clr-namespace:_86BoxManager.Views"
+			 xmlns:gb="using:GroupBox.Avalonia.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="_86BoxManager.Views.ctrlSetExecutable"
+			 x:DataType="v:ctrlSetExecutableModel">
+	<Design.DataContext>
+		<v:ctrlSetExecutableModel/>
+	</Design.DataContext>
+	<UserControl.Styles>
+		<Style Selector="Button">
+			<Setter Property="Background" Value="#e1e1e1"/>
+			<Setter Property="BorderBrush" Value="#adadad"/>
+			<Setter Property="BorderThickness" Value="1"/>
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="BorderBrush" Value="{StaticResource CustomTextBoxBrush}"/>
+		</Style>
+	</UserControl.Styles>
+	<gb:GroupBox Header="Prefered 86Box executable" Margin="0,0,0,10"
+								   Theme="{StaticResource GroupBoxClassic}"
+								   BorderBrush="{StaticResource TabCtrlBorderBrush}">
+		<StackPanel Margin="20, 10">
+			<ComboBox ItemsSource="{Binding ExeFiles}" SelectedItem="{Binding SelectedItem}" HorizontalAlignment="Stretch">
+				<ComboBox.ItemTemplate>
+					<DataTemplate>
+						<TextBlock Text="{Binding Name}" />
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
+			<Grid
+				ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+				<Grid.Styles>
+					<Style Selector="TextBlock">
+						<Setter Property="Margin" Value="0, 2, 2, 2" />
+					</Style>
+					<Style Selector="SelectableTextBlock">
+						<Setter Property="Margin" Value="0, 2" />
+					</Style>
+				</Grid.Styles>
+				<TextBlock Text="Version:" Grid.Column="0" Grid.Row="0" />
+				<SelectableTextBlock TextTrimming="WordEllipsis" Text="{Binding SelVersion}" Grid.Column="1" Grid.Row="0" />
+				<TextBlock Text="CPU architecture:" Grid.Column="0" Grid.Row="1" />
+				<SelectableTextBlock Text="{Binding SelectedItem.Arch}" Grid.Column="1" Grid.Row="1" />
+				<TextBlock Text="86Box executable:" Grid.Column="0" Grid.Row="2" />
+				<SelectableTextBlock TextTrimming="WordEllipsis" Text="{Binding SelExePath}" Grid.Column="1" Grid.Row="2" />
+				<TextBlock Text="Firmware folder:" Grid.Column="0" Grid.Row="3" />
+				<SelectableTextBlock TextTrimming="WordEllipsis" Text="{Binding SelExeRomDir}" Grid.Column="1" Grid.Row="3" />
+				<TextBlock Text="Comment:" Grid.Column="0" Grid.Row="4" />
+				<SelectableTextBlock Text="{Binding SelectedItem.Comment}" Grid.Column="1" Grid.Row="4" />
+			</Grid>
+		</StackPanel>
+	</gb:GroupBox>
+</UserControl>

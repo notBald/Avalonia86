@@ -270,14 +270,15 @@ namespace _86BoxManager.Core
             return id;
         }
 
-        public void EditVM(long id, string name, string cat, string icon_path)
+        public void EditVM(long id, string name, string cat, string icon_path, long? exe_id)
         {
             if (name == null)
                 throw new ArgumentNullException();
 
-            var r = _store.Execute("UPDATE VMs SET Name = @n, Category = @c, iconpath = @icon where id = @id",
+            var r = _store.Execute("UPDATE VMs SET Name = @n, Category = @c, iconpath = @icon, ExeID = @exe where id = @id",
                 new SQLParam("n", name), new SQLParam("c", cat), 
-                new SQLParam("icon", icon_path), new SQLParam("id", id));
+                new SQLParam("icon", icon_path), new SQLParam("id", id),
+                new SQLParam("exe", exe_id));
 
             if (r != 1)
                 throw new Exception("Unexpected result of update query.");
@@ -314,28 +315,28 @@ namespace _86BoxManager.Core
             _store.Execute("DELETE FROM Executables where ID = @id", p);
         }
 
-        public void AddExe(string name, string vm_exe, string vm_roms, string comment, string version, string arch, bool def)
+        public void AddExe(string name, string vm_exe, string vm_roms, string comment, string version, string arch, string build, bool def)
         {
-            _store.Execute("INSERT INTO Executables (IsDef, Name, VMExe, VMRoms, \"Version\", Comment, Arch) " +
+            _store.Execute("INSERT INTO Executables (IsDef, Name, VMExe, VMRoms, \"Version\", Comment, Arch, Build) " +
                            " VALUES "+
-                           "(@def, @name, @vmpath, @vmroms, @vers, @comment, @arch)",
+                           "(@def, @name, @vmpath, @vmroms, @vers, @comment, @arch, @build)",
                            new SQLParam("name", name), new SQLParam("vmpath", vm_exe), new SQLParam("vmroms", vm_roms),
                            new SQLParam("comment", comment), new SQLParam("vers", version), new SQLParam("arch", arch),
-                           new SQLParam("def", def));
+                           new SQLParam("build", build), new SQLParam("def", def));
         }
 
-        public void UpdateExe(long id, string name, string vm_exe, string vm_roms, string comment, string version, string arch, bool def)
+        public void UpdateExe(long id, string name, string vm_exe, string vm_roms, string comment, string version, string arch, string build, bool def)
         {
-            _store.Execute("UPDATE Executables SET IsDef = @def, Name = @name, VMExe = @vmpath, VMRoms = @vmroms, \"Version\" = @vers, Comment = @comment, Arch = @arch " +
+            _store.Execute("UPDATE Executables SET IsDef = @def, Name = @name, VMExe = @vmpath, VMRoms = @vmroms, \"Version\" = @vers, Comment = @comment, Arch = @arch, Build = @build " +
                            "WHERE ID = @id",
                            new SQLParam("name", name), new SQLParam("vmpath", vm_exe), new SQLParam("vmroms", vm_roms),
                            new SQLParam("comment", comment), new SQLParam("vers", version), new SQLParam("arch", arch),
-                           new SQLParam("def", def), new SQLParam("id", id));
+                           new SQLParam("build", build), new SQLParam("def", def), new SQLParam("id", id));
         }
 
         public IEnumerable<DataReader> ListExecutables()
         {
-            return _store.Query("SELECT ID, IsDef, Name, VMExe, VMRoms, \"Version\", Comment, Arch FROM Executables ORDER BY Name");
+            return _store.Query("SELECT ID, IsDef, Name, VMExe, VMRoms, \"Version\", Comment, Arch, Build FROM Executables ORDER BY Name");
         }
 
         /// <summary>
@@ -472,8 +473,6 @@ namespace _86BoxManager.Core
         /// <summary>
         /// Gets the path of a VM based on its id
         /// </summary>
-        /// <param name="path">Path to VM</param>
-        /// <returns>Name of VM, null if there is no named VM on that path</returns>
         public string IdToPath(long id)
         {
             foreach (var name in _store.Query("select VMPath from VMs where id = @id", new SQLParam("id", id)))
@@ -482,6 +481,21 @@ namespace _86BoxManager.Core
             }
 
             return "";
+        }
+
+        /// <summary>
+        /// Gets the exe id of a VM based on its id
+        /// </summary>
+        /// <returns>Id of exe, null if there is no</returns>
+        public long? IdToExeId(long id)
+        {
+            foreach (var name in _store.Query("select ExeID from VMs where id = @id", new SQLParam("id", id)))
+            {
+                if (name[0] is long i)
+                    return i;
+            }
+
+            return null;
         }
 
         /// <summary>

@@ -118,6 +118,11 @@ namespace _86BoxManager.ViewModels
             get => _s.IdToPath(_vm.UID);
         }
 
+        public long? ExeID
+        {
+            get => _s.IdToExeId(_vm.UID);
+        }
+
         public string Name { get => _vm.Name; set => this.RaiseAndSetIfChanged(ref _vm.Name, value); }
         /// <summary>
         /// What sort of machine to categorize this as
