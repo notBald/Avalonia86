@@ -127,7 +127,7 @@
 												</Style>
 											</RadioButton.Styles>
 										</RadioButton>
-										<Label Grid.Column="1" Content="Prefer default executable" PointerReleased="label_default_released" />
+										<Label Grid.Column="1" Content="Prefer default executable" Tapped="label_default_tapped" />
 									</Grid>
 									<DataGrid RowBackground="White" SelectedItem="{Binding SelectedExe}, Mode=OneWayToSource" BorderThickness="0"
 										GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}">
@@ -169,9 +169,17 @@
 				</TabItem>
 				<TabItem Header="Behaviour" Theme="{StaticResource CustomTabItm}">
 					<StackPanel Orientation="Vertical">
-						<gb:GroupBox Header="List of machines" VerticalAlignment="Top"
+						<gb:GroupBox Header="Apperance" VerticalAlignment="Top"
 									 Theme="{StaticResource GroupBoxClassic}">
-							<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" Margin="21" />
+							<Grid Margin="9" ColumnDefinitions="*, *">
+								<StackPanel Grid.Column="0">
+									<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" Margin="12" />	
+								</StackPanel>
+								<StackPanel Grid.Column="1">
+									<TextBlock Text="Application theme: " Margin="0, 0, 0, 5" />
+									<ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}" HorizontalAlignment="Stretch" />
+								</StackPanel>
+							</Grid>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Tray behaviour"
 									 Theme="{StaticResource GroupBoxClassic}">

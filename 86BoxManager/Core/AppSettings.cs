@@ -2,6 +2,7 @@
 using _86BoxManager.ViewModels;
 using _86BoxManager.Xplat;
 using Avalonia.Platform;
+using Avalonia.Styling;
 using DynamicData;
 using System;
 using System.Collections.Generic;
@@ -127,6 +128,33 @@ namespace _86BoxManager.Core
         {
             get => FetchProperty("compact_list", false);
             set => SetProperty("compact_list", value);
+        }
+
+        public ThemeVariant Theme
+        {
+            get
+            {
+                switch(FetchProperty("app_theme", "Default"))
+                {
+                    case "Light":
+                        return ThemeVariant.Light;
+
+                    case "Dark":
+                        return ThemeVariant.Dark;
+
+                    default:
+                        return ThemeVariant.Default;
+                }
+            }
+            set
+            {
+                if (ReferenceEquals(value, ThemeVariant.Light))
+                    SetProperty("app_theme", "Light");
+                else if (ReferenceEquals(value, ThemeVariant.Dark))
+                    SetProperty("app_theme", "Dark");
+                else
+                    SetProperty("app_theme", "Default");
+            }
         }
 
         /// <summary>
