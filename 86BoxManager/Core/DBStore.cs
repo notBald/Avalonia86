@@ -1,14 +1,19 @@
 ﻿using _86BoxManager.Xplat;
 using Avalonia.Controls;
-using DynamicData;
-using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
 using System.IO;
-using System.Linq;
 using System.Reflection;
+
+#if MSDB
+using SQLiteConnection = Microsoft.Data.Sqlite.SqliteConnection;
+using SQLiteCommand = Microsoft.Data.Sqlite.SqliteCommand;
+using SQLiteDataReader = Microsoft.Data.Sqlite.SqliteDataReader;
+using SQLiteTransaction = Microsoft.Data.Sqlite.SqliteTransaction;
+#else
+using System.Data.SQLite;
+#endif
 
 namespace _86BoxManager.Core
 {
@@ -20,6 +25,13 @@ namespace _86BoxManager.Core
         const int CUR_MINOR_DB_VER = 1;
 
         #region Static fields
+
+#if MSDB
+        private static SQLiteTransaction _current_transaction = null;
+        private static SQLiteCommand NewCommand(string cmd, SQLiteConnection db) => new SQLiteCommand(cmd, db, _current_transaction);
+#else
+        private static SQLiteCommand NewCommand(string cmd, SQLiteConnection db) => new SQLiteCommand(cmd, db);
+#endif
 
         private static readonly SQLiteConnection _db;
         private static bool _in_memeory_db;
@@ -47,7 +59,7 @@ namespace _86BoxManager.Core
 
         private static int GetDBVersion(SQLiteConnection db)
         {
-            using (var cmd = new SQLiteCommand("PRAGMA user_version", db))
+            using (var cmd = NewCommand("PRAGMA user_version", db))
             {
                 using (var r = cmd.ExecuteReader())
                 {
@@ -61,7 +73,7 @@ namespace _86BoxManager.Core
 
         private static void SetDBVersion(int value, SQLiteConnection db)
         {
-            using (var cmd = new SQLiteCommand($"PRAGMA user_version = {value}", db))
+            using (var cmd = NewCommand($"PRAGMA user_version = {value}", db))
             {
                 cmd.ExecuteNonQuery();
             }
@@ -100,7 +112,11 @@ namespace _86BoxManager.Core
             con = new SQLiteConnection("Data Source=:memory:");
             con.Open();
 
+#if MSDB
+            if (!InitDB(con))
+#else
             if (con.IsReadOnly(null) || !InitDB(con))
+#endif
                 throw new Exception();
             _in_memeory_db = true;
 
@@ -148,7 +164,7 @@ namespace _86BoxManager.Core
 
                             foreach (var command in commands)
                             {
-                                using var cmd = new SQLiteCommand(command, db);
+                                using var cmd = NewCommand(command, db);
                                 cmd.ExecuteNonQuery();
                             }
                         }
@@ -159,12 +175,12 @@ namespace _86BoxManager.Core
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
                 if (current_minor != -1)
                 {
-                    using var cmd = new SQLiteCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}', Version = 2.0", db);
+                    using var cmd = NewCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}', Version = 2.0", db);
                     cmd.ExecuteNonQuery();
                 }
                 else
                 {
-                    using var cmd = new SQLiteCommand($"INSERT INTO FileInfo(Creator, Version) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 2.0)", db);
+                    using var cmd = NewCommand($"INSERT INTO FileInfo(Creator, Version) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 2.0)", db);
                     cmd.ExecuteNonQuery();
                 }
 
@@ -187,7 +203,7 @@ namespace _86BoxManager.Core
 
                 foreach (var command in commands)
                 {
-                    using var cmd = new SQLiteCommand(command, db);
+                    using var cmd = NewCommand(command, db);
                     cmd.ExecuteNonQuery();
                 }
 
@@ -241,16 +257,31 @@ namespace _86BoxManager.Core
                 if (File.Exists(path))
                 {
                     //Try open the db
+#if MSDB
+                    db = new SQLiteConnection("Data Source=" + path);
+#else
                     db = new SQLiteConnection("URI=file:" + path);
+#endif
                     db.Open();
 
                     try
                     {
+#if MSDB
+                        //MS has this setting on by default, which is a problem when creating the database.
+                        //Also, it can only be turned off outside a transaction, so we can't sneak these
+                        //commands into the db script.
+                        using (var cmd = db.CreateCommand())
+                        {
+                            cmd.CommandText = "PRAGMA foreign_keys = OFF";
+                            cmd.ExecuteNonQuery();
+                        }
+#else
                         if (!db.IsReadOnly(null))
+#endif
                         {
                             if (test_db)
                             {
-                                var fetch = new SQLiteCommand(@"select Version from FileInfo", db);
+                                var fetch = NewCommand(@"select Version from FileInfo", db);
 
                                 float major;
                                 using (fetch)
@@ -268,6 +299,17 @@ namespace _86BoxManager.Core
                                 if (GetDBVersion(db) < CUR_MINOR_DB_VER)
                                 {
                                     //We got to upgrade.
+#if MSDB
+                                    using var t = db.BeginTransaction();
+                                    _current_transaction = t;
+                                    if (!InitDB(db, GetDBVersion(db)))
+                                    {
+                                        t.Rollback();
+                                        throw new Exception("DB create failed.");
+                                    }
+                                    t.Commit();
+                                    _current_transaction = null;
+#else
                                     using var t = db.BeginTransaction();
                                     if (!InitDB(db, GetDBVersion(db)))
                                     {
@@ -275,6 +317,7 @@ namespace _86BoxManager.Core
                                         throw new Exception("DB create failed.");
                                     }
                                     t.Commit();
+#endif
                                 }
                             }
                             
@@ -295,7 +338,11 @@ namespace _86BoxManager.Core
 
         internal static void UpdateWindow(double top, double left, double height, double width, bool maximized)
         {
+#if MSDB
+            var update = new SQLiteCommand(null, _db, _current_transaction)
+#else
             var update = new SQLiteCommand(_db)
+#endif
             {
                 CommandText =
                     @"UPDATE Window SET Top = @t, ""Left"" = @l, Height = @h, Width = @w, Maximized = @m"
@@ -322,7 +369,11 @@ namespace _86BoxManager.Core
 
         internal static SizeWindow FetchWindowSize()
         {
+#if MSDB
+            var fetch = new SQLiteCommand(null, _db, _current_transaction)
+#else
             var fetch = new SQLiteCommand(_db)
+#endif
             {
                 CommandText =
                     @"select Top, ""Left"", Height, Width, Maximized from Window"
@@ -360,7 +411,7 @@ namespace _86BoxManager.Core
             }
         }
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Execute the command and return the number of rows inserted/updated affected by it.
@@ -368,7 +419,7 @@ namespace _86BoxManager.Core
         /// <returns>The number of rows inserted/updated affected by it.</returns>
         public int Execute(string query, params SQLParam[] parameters)
         {
-            using (var cmd = new SQLiteCommand(query, _db))
+            using (var cmd = NewCommand(query, _db))
             {
                 foreach (var param in parameters)
                     cmd.Parameters.AddWithValue($"@{param.Name}", param.Value);
@@ -379,7 +430,7 @@ namespace _86BoxManager.Core
 
         public void SetOrUpdate(string update, string set, params SQLParam[] parameters)
         {
-            using (var cmd = new SQLiteCommand(update, _db))
+            using (var cmd = NewCommand(update, _db))
             {
                 foreach (var param in parameters)
                     cmd.Parameters.AddWithValue($"@{param.Name}", param.Value);
@@ -395,7 +446,7 @@ namespace _86BoxManager.Core
 
         public IEnumerable<DataReader> Query(string query)
         {
-            using (var cmd = new SQLiteCommand(query, _db))
+            using (var cmd = NewCommand(query, _db))
             using (SQLiteDataReader r = cmd.ExecuteReader())
             {
                 while (r.Read())
@@ -405,7 +456,7 @@ namespace _86BoxManager.Core
 
         public IEnumerable<DataReader> Query(string query, params SQLParam[] parameters)
         {
-            using (var cmd = new SQLiteCommand(query, _db))
+            using (var cmd = NewCommand(query, _db))
             {
                 foreach (var param in parameters)
                     cmd.Parameters.AddWithValue($"@{param.Name}", param.Value);
@@ -420,7 +471,14 @@ namespace _86BoxManager.Core
 
         public Transaction BeginTransaction()
         {
+#if MSDB
+            if (_current_transaction != null)
+                throw new NotImplementedException("Nested transactions");
+            _current_transaction = _db.BeginTransaction();
+            return new Transaction(_current_transaction);
+#else
             return new Transaction(_db.BeginTransaction());
+#endif
         }
 
         public sealed class DataReader
@@ -448,9 +506,13 @@ namespace _86BoxManager.Core
             readonly SQLiteTransaction _t;
 
             internal Transaction(SQLiteTransaction db) { _t = db; }
-
+#if MSDB
+            public void Dispose() { _t.Dispose(); _current_transaction = null; }
+            public void Commit() { _t.Commit(); _current_transaction = null; }
+#else
             public void Dispose() { _t.Dispose(); }
             public void Commit() { _t.Commit(); }
+#endif
         }
     }
 
@@ -462,7 +524,11 @@ namespace _86BoxManager.Core
         public SQLParam(string name, object val)
         {
             Name = name;
+#if MSDB
+            Value = val ?? DBNull.Value;
+#else
             Value = val;
+#endif
         }
     }
 }

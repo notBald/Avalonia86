@@ -246,9 +246,9 @@
 
 						<StackPanel DockPanel.Dock="Bottom" Margin="0, 10">
 							<TextBlock Text="Source code and related projects:" />
-							<controls:Hyperlink Margin="10, 0" Url="https://github.com/86Box/86Box" />
-							<controls:Hyperlink Margin="10, 0" Url="https://github.com/RetBox/86BoxManagerX" />
-							<controls:Hyperlink Margin="10, 0" Url="https://github.com/notBald/Avalonia86" />
+							<HyperlinkButton Padding="10, 0" Content="https://github.com/86Box/86Box" NavigateUri="https://github.com/86Box/86Box" />
+							<HyperlinkButton Padding="10, 0" Content="https://github.com/RetBox/86BoxManagerX" NavigateUri="https://github.com/RetBox/86BoxManagerX" />
+							<HyperlinkButton Padding="10, 0" Content="https://github.com/notBald/Avalonia86" NavigateUri="https://github.com/notBald/Avalonia86" />
 						</StackPanel>
 						
 						<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" MinHeight="100">

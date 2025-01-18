@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>_86BoxManager.Linux</RootNamespace>
+    <Configurations>Debug;Release;Release-MSDB;Debug-MSDB</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,9 +2,17 @@
 using Avalonia.Controls;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.IO;
 using System;
+
+#if MSDB
+using SQLiteConnection = Microsoft.Data.Sqlite.SqliteConnection;
+using SQLiteCommand = Microsoft.Data.Sqlite.SqliteCommand;
+using SQLiteDataReader = Microsoft.Data.Sqlite.SqliteDataReader;
+using SQLiteParameter = Microsoft.Data.Sqlite.SqliteParameter;
+#else
+using System.Data.SQLite;
+#endif
 
 namespace _86BoxManager.Tools
 {
@@ -20,7 +28,11 @@ namespace _86BoxManager.Tools
                 var db = Path.Combine(startupPath, "Resources", "HWDB.sqlite");
                 if (File.Exists(db))
                 {
+#if MSDB
+                    _db = new SQLiteConnection("Data Source=" + db);
+#else
                     _db = new SQLiteConnection("URI=file:" + db);
+#endif
                     _db.Open();
                 }
                 else

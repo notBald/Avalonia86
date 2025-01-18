@@ -1,1 +1,14 @@
-﻿
+﻿There are two database backends: system.data.sqlite and microsoft.data.sqlite.
+
+I'm more familiar with the former, but there is no ARM builds. Instead of making my own, 
+I shifted over to using Microsoft's solution. Problem is, it's more temperamental, so there
+may still be bugs lurking in my implementation. Therefore, for now, it's only used on ARM 
+builds.
+
+Meaning, when building for ARM, use "Release-MSDB". 
+
+MSDB will also work for x86/x64 builds and will eventually replace system.data.sqlite.
+
+Note, Avalonia86.csproj has been hand edited to exclude the "other" SQL library for builds 
+that don't need it. The same technique can be used to exclude the rather large amount of 
+Linux specific code in Windows builds.

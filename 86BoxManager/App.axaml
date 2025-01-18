@@ -4,7 +4,6 @@
 			 xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
              x:Class="_86BoxManager.App">	
     <Application.Styles>
-        <avalonia:HyperLinkStyle/>
         <!--<FluentTheme />-->
 		<!-- ^To use Fluent theme, remove SimpleTheme and comment out "FluidThemeBits" from resources below -->
 		<SimpleTheme />
