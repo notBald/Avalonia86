@@ -18,6 +18,37 @@
 		<vm:MainModel/>
 	</Design.DataContext>
 	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.ThemeDictionaries>
+				<ResourceDictionary x:Key="Default">
+					<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
+						<GradientStop Color="#FFFFFF" Offset="0.0"/>
+						<GradientStop Color="#D6D6D6" Offset="1.0"/>
+					</LinearGradientBrush>
+
+					<SolidColorBrush Color="#a0a0a0" x:Key="VerticalGridSplitter_rect1"/>
+					<SolidColorBrush Color="#f0f0f0" x:Key="VerticalGridSplitter_rect2"/>
+
+					<SolidColorBrush Color="#f0f0f0" x:Key="StatusBarBackgroundColor" />
+					<SolidColorBrush Color="White" x:Key="content_BackgroundColor" />
+					<SolidColorBrush Color="#E2EAF1" x:Key="caption_btn_BackgroundColor" />
+				</ResourceDictionary>
+				<ResourceDictionary x:Key="Dark">
+					<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
+						<GradientStop Color="#666666" Offset="0.0"/>
+						<GradientStop Color="#222222" Offset="1.0"/>
+					</LinearGradientBrush>
+
+					<SolidColorBrush Color="#000000" x:Key="VerticalGridSplitter_rect1"/>
+					<SolidColorBrush Color="#000000" x:Key="VerticalGridSplitter_rect2"/>
+					
+					<SolidColorBrush Color="#222222" x:Key="StatusBarBackgroundColor" />
+					<SolidColorBrush Color="#222222" x:Key="content_BackgroundColor" />
+					<SolidColorBrush Color="#222222" x:Key="caption_btn_BackgroundColor" />
+				</ResourceDictionary>
+			</ResourceDictionary.ThemeDictionaries>
+		</ResourceDictionary>
+		
 		<ControlTheme x:Key="VerticalGridSplitter" TargetType="GridSplitter">
 			<Setter Property="Focusable" Value="True" />
 			<Setter Property="MinWidth" Value="6" />
@@ -31,8 +62,8 @@
 			<Setter Property="Template">
 				<ControlTemplate>
 					<StackPanel Orientation="Horizontal">
-						<Rectangle Width="1" VerticalAlignment="Stretch" Fill="#a0a0a0"></Rectangle>
-						<Rectangle Width="1" VerticalAlignment="Stretch" Fill="#f0f0f0"></Rectangle>
+						<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect1}"></Rectangle>
+						<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect2}"></Rectangle>
 					</StackPanel>
 				</ControlTemplate>
 			</Setter>
@@ -176,7 +207,7 @@
 				</MenuItem>
 			</Menu>
 			<Rectangle Fill="#f0f0f0" Height="2"/>
-			<StackPanel Orientation="Horizontal" Spacing="0" Margin="0, 2, 0, 0">
+			<StackPanel Orientation="Horizontal" Spacing="0" Margin="0, 2, 0, 0" Background="{DynamicResource ToolbarBackgroundBrush}">
 				<StackPanel.Styles>
 					<!-- Applies animations to the Background and BorderBrush properties of all buttons within this StackPanel -->
 					<Style Selector=":is(Button)">
@@ -237,12 +268,6 @@
 						<Setter Property="TextAlignment" Value="Center"/>
 					</Style>
 				</StackPanel.Styles>
-				<StackPanel.Background>
-					<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
-						<GradientStop Color="#FFFFFF" Offset="0.0"/>
-						<GradientStop Color="#D6D6D6" Offset="1.0"/>
-					</LinearGradientBrush>
-				</StackPanel.Background>
 				<Button Name="btnStart"  Click="btnStart_Click">
 					<!-- Note, uses Multibinding in backend code to set "stop" class -->
 					<Button.IsEnabled>
@@ -302,7 +327,7 @@
 				<ComboBox SelectedIndex="{Binding CategoryIndex}" Background="transparent" Width="150" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Center" ItemsSource="{Binding Categories}" />
 			</StackPanel>
 		</StackPanel>
-		<Grid DockPanel.Dock="Bottom" Background="#f0f0f0">
+		<Grid DockPanel.Dock="Bottom" Background="{DynamicResource StatusBarBackgroundColor}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"></ColumnDefinition>
 				<ColumnDefinition Width="10"><!-- Where we put the "Grip resizer" dots --></ColumnDefinition>
@@ -337,7 +362,7 @@
 				<Border Grid.Column="0" BorderThickness="1" BorderBrush="#828790">
 					<ListBox BorderThickness="1" BorderBrush="White" Padding="0"
 							 x:Name="lstVMs" SelectedIndex="{Binding MachineIndex}" ItemsSource="{Binding Path=Machines}" 
-							 KeyDown="lstVMs_KeyDown" Background="White" DoubleTapped="lstVMs_MouseDoubleClick"
+							 KeyDown="lstVMs_KeyDown" Background="{DynamicResource content_BackgroundColor}" DoubleTapped="lstVMs_MouseDoubleClick"
 							 ScrollViewer.AllowAutoHide="False">
 						<ListBox.Resources>
 							<ContextMenu Name="lstVMpop" x:Key="lstVMpop" DataContext="{Binding #lstVMs.((vm:MainModel)DataContext), Mode=OneWay}">
@@ -475,13 +500,13 @@
 					</ListBox>
 				</Border>
 				<GridSplitter Grid.Column="1" Background="Transparent" ResizeDirection="Columns"/>
-				<Border Grid.Column="2" BorderThickness="1" BorderBrush="#d9d9d9" Background="White" >
+				<Border Grid.Column="2" BorderThickness="1" BorderBrush="#d9d9d9" Background="{DynamicResource content_BackgroundColor}" >
 					<Grid>
 						<view:ctrlWelcome IsVisible="{Binding !VmIsSelected}"></view:ctrlWelcome>
 						<DockPanel IsVisible="{Binding VmIsSelected}" Margin="2">
 							<!-- Caption -->
 							<Button HorizontalAlignment="Stretch" Padding="20,10,10,10" Margin="0, 0, 0, 3" DockPanel.Dock="Top" CornerRadius="0" 
-									Background="#E2EAF1" FontSize="14" FontWeight="Bold" Click="openFolderToolStripMenuItem_Click"
+									Background="{DynamicResource caption_btn_BackgroundColor}" FontSize="14" FontWeight="Bold" Click="openFolderToolStripMenuItem_Click"
 									Content="{Binding Machine.Name}" BorderThickness="0" >
 								<Button.Styles>
 									<Style Selector="Button:pointerover /template/ ContentPresenter">
@@ -536,7 +561,7 @@
 									</Border>
 									<GridSplitter Grid.Column="1" ResizeDirection="Columns" Theme="{StaticResource VerticalGridSplitter}" Margin="7, 2, 8, 2" />
 									<DockPanel Grid.Column="2" Margin="0, 0, 18, 0">
-										<DockPanel DockPanel.Dock="Top" Background="White" Height="35">
+										<DockPanel DockPanel.Dock="Top" Background="{DynamicResource content_BackgroundColor}" Height="35">
 											<TextBlock DockPanel.Dock="Left" Text="Screenshots:" VerticalAlignment="Center" FontSize="12" TextDecorations="Underline" Foreground="#0066cc" Margin="0, 0, 0, 1" 
 													   PointerPressed="Screenshots_PointerPressed">
 												<TextBlock.Styles>
