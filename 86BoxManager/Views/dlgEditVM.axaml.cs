@@ -27,6 +27,14 @@ namespace _86BoxManager.Views
             InitializeComponent();
             _m = new dlgEditModel(Program.Root != null ? Program.Root.Settings : null);
             DataContext = _m;
+
+            Loaded += DlgEditVM_Loaded;
+        }
+
+        private void DlgEditVM_Loaded(object sender, RoutedEventArgs e)
+        {
+            tbName.Focus();
+            tbName.SelectAll();
         }
 
         private void btnLeftImg_Click(object sender, RoutedEventArgs e)
