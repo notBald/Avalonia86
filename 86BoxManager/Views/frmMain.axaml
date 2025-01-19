@@ -21,19 +21,32 @@
 		<ResourceDictionary>
 			<ResourceDictionary.ThemeDictionaries>
 				<ResourceDictionary x:Key="Default">
+					<Color x:Key="LineColor">#f0f0f0</Color>
+					<Color x:Key="LineColor3">#a0a0a0</Color>
+					
 					<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
 						<GradientStop Color="#FFFFFF" Offset="0.0"/>
 						<GradientStop Color="#D6D6D6" Offset="1.0"/>
 					</LinearGradientBrush>
 
-					<SolidColorBrush Color="#a0a0a0" x:Key="VerticalGridSplitter_rect1"/>
-					<SolidColorBrush Color="#f0f0f0" x:Key="VerticalGridSplitter_rect2"/>
+					<SolidColorBrush Color="{StaticResource LineColor3}" x:Key="VerticalGridSplitter_rect1"/>
+					<SolidColorBrush Color="{StaticResource LineColor}" x:Key="VerticalGridSplitter_rect2"/>
 
-					<SolidColorBrush Color="#f0f0f0" x:Key="StatusBarBackgroundColor" />
+					<SolidColorBrush Color="{StaticResource LineColor}" x:Key="StatusBarBackgroundColor" />
 					<SolidColorBrush Color="White" x:Key="content_BackgroundColor" />
 					<SolidColorBrush Color="#E2EAF1" x:Key="caption_btn_BackgroundColor" />
+					<SolidColorBrush Color="#E5EDF4" x:Key="caption_btn_HoverColor" />
+					<SolidColorBrush Color="#828790" x:Key="listVMs_BorderBrush" />
+					<SolidColorBrush Color="#d9d9d9" x:Key="main_BorderBrush" />
+					<SolidColorBrush Color="#d7d7d7" x:Key="statusbar_LineBrush" />
+					
+					<!-- The info pane has multiple borders, only part of the outer border is here -->
+					<SolidColorBrush Color="{StaticResource LineColor3}" x:Key="info_Border1" />
 				</ResourceDictionary>
 				<ResourceDictionary x:Key="Dark">
+					<Color x:Key="LineColor">#111111</Color>
+					<Color x:Key="LineColor2">#828790</Color>
+					
 					<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
 						<GradientStop Color="#666666" Offset="0.0"/>
 						<GradientStop Color="#222222" Offset="1.0"/>
@@ -44,7 +57,10 @@
 					
 					<SolidColorBrush Color="#222222" x:Key="StatusBarBackgroundColor" />
 					<SolidColorBrush Color="#222222" x:Key="content_BackgroundColor" />
-					<SolidColorBrush Color="#222222" x:Key="caption_btn_BackgroundColor" />
+					<SolidColorBrush Color="#262626" x:Key="caption_btn_BackgroundColor" />
+					<SolidColorBrush Color="#333333" x:Key="caption_btn_HoverColor" />
+					<SolidColorBrush Color="{StaticResource LineColor2}" x:Key="main_BorderBrush" />
+					<SolidColorBrush Color="{StaticResource LineColor2}" x:Key="statusbar_LineBrush" />
 				</ResourceDictionary>
 			</ResourceDictionary.ThemeDictionaries>
 		</ResourceDictionary>
@@ -53,7 +69,6 @@
 			<Setter Property="Focusable" Value="True" />
 			<Setter Property="MinWidth" Value="6" />
 			<Setter Property="MinHeight" Value="6" />
-			<Setter Property="Background" Value="White" />
 			<Setter Property="PreviewContent">
 				<Template>
 					<Rectangle Fill="{DynamicResource SystemAccentColor}" />
@@ -206,7 +221,7 @@
 					</MenuItem>
 				</MenuItem>
 			</Menu>
-			<Rectangle Fill="#f0f0f0" Height="2"/>
+			<Rectangle Fill="{DynamicResource LineColor}" Height="2"/>
 			<StackPanel Orientation="Horizontal" Spacing="0" Margin="0, 2, 0, 0" Background="{DynamicResource ToolbarBackgroundBrush}">
 				<StackPanel.Styles>
 					<!-- Applies animations to the Background and BorderBrush properties of all buttons within this StackPanel -->
@@ -336,7 +351,7 @@
 				<RowDefinition Height="1"><!-- Used to create a thin boarder over the status bar --></RowDefinition>
 				<RowDefinition Height="18"></RowDefinition>
 			</Grid.RowDefinitions>
-			<Rectangle Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Height="1" Fill="#d7d7d7"/>
+			<Rectangle Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Height="1" Fill="{DynamicResource statusbar_LineBrush}"/>
 			<!--<TextBlock Grid.Column="0" Grid.Row="1" Name="lblVMCount" Margin="1, 0" Padding="3, 1, 3, 0" Text="{Binding Path=VmCount}" FontSize="10" />-->
 			<TextBlock Grid.Column="0" Grid.Row="1" Margin="1, 0" Padding="3, 1, 3, 0" FontSize="10">
 				All VMs: <Run Text="{Binding AllVmCount}" /> | Running: <Run Text="{Binding AllRunningVMs}" />  | Stopped: <Run Text="{Binding StoppedVMs}" />
@@ -359,8 +374,8 @@
 					<ColumnDefinition Width="3" />
 					<ColumnDefinition Width="*" />
 				</Grid.ColumnDefinitions>
-				<Border Grid.Column="0" BorderThickness="1" BorderBrush="#828790">
-					<ListBox BorderThickness="1" BorderBrush="White" Padding="0"
+				<Border Grid.Column="0" BorderThickness="1" BorderBrush="{DynamicResource listVMs_BorderBrush}">
+					<ListBox BorderThickness="1" BorderBrush="{DynamicResource content_BackgroundColor}" Padding="0"
 							 x:Name="lstVMs" SelectedIndex="{Binding MachineIndex}" ItemsSource="{Binding Path=Machines}" 
 							 KeyDown="lstVMs_KeyDown" Background="{DynamicResource content_BackgroundColor}" DoubleTapped="lstVMs_MouseDoubleClick"
 							 ScrollViewer.AllowAutoHide="False">
@@ -500,7 +515,7 @@
 					</ListBox>
 				</Border>
 				<GridSplitter Grid.Column="1" Background="Transparent" ResizeDirection="Columns"/>
-				<Border Grid.Column="2" BorderThickness="1" BorderBrush="#d9d9d9" Background="{DynamicResource content_BackgroundColor}" >
+				<Border Grid.Column="2" BorderThickness="1" BorderBrush="{DynamicResource main_BorderBrush}" Background="{DynamicResource content_BackgroundColor}" >
 					<Grid>
 						<view:ctrlWelcome IsVisible="{Binding !VmIsSelected}"></view:ctrlWelcome>
 						<DockPanel IsVisible="{Binding VmIsSelected}" Margin="2">
@@ -510,7 +525,7 @@
 									Content="{Binding Machine.Name}" BorderThickness="0" >
 								<Button.Styles>
 									<Style Selector="Button:pointerover /template/ ContentPresenter">
-										<Setter Property="Background" Value="#E5EDF4"/>
+										<Setter Property="Background" Value="{DynamicResource caption_btn_HoverColor}"/>
 									</Style>
 									<Style Selector="Button:pressed">
 										<Setter Property="RenderTransform" Value="scale(0.995)" />
@@ -556,7 +571,7 @@
 											<Setter Property="Height" Value="21"/>
 										</Style>
 									</Grid.Styles>
-									<Border Margin="3, 0, 0, 0" BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0">
+									<Border Margin="3, 0, 0, 0" BorderBrush="{DynamicResource info_Border1}" BorderThickness="1, 1, 0, 0">
 										<view:ctrlMachineInfo DataContext="{Binding VMConfig, Mode=OneWay}" />
 									</Border>
 									<GridSplitter Grid.Column="1" ResizeDirection="Columns" Theme="{StaticResource VerticalGridSplitter}" Margin="7, 2, 8, 2" />

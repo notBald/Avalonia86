@@ -36,6 +36,9 @@ namespace _86BoxManager.Tools
         /// </summary>
         public static void SetDarkMode(Window w)
         {
+            if (Design.IsDesignMode)
+                return;
+
             if (IsWindows && IsWindows10 && App.Current != null)
             {
                 var build = Environment.OSVersion.Version.Build;

@@ -6,16 +6,29 @@
 			 x:DataType="vm:VMConfig"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
              x:Class="_86BoxManager.Views.ctrlMachineInfo"
-			 BorderBrush="#e3e3e3" BorderThickness="0, 0, 1, 1">
+			 BorderBrush="{DynamicResource BottomRightBorder}" BorderThickness="0, 0, 1, 1">
 	<Design.DataContext>
 		<vm:VMConfig/>
 	</Design.DataContext>
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.ThemeDictionaries>
+				<ResourceDictionary x:Key="Default">
+					<SolidColorBrush Color="#e3e3e3" x:Key="BottomRightBorder" />
+					<SolidColorBrush Color="#696969" x:Key="TopLeftBorder" />
+				</ResourceDictionary>
+				<ResourceDictionary x:Key="Dark">
+					<SolidColorBrush Color="#a0a0a0" x:Key="BottomRightBorder" />
+				</ResourceDictionary>
+			</ResourceDictionary.ThemeDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
 	<UserControl.Styles>
 		<Style Selector="Grid">
 			<Setter Property="Margin" Value="2, 0, 0, 0" />
 		</Style>
 	</UserControl.Styles>
-	<Border BorderBrush="#696969" BorderThickness="1, 1, 0, 0">
+	<Border BorderBrush="{DynamicResource TopLeftBorder}" BorderThickness="1, 1, 0, 0">
 		<ScrollViewer VerticalAlignment="Stretch">
 			<StackPanel VerticalAlignment="Stretch" Spacing="10">
 				<Expander HorizontalAlignment="Stretch" Header="System" IsExpanded="True">
