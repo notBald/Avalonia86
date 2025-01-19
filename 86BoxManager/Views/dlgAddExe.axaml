@@ -9,16 +9,16 @@
         x:Class="_86BoxManager.Views.dlgAddExe"
 		x:DataType="v:dlgAddExeModel"
         Title="Add 86Box Executable"
-		Background="#f0f0f0">
+		Background="{DynamicResource TabDlgBackground}">
 	<Window.Styles>
 		<Style Selector="Button">
-			<Setter Property="Background" Value="#e1e1e1"/>
-			<Setter Property="BorderBrush" Value="#adadad"/>
+			<Setter Property="Background" Value="{DynamicResource DlgBtnBackground}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource DlgBtnBoarderBrush}"/>
 			<Setter Property="BorderThickness" Value="1"/>
 		</Style>
 
 		<Style Selector="TextBox">
-			<Setter Property="BorderBrush" Value="{StaticResource CustomTextBoxBrush}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBrush}"/>
 		</Style>
 
 		<Style Selector="SelectableTextBlock.version">
@@ -38,7 +38,7 @@
 		</Style>
 
 		<Style Selector="gb|GroupBox">
-			<Setter Property="BorderBrush" Value="{StaticResource TabCtrlBorderBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource TabCtrlBorderBrush}" />
 		</Style>
 	</Window.Styles>
 	<Grid>

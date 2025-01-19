@@ -13,7 +13,7 @@
         x:Class="_86BoxManager.Views.dlgAddVM"
 		x:DataType="v:dlgAddVMModel"
         Title="Add a virtual machine"
-		Background="#f0f0f0">
+		Background="{DynamicResource TabDlgBackground}">
 	<Window.Resources>
 		<!-- Imports the custom tab control theme -->
 		<!--<ResourceDictionary>
@@ -42,19 +42,19 @@
 	</Window.Resources>
 	<Window.Styles>
 		<Style Selector="Button">
-			<Setter Property="Background" Value="#e1e1e1"/>
-			<Setter Property="BorderBrush" Value="#adadad"/>
+			<Setter Property="Background" Value="{DynamicResource DlgBtnBackground}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource DlgBtnBoarderBrush}"/>
 			<Setter Property="BorderThickness" Value="1"/>
 		</Style>
 
 		<Style Selector="Border#Acorn">
-			<Setter Property="Background" Value="#e1e1e1"/>
-			<Setter Property="BorderBrush" Value="#adadad"/>
+			<Setter Property="Background" Value="{DynamicResource DlgBtnBackground}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource DlgBtnBoarderBrush}"/>
 			<Setter Property="BorderThickness" Value="1"/>
 		</Style>
 
 		<Style Selector="TextBox">
-			<Setter Property="BorderBrush" Value="{StaticResource CustomTextBoxBrush}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBrush}"/>
 		</Style>
 
 		<!-- https://github.com/AvaloniaUI/Avalonia/blob/master/samples/RenderDemo/Pages/AnimationsPage.xaml -->
@@ -197,7 +197,7 @@
 								</DataTemplate>
 							</ListBox.ItemTemplate>
 						</ListBox>-->
-						<DataGrid ItemsSource="{Binding Imports}" RowBackground="White">
+						<DataGrid ItemsSource="{Binding Imports}" RowBackground="{DynamicResource GridRowBackground}">
 							<DataGrid.Styles>
 								<Style Selector="ScrollBar">
 									<Setter Property="AllowAutoHide" Value="False"/>

@@ -12,7 +12,7 @@
 		x:DataType="v:dlgSettingsModel"
         Title="Settings"
         Opened="dlgSettings_Load"
-		Background="#f0f0f0">
+		Background="{DynamicResource TabDlgBackground}">
 	<Window.Resources>
 		<!-- Imports the custom tab control theme -->
 		<!--<ResourceDictionary>
@@ -23,13 +23,13 @@
 	</Window.Resources>
 	<Window.Styles>
 		<Style Selector="Button">
-			<Setter Property="Background" Value="#e1e1e1"/>
-			<Setter Property="BorderBrush" Value="#adadad"/>
+			<Setter Property="Background" Value="{DynamicResource DlgBtnBackground}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource DlgBtnBoarderBrush}"/>
 			<Setter Property="BorderThickness" Value="1"/>
 		</Style>
 
 		<Style Selector="TextBox">
-			<Setter Property="BorderBrush" Value="{StaticResource CustomTextBoxBrush}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBrush}"/>
 		</Style>
 
 		<Style Selector="SelectableTextBlock.version">
@@ -49,7 +49,7 @@
 		</Style>
 
 		<Style Selector="gb|GroupBox">
-			<Setter Property="BorderBrush" Value="{StaticResource TabCtrlBorderBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource TabCtrlBorderBrush}" />
 		</Style>
 	</Window.Styles>
 	<Grid>
@@ -129,7 +129,7 @@
 										</RadioButton>
 										<Label Grid.Column="1" Content="Prefer default executable" Tapped="label_default_tapped" />
 									</Grid>
-									<DataGrid RowBackground="White" SelectedItem="{Binding SelectedExe}, Mode=OneWayToSource" BorderThickness="0"
+									<DataGrid RowBackground="{DynamicResource GridRowBackground}" SelectedItem="{Binding SelectedExe}, Mode=OneWayToSource" BorderThickness="0"
 										GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}">
 										<DataGrid.Styles>
 											<Style Selector="ScrollBar">

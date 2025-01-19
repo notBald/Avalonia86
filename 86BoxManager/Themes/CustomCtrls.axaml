@@ -13,28 +13,54 @@
 			<GeometryDrawing Brush="Black" Geometry="F1 M438.6 278.6C451.1 266.1 451.1 245.8 438.6 233.3L278.6 73.3C266.1 60.8 245.8 60.8 233.3 73.3C220.8 85.8 220.8 106.1 233.3 118.6L338.8 224L32 224C14.3 224 0 238.3 0 256C0 273.7 14.3 288 32 288L338.7 288L233.4 393.4C220.9 405.9 220.9 426.2 233.4 438.7C245.9 451.2 266.2 451.2 278.7 438.7L438.7 278.7L438.6 278.6Z" />
 		</DrawingGroup>
 	</DrawingImage>
-	
-    <!-- Colors most borders on the custom tab theme -->
-	<SolidColorBrush x:Key="TabCtrlBorderBrush" Color="#d9d9d9"/>
 
-	<!-- Color used on text box borders -->
-	<SolidColorBrush x:Key="CustomTextBoxBrush" Color="#7a7a7a"/>
+	<ResourceDictionary.ThemeDictionaries>
+		<ResourceDictionary x:Key="Default">
+			<!-- Colors most borders on the custom tab theme -->
+			<SolidColorBrush x:Key="TabCtrlBorderBrush" Color="#d9d9d9"/>
+			<SolidColorBrush x:Key="TabCtrlBackgroundBrush" Color="White"/>
+			<SolidColorBrush x:Key="TabCtrlUnselectedBrush" Color="#f0f0f0"/>
+			<SolidColorBrush x:Key="TabDlgBackground" Color="#f0f0f0"/>
+
+			<!-- Color used on text box borders -->
+			<SolidColorBrush x:Key="CustomTextBoxBrush" Color="#7a7a7a"/>
+			
+			<!-- Colors used on dialog buttons -->
+			<SolidColorBrush x:Key="DlgBtnBackground" Color="#e1e1e1" />
+			<SolidColorBrush x:Key="DlgBtnBoarderBrush" Color="#adadad" />
+
+			<!-- Colors used on data tables -->
+			<SolidColorBrush x:Key="GridRowBackground" Color="White"/>
+		</ResourceDictionary>
+		<ResourceDictionary x:Key="Dark">
+			<!-- Colors most borders on the custom tab theme -->
+			<SolidColorBrush x:Key="TabCtrlBorderBrush" Color="#d9d9d9"/>
+			<SolidColorBrush x:Key="TabCtrlBackgroundBrush" Color="#222222"/>
+			<SolidColorBrush x:Key="TabCtrlUnselectedBrush" Color="Black"/>
+			<SolidColorBrush x:Key="TabDlgBackground" Color="Black"/>
+
+			<!-- Color used on text box borders -->
+			<SolidColorBrush x:Key="CustomTextBoxBrush" Color="#7a7a7a"/>
+
+			<!-- Colors used on dialog buttons -->
+			<SolidColorBrush x:Key="DlgBtnBackground" Color="#111111" />
+			<SolidColorBrush x:Key="DlgBtnBoarderBrush" Color="#adadad" />
+
+			<!-- Colors used on data tables -->
+			<SolidColorBrush x:Key="GridRowBackground" Color="Black"/>
+		</ResourceDictionary>
+	</ResourceDictionary.ThemeDictionaries>
 
 	<!-- Trying to get the existing style to work the way I want was a headache, so we create the template from scratch. Note, how we set
-		     values straight into the template rather than bothering with style atributes. Ater all, this is only used on one control. 
-			 
-			 Right now, if you want to add more tabs you'll have to code the "unselected tab" bit. Useful resources:
-			 https://github.com/AvaloniaUI/Avalonia/blob/master/src/Avalonia.Themes.Fluent/Controls/TabItem.xaml 
-			 -->
+		 values straight into the template rather than bothering with style atributes. 
+	-->
 	<ControlTheme x:Key="CustomTabCtrl" TargetType="TabControl">
 		<Setter Property="Margin" Value="0" />
 		<Setter Property="Template">
 			<ControlTemplate>
 				<DockPanel>
 					<!-- The way we get rid of the boarder below the selected tab is by slightly overdrawing the ItemsPresenter over the ContentPresenter,
-							 then not drawing the lower boarder on TabItem. Currently this will also happen for non-selected tabs. I imagine the fix being
-							 to do BorderThickness="{TemplateBinding BorderThickness}, then using a style to selectivly set the BorderThickness depending
-							 on whenever a tab is selected or not. -->
+						 then not drawing the lower boarder on TabItem. ZIndex is key here. -->
 					<ItemsPresenter Name="PART_ItemsPresenter"
 									ItemsPanel="{TemplateBinding ItemsPanel}"
 									DockPanel.Dock="{TemplateBinding TabStripPlacement}"
@@ -45,7 +71,7 @@
 									  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
 									  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
 									  Content="{TemplateBinding SelectedContent}"
-									  ContentTemplate="{TemplateBinding SelectedContentTemplate}"  BorderBrush="{StaticResource TabCtrlBorderBrush}" BorderThickness="1" Background="white" ZIndex="4" />
+									  ContentTemplate="{TemplateBinding SelectedContentTemplate}"  BorderBrush="{DynamicResource TabCtrlBorderBrush}" BorderThickness="1" Background="{DynamicResource TabCtrlBackgroundBrush}" ZIndex="4" />
 				</DockPanel>
 			</ControlTemplate>
 		</Setter>
@@ -57,7 +83,7 @@
 			<ControlTemplate>
 				<Border
 					Name="PART_LayoutRoot"
-					Background="#f0f0f0"
+					Background="{DynamicResource TabCtrlUnselectedBrush}"
 					BorderBrush="{StaticResource TabCtrlBorderBrush}"
 					BorderThickness="1"
 					CornerRadius="{TemplateBinding CornerRadius}"
@@ -76,36 +102,8 @@
 		</Setter>
 
 		<Style Selector="^:selected /template/ Border">
-			<Setter Property="Background" Value="white" />
+			<Setter Property="Background" Value="{DynamicResource TabCtrlBackgroundBrush}" />
 			<Setter Property="BorderThickness" Value="1, 1, 1, 0" />
 		</Style>
 	</ControlTheme>
-
-	<!--<ControlTheme x:Key="CustomButton" TargetType="Button">
-		<Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
-		<Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
-		<Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrush}" />
-		<Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThemeThickness}" />
-		<Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
-		<Setter Property="Padding" Value="{DynamicResource ButtonPadding}" />
-		<Setter Property="HorizontalAlignment" Value="Left" />
-		<Setter Property="VerticalAlignment" Value="Center" />
-		<Setter Property="RenderTransform" Value="none" />
-
-		<Setter Property="Template">
-			<ControlTemplate>
-				<ContentPresenter x:Name="PART_ContentPresenter"
-								  Background="{TemplateBinding Background}"
-								  BorderBrush="{TemplateBinding BorderBrush}"
-								  BorderThickness="{TemplateBinding BorderThickness}"
-								  CornerRadius="{TemplateBinding CornerRadius}"
-								  Content="{TemplateBinding Content}"
-								  ContentTemplate="{TemplateBinding ContentTemplate}"
-								  Padding="{TemplateBinding Padding}"
-								  RecognizesAccessKey="True"
-								  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-								  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-			</ControlTemplate>
-		</Setter>
-	</ControlTheme>-->
 </ResourceDictionary>
