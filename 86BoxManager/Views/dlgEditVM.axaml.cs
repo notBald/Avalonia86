@@ -124,7 +124,8 @@ namespace _86BoxManager.Views
                        _desc != _me._desc ||
                        _cat != _me._cat ||
                        _com != _me._com ||
-                       _exe_id != ExeModel.SelectedItem.ID;
+                       _exe_id != ExeModel.SelectedItem.ID ||
+                       _index != _me._index;
             }
         }
 
@@ -209,6 +210,7 @@ namespace _86BoxManager.Views
             if (_index == _img_list.Count)
                 _index = 0;
             this.RaisePropertyChanged(nameof(VMIcon));
+            this.RaisePropertyChanged(nameof(HasChanges));
         }
         public void PrevIndex()
         {
@@ -216,6 +218,7 @@ namespace _86BoxManager.Views
             if (_index < 0)
                 _index = _img_list.Count - 1;
             this.RaisePropertyChanged(nameof(VMIcon));
+            this.RaisePropertyChanged(nameof(HasChanges));
         }
 
         public void SetIcon(string path)
