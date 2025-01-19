@@ -87,7 +87,7 @@
 		<DockPanel Margin="12">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0" Spacing="4" DockPanel.Dock="Bottom">
 				<Button Content="Add" Click="btnAdd_Click" IsEnabled="{Binding CanAdd}" IsDefault="True" />
-				<Button Name="btnCancel" Content="Cancel" Click="btnCancel_OnClick" />
+				<Button Name="btnCancel" Content="Cancel" Click="btnCancel_OnClick" IsCancel="True" />
 			</StackPanel>
 			<TabControl Name="tbc" SelectedIndex="{Binding TabIndex}" Theme="{StaticResource CustomTabCtrl}" >
 				<TabItem Name="tbiNew" Header="Register" Theme="{StaticResource CustomTabItm}">

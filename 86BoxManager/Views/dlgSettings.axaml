@@ -57,17 +57,17 @@
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0" Spacing="4" DockPanel.Dock="Bottom">
 				<Button Content="Defaults"
 						HorizontalAlignment="Stretch" VerticalAlignment="Center"
-						IsDefault="False" Margin="0,0,40,0"
+						Margin="0,0,40,0"
 						Click="btnDefaults_Click"/>
 				<Button Content="OK" IsEnabled="{Binding HasChanges}"
 						HorizontalAlignment="Stretch" VerticalAlignment="Center"
-						IsDefault="False" Click="btnOK_Click"/>
-				<Button Content="Cancel"
+						IsDefault="True" Click="btnOK_Click"/>
+				<Button Content="Cancel" IsCancel="True"
 						HorizontalAlignment="Stretch" VerticalAlignment="Center"
-						IsDefault="True" Click="btnCancel_Click"/>
+						Click="btnCancel_Click"/>
 				<Button Content="Apply" IsEnabled="{Binding HasChanges}"
 						HorizontalAlignment="Stretch" VerticalAlignment="Center"
-						IsDefault="False" Click="btnApply_Click"/>
+						Click="btnApply_Click"/>
 			</StackPanel>
 			<TabControl SelectedIndex="0" Theme="{StaticResource CustomTabCtrl}" >
 				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">

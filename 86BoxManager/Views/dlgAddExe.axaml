@@ -44,7 +44,7 @@
 	<Grid>
 		<DockPanel Margin="12">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0" Spacing="4" DockPanel.Dock="Bottom">
-				<Button Content="OK" Click="btnOK_Click">
+				<Button Content="OK" Click="btnOK_Click" IsDefault="True">
 					<Button.IsEnabled>
 						<MultiBinding Converter="{x:Static BoolConverters.And}">
 							<Binding Path="HasChanges" />
@@ -52,7 +52,7 @@
 						</MultiBinding>
 					</Button.IsEnabled>
 				</Button>
-				<Button Content="Cancel" Click="btnCancel_Click" />
+				<Button Content="Cancel" Click="btnCancel_Click" IsCancel="True" />
 			</StackPanel>
 			<TabControl Theme="{StaticResource CustomTabCtrl}" >
 				<TabItem Header="Register" Theme="{StaticResource CustomTabItm}">

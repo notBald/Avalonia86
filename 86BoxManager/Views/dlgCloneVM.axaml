@@ -26,7 +26,7 @@
 	<Grid>
 		<DockPanel Margin="12">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
-				<Button Name="btnClone" Content="Clone" HorizontalAlignment="Stretch" Click="btnClone_Click" Margin="0,0,20,0">
+				<Button Name="btnClone" Content="Clone" HorizontalAlignment="Stretch" Click="btnClone_Click" Margin="0,0,20,0" IsDefault="True">
 					<Button.IsEnabled>
 						<MultiBinding Converter="{x:Static BoolConverters.And}">
 							<Binding Path="HasName"/>
@@ -34,7 +34,7 @@
 						</MultiBinding>
 					</Button.IsEnabled>
 				</Button>
-				<Button Name="btnCancel" Content="Cancel" HorizontalAlignment="Stretch" Click="btnCancel_Click" Margin="0,0,20,0" IsDefault="True"/>
+				<Button Name="btnCancel" Content="Cancel" HorizontalAlignment="Stretch" Click="btnCancel_Click" Margin="0,0,20,0" IsCancel="True" />
 			</StackPanel>
 			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10">
 				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
@@ -50,7 +50,7 @@
 							<Grid>
 								<StackPanel IsVisible="{Binding !IsWorking, Mode=OneWay}">
 									<TextBlock Text="Name of cloned machine will be:" Margin="2, 25, 2, 2"/>
-									<TextBox Watermark="Enter name" Text="{Binding CloneName}" />
+									<TextBox Name="tbName" Watermark="Enter name" Text="{Binding CloneName}" />
 								</StackPanel>
 								<StackPanel IsVisible="{Binding IsWorking, Mode=OneWay}">
 									<TextBlock Text="Copy in progress:" Margin="2, 25, 2, 2"/>
