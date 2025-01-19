@@ -34,9 +34,7 @@ namespace _86BoxManager.Tools
         /// <summary>
         /// Workarround for this feature being missing from Windows 10
         /// </summary>
-        /// <param name="hwnd">Handle for the window</param>
-        /// <param name="enabled">Set dark or light</param>
-        public static void SetDarkMode(Avalonia.Controls.Window w)
+        public static void SetDarkMode(Window w)
         {
             if (IsWindows && IsWindows10 && App.Current != null)
             {

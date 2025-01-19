@@ -225,9 +225,6 @@ namespace _86BoxManager.Views
             }
         }
 
-        [DllImport("DwmApi")] //System.Runtime.InteropServices
-        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
-
         /// <summary>
         /// Sets the window size, but makes sure not to set the window in a bad location.
         /// </summary>
