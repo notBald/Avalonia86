@@ -1,21 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-	<DrawingImage x:Key="SvgArrowLeft">
-		<DrawingGroup>
-			<GeometryDrawing Brush="Transparent" Geometry="F1M0,0L448,0L448,512L0,512z" />
-			<GeometryDrawing Brush="Black" Geometry="F1 M9.4 233.4C-3.1 245.9 -3.1 266.2 9.4 278.7L169.4 438.7C181.9 451.2 202.2 451.2 214.7 438.7C227.2 426.2 227.2 405.9 214.7 393.4L109.2 288L416 288C433.7 288 448 273.7 448 256C448 238.3 433.7 224 416 224L109.3 224L214.6 118.6C227.1 106.1 227.1 85.8 214.6 73.3C202.1 60.8 181.8 60.8 169.3 73.3L9.3 233.3L9.4 233.4Z" />
-		</DrawingGroup>
-	</DrawingImage>
-
-	<DrawingImage x:Key="SvgArrowRight">
-		<DrawingGroup>
-			<GeometryDrawing Brush="Transparent" Geometry="F1M0,0L448,0L448,512L0,512z" />
-			<GeometryDrawing Brush="Black" Geometry="F1 M438.6 278.6C451.1 266.1 451.1 245.8 438.6 233.3L278.6 73.3C266.1 60.8 245.8 60.8 233.3 73.3C220.8 85.8 220.8 106.1 233.3 118.6L338.8 224L32 224C14.3 224 0 238.3 0 256C0 273.7 14.3 288 32 288L338.7 288L233.4 393.4C220.9 405.9 220.9 426.2 233.4 438.7C245.9 451.2 266.2 451.2 278.7 438.7L438.7 278.7L438.6 278.6Z" />
-		</DrawingGroup>
-	</DrawingImage>
-
 	<ResourceDictionary.ThemeDictionaries>
 		<ResourceDictionary x:Key="Default">
+			<SolidColorBrush x:Key="ArrowBrush" Color="Black" />
+			
 			<!-- Colors most borders on the custom tab theme -->
 			<SolidColorBrush x:Key="TabCtrlBorderBrush" Color="#d9d9d9"/>
 			<SolidColorBrush x:Key="TabCtrlBackgroundBrush" Color="White"/>
@@ -33,6 +21,8 @@
 			<SolidColorBrush x:Key="GridRowBackground" Color="White"/>
 		</ResourceDictionary>
 		<ResourceDictionary x:Key="Dark">
+			<SolidColorBrush x:Key="ArrowBrush" Color="White" />
+
 			<!-- Colors most borders on the custom tab theme -->
 			<SolidColorBrush x:Key="TabCtrlBorderBrush" Color="#d9d9d9"/>
 			<SolidColorBrush x:Key="TabCtrlBackgroundBrush" Color="#222222"/>
@@ -50,6 +40,20 @@
 			<SolidColorBrush x:Key="GridRowBackground" Color="Black"/>
 		</ResourceDictionary>
 	</ResourceDictionary.ThemeDictionaries>
+
+	<DrawingImage x:Key="SvgArrowLeft">
+		<DrawingGroup>
+			<GeometryDrawing Brush="Transparent" Geometry="F1M0,0L448,0L448,512L0,512z" />
+			<GeometryDrawing Brush="{DynamicResource ArrowBrush}" Geometry="F1 M9.4 233.4C-3.1 245.9 -3.1 266.2 9.4 278.7L169.4 438.7C181.9 451.2 202.2 451.2 214.7 438.7C227.2 426.2 227.2 405.9 214.7 393.4L109.2 288L416 288C433.7 288 448 273.7 448 256C448 238.3 433.7 224 416 224L109.3 224L214.6 118.6C227.1 106.1 227.1 85.8 214.6 73.3C202.1 60.8 181.8 60.8 169.3 73.3L9.3 233.3L9.4 233.4Z" />
+		</DrawingGroup>
+	</DrawingImage>
+
+	<DrawingImage x:Key="SvgArrowRight">
+		<DrawingGroup>
+			<GeometryDrawing Brush="Transparent" Geometry="F1M0,0L448,0L448,512L0,512z" />
+			<GeometryDrawing Brush="{DynamicResource ArrowBrush}" Geometry="F1 M438.6 278.6C451.1 266.1 451.1 245.8 438.6 233.3L278.6 73.3C266.1 60.8 245.8 60.8 233.3 73.3C220.8 85.8 220.8 106.1 233.3 118.6L338.8 224L32 224C14.3 224 0 238.3 0 256C0 273.7 14.3 288 32 288L338.7 288L233.4 393.4C220.9 405.9 220.9 426.2 233.4 438.7C245.9 451.2 266.2 451.2 278.7 438.7L438.7 278.7L438.6 278.6Z" />
+		</DrawingGroup>
+	</DrawingImage>
 
 	<!-- Trying to get the existing style to work the way I want was a headache, so we create the template from scratch. Note, how we set
 		 values straight into the template rather than bothering with style atributes. 
