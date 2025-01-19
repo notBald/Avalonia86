@@ -49,6 +49,9 @@ namespace _86BoxManager.Views
 
             Closing += DlgAddVM_Closing;
             Loaded += DlgAddVM_Loaded;
+
+            //Windows 10 workarround
+            NativeMSG.SetDarkMode(this);
         }
 
         private void DlgAddVM_Loaded(object sender, RoutedEventArgs e)

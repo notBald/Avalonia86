@@ -31,6 +31,9 @@ namespace _86BoxManager.Views
         {
             InitializeComponent();
             Loaded += dlgCloneVM_Load;
+
+            //Windows 10 workarround
+            NativeMSG.SetDarkMode(this);
         }
 
         public dlgCloneVM(string oldPath) : this()

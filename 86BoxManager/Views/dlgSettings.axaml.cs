@@ -33,6 +33,9 @@ namespace _86BoxManager.Views
             DataContext = _m;
 
             _m.PropertyChanged += _m_PropertyChanged;
+
+            //Windows 10 workarround
+            NativeMSG.SetDarkMode(this);
         }
 
 

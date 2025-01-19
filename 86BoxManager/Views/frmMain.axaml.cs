@@ -31,6 +31,8 @@ using Avalonia.Controls.Documents;
 using System.Collections.Generic;
 using _86BoxManager.Converters;
 using System.Reactive.Linq;
+using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 
 namespace _86BoxManager.Views
 {
@@ -209,7 +211,22 @@ namespace _86BoxManager.Views
                 OldPos = NewPos;
                 NewPos = e.Point;
             };
+
+            NativeMSG.SetDarkMode(this);
+            if (App.Current != null)
+                App.Current.PropertyChanged += Current_PropertyChanged;
         }
+
+        private void Current_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property.Name == nameof(App.RequestedThemeVariant))
+            {
+                NativeMSG.SetDarkMode(this);
+            }
+        }
+
+        [DllImport("DwmApi")] //System.Runtime.InteropServices
+        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
 
         /// <summary>
         /// Sets the window size, but makes sure not to set the window in a bad location.

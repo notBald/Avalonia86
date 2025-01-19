@@ -24,6 +24,9 @@ public partial class dlgAddExe : Window
         DataContext = _m;
 
         _m.PropertyChanged += _m_PropertyChanged;
+
+        //Windows 10 workarround
+        NativeMSG.SetDarkMode(this);
     }
 
     private void _m_PropertyChanged(object sender, PropertyChangedEventArgs e)

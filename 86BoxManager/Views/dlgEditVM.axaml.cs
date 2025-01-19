@@ -29,6 +29,9 @@ namespace _86BoxManager.Views
             DataContext = _m;
 
             Loaded += DlgEditVM_Loaded;
+
+            //Windows 10 workarround
+            NativeMSG.SetDarkMode(this);
         }
 
         private void DlgEditVM_Loaded(object sender, RoutedEventArgs e)
