@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="_86BoxManager.Views.dlgUpdater"
+        Title="86Box Updater">
+	<Window.Styles>
+		<Style Selector="Button">
+			<Setter Property="Background" Value="{DynamicResource DlgBtnBackground}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource DlgBtnBoarderBrush}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBrush}"/>
+		</Style>
+	</Window.Styles>
+	<Grid>
+		
+	</Grid>
+</Window>

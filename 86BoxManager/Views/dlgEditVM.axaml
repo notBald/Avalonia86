@@ -109,13 +109,6 @@
 				</TabItem>
 			</TabControl>
 		</DockPanel>
-		<Canvas>
-			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="2"/>
-			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="2"/>
-			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="8" Canvas.Bottom="2"/>
-			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="5"/>
-			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="5" Canvas.Bottom="5"/>
-			<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="8"/>
-		</Canvas>
+		<v:ctrlGrip />
 	</Grid>
 </Window>
