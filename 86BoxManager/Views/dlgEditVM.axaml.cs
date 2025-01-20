@@ -7,6 +7,7 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using MessageType = MsBox.Avalonia.Enums.Icon;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 
@@ -82,7 +83,7 @@ namespace _86BoxManager.Views
 
             try
             {
-                VMCenter.Edit(_vm.Tag.UID, _m.Name, _m.Description, _m.Category, dc?.VMIcon, _m.Comment, _m.ExeModel.SelectedItem.ID, this);
+                VMCenter.Edit(_vm.Tag.UID, _m.Name, _m.Path, _m.Description, _m.Category, dc?.VMIcon, _m.Comment, _m.ExeModel.SelectedItem.ID, this);
             }
             catch (Exception ex)
             {
@@ -106,6 +107,8 @@ namespace _86BoxManager.Views
         private dlgEditModel _me;
         private string _name, _desc, _com, _path = "< path goes here >";
         private long? _exe_id;
+        private readonly bool _rename_folders;
+        private string _parent_path = string.Empty;
 
         private readonly List<string> _img_list;
 
@@ -137,6 +140,11 @@ namespace _86BoxManager.Views
                 if (_name != value)
                 {
                     this.RaiseAndSetIfChanged(ref _name, value);
+                    if (_rename_folders)
+                    {
+                        _path = FolderHelper.EnsureUniqueFolderName(_parent_path, value);
+                        this.RaisePropertyChanged(nameof(Path));
+                    }
                     this.RaisePropertyChanged(nameof(HasChanges));
                 }
             }
@@ -168,7 +176,27 @@ namespace _86BoxManager.Views
             }
         }
 
-        public string Path { get => _path; set => this.RaiseAndSetIfChanged(ref _path, value); }
+        public string Path 
+        { 
+            get => _path; set
+            {
+                if (value != _path)
+                {
+                    _parent_path = string.Empty;
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        try
+                        {
+                            var di = new DirectoryInfo(value);
+                            _parent_path = di.Parent.FullName;
+                        }
+                        catch { }
+                    }
+
+                    this.RaiseAndSetIfChanged(ref _path, value);
+                }
+            }
+        }
 
         public string DefaultCategory { get; private set; }
         public string Default86BoxFolder { get; private set; }
@@ -261,6 +289,7 @@ namespace _86BoxManager.Views
                 Categories.Sort();
 
                 DefaultCategory = s.DefaultCat.Name;
+                _rename_folders = s.RenameFolders;
             }
         }
 

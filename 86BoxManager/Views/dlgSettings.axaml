@@ -220,9 +220,10 @@
 									 Theme="{StaticResource GroupBoxClassic}">						
 							<Border Margin="9">
 								<StackPanel Orientation="Vertical">
-									<StackPanel Orientation="Horizontal">
+									<WrapPanel Orientation="Horizontal">
 										<CheckBox IsChecked="{Binding EnableConsole}" Content="Enable 86Box console window" Margin="12" />
-									</StackPanel>
+										<CheckBox IsChecked="{Binding RenameFolders}" Content="Rename folders when changing the name of a VM" />
+									</WrapPanel>
 								</StackPanel>
 							</Border>
 						</gb:GroupBox>

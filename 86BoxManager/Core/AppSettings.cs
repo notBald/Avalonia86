@@ -122,6 +122,15 @@ namespace _86BoxManager.Core
         }
 
         /// <summary>
+        /// Rename folders when changing the name of a machine
+        /// </summary>
+        public bool RenameFolders
+        {
+            get => FetchProperty("fld_rename", true);
+            set => SetProperty("fld_rename", value);
+        }
+
+        /// <summary>
         /// Whenever the list should show compact or not
         /// </summary>
         public bool CompactMachineList

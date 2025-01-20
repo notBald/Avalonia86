@@ -175,6 +175,7 @@ namespace _86BoxManager.Views
             _m.LogPath = "";
             _m.AllowInstances = false;
             _m.CompactList = false;
+            _m.RenameFolders = true;
             _m.SelectedTheme = ThemeVariant.Default;
             _m.RaisePropertyChanged(nameof(dlgSettingsModel.HasChanges));
         }
@@ -330,6 +331,7 @@ namespace _86BoxManager.Views
                     s.MinimizeToTray = _m.MinToTray;
                     s.CloseTray = _m.CloseToTray;
                     s.EnableLogging = _m.EnableLogging;
+                    s.RenameFolders = _m.RenameFolders;
                     s.LogPath = _m.LogPath;
                     s.AllowInstances = _m.AllowInstances;
                     s.CompactMachineList = _m.CompactList;
@@ -394,6 +396,7 @@ namespace _86BoxManager.Views
             _m.LogPath = s.LogPath;
             _m.MinOnStart = s.MinimizeOnVMStart;
             _m.EnableConsole = s.ShowConsole;
+            _m.RenameFolders = s.RenameFolders;
             _m.IsTrayEnabled = s.IsTrayEnabled;
             _m.MinToTray = s.MinimizeToTray;
             _m.CloseToTray = s.CloseTray;
@@ -565,7 +568,7 @@ namespace _86BoxManager.Views
     {
         private string _exe_dir, _exe_path, _cfg_dir, _rom_dir;
         private bool _min_start, _min_tray, _close_tray;
-        private bool _enable_logging, _enable_tray;
+        private bool _enable_logging, _enable_tray, _rename_folders;
         private bool _is_default_selected, _is_exe_list_changed;
         private string _log_path;
         private bool _allow_instances, _enable_console;
@@ -667,6 +670,7 @@ namespace _86BoxManager.Views
                        _me.AllowInstances != AllowInstances ||
                        _me.LogPath != LogPath ||
                        _me.CompactList != CompactList ||
+                       _me.RenameFolders != RenameFolders ||
                        !ReferenceEquals(_me.SelectedTheme, SelectedTheme);
             }
         }
@@ -829,6 +833,19 @@ namespace _86BoxManager.Views
                 if (_enable_console != value)
                 {
                     this.RaiseAndSetIfChanged(ref _enable_console, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public bool RenameFolders
+        {
+            get => _rename_folders;
+            set
+            {
+                if (_rename_folders != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _rename_folders, value);
                     this.RaisePropertyChanged(nameof(HasChanges));
                 }
             }

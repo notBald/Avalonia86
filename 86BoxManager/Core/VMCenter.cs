@@ -359,13 +359,14 @@ namespace _86BoxManager.Core
         }
 
         // Changes a VM's name and/or description
-        public static void Edit(long uid, string name, string desc, string category, string icon, string comment, long? exe_id, Window parent)
+        public static void Edit(long uid, string name, string new_folder, string desc, string category, string icon, string comment, long? exe_id, Window parent)
         {
             var m = Program.Root.Model;
             var current_cat = m.CategoryIndex != 0 ? m.CategoryName : null;
             var selected = m.Machine;
             var is_selected = (selected != null) && selected.Tag.UID == uid;
             VMVisual vm;
+            bool rename = Sett.RenameFolders;
 
             using (var t = Sett.BeginTransaction())
             {
@@ -374,9 +375,20 @@ namespace _86BoxManager.Core
                 if (vm == null)
                     throw new Exception("Failed to refresh database");
 
-
                 vm.Desc = desc;
                 vm.Comment = comment;
+
+                if (rename && !Directory.Exists(new_folder))
+                {
+                    try
+                    {
+                        Directory.Move(vm.Path, new_folder);
+                    }
+                    catch { rename = false; }
+
+                    if (rename)
+                        vm.Path = new_folder;
+                }
 
                 t.Commit();
             }

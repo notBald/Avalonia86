@@ -126,6 +126,12 @@
 					</StackPanel>
 				</TabItem>
 				<TabItem Header="Settings" Theme="{StaticResource CustomTabItm}">
+					<Grid RowDefinitions="*, *">
+						<gb:GroupBox Header="Preserving current build" Theme="{StaticResource GroupBoxClassic}">
+						</gb:GroupBox>
+						<gb:GroupBox Header="Select new build" Theme="{StaticResource GroupBoxClassic}" Grid.Row="1">
+						</gb:GroupBox>
+					</Grid>
 				</TabItem>
 			</TabControl>
 		</DockPanel>
