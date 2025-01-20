@@ -5,14 +5,16 @@
 		xmlns:gb="using:GroupBox.Avalonia.Controls"
 		xmlns:vm="clr-namespace:_86BoxManager.ViewModels"
 		xmlns:v="clr-namespace:_86BoxManager.Views"
-		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		xmlns:conv="clr-namespace:_86BoxManager.Converters"
+		mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+		Width="600" Height="450"
         x:Class="_86BoxManager.Views.dlgUpdater"
 		x:DataType="v:dlgUpdaterModel"
         Title="86Box Updater"
 		Background="{DynamicResource TabDlgBackground}">
-	<Design.DataContext>
-		<v:dlgUpdaterModel />
-	</Design.DataContext>
+	<Window.Resources>
+		
+	</Window.Resources>
 	<Window.Styles>
 		<Style Selector="Button">
 			<Setter Property="Background" Value="{DynamicResource DlgBtnBackground}"/>
@@ -28,26 +30,119 @@
 		</Style>
 	</Window.Styles>
 	<Grid>
-		<DockPanel Margin="12">
-			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
-				<Button Name="btnApply" Content="Save settings" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsDefault="True" />
-				<Button Name="btnCancel" Content="Close" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsCancel="True" />
-			</StackPanel>
-			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10">
-				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
-					<DockPanel>
-						<Grid DockPanel.Dock="Top">
-							
+		<DockPanel Margin="12" IsVisible="{Binding Has86BoxFolder, Mode=OneTime}">
+			<Grid ColumnDefinitions="Auto, *, Auto" DockPanel.Dock="Bottom">
+				<Button IsEnabled="{Binding CanUpdate}" Margin="0, 0, 0, 0" Click="btnUpdatel_Click">Update to latest 86Box</Button>
+				<StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
+					<Button Content="Save settings" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsDefault="{Binding Has86BoxFolder, Mode=OneTime}" />
+					<Button Content="Close" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsCancel="{Binding Has86BoxFolder, Mode=OneTime}" Click="btnCancel_Click" />
+				</StackPanel>
+			</Grid>
+			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10" SelectedIndex="{Binding TabIndex}">
+				<TabItem Header="Status" Theme="{StaticResource CustomTabItm}">
+					<DockPanel Margin="0, 0, 0, 10">
+						<Grid DockPanel.Dock="Top" ColumnDefinitions="*, 10, *">
+							<gb:GroupBox Header="Installed build" Theme="{StaticResource GroupBoxClassic}">
+								<TextBlock Text="{Binding CurrentExe.Build}" HorizontalAlignment="Center" Margin="10" FontSize="26" />
+							</gb:GroupBox>
+							<gb:GroupBox Header="Latest build" Theme="{StaticResource GroupBoxClassic}" Grid.Column="2">
+								<Grid>
+									<TextBlock Text="{Binding DM.LatestBuild, Mode=OneWay, TargetNullValue='N/A'}"
+										IsVisible="{Binding !DM.IsFetching, Mode=OneWay}" HorizontalAlignment="Center" 
+										Margin="10" FontSize="26"/>
+									<Grid Width="30" IsVisible="{Binding DM.IsFetching, Mode=OneWay}"
+										  HorizontalAlignment="Center" VerticalAlignment="Center">
+										<Grid.Styles>
+											<Style Selector="Grid.working">
+												<Style.Animations>
+													<Animation Duration="0:0:3" IterationCount="INFINITE">
+														<Animation.Easing>
+															<conv:HardStepEasing NSteps="4" />
+														</Animation.Easing>
+														<KeyFrame Cue="0%">
+															<Setter Property="Width" Value="0"/>
+														</KeyFrame>
+														<KeyFrame Cue="33%">
+															<Setter Property="Width" Value="10"/>
+														</KeyFrame>
+														<KeyFrame Cue="66%">
+															<Setter Property="Width" Value="20"/>
+														</KeyFrame>
+														<KeyFrame Cue="100%">
+															<Setter Property="Width" Value="30"/>
+														</KeyFrame>
+													</Animation>
+												</Style.Animations>
+											</Style>
+										</Grid.Styles>
+										<Grid Classes="working" HorizontalAlignment="Left">
+											<TextBlock FontSize="36" Text="..." Margin="0, -26, 0, 0"  />
+										</Grid>
+									</Grid>
+								</Grid>
+							</gb:GroupBox>
 						</Grid>
-						<gb:GroupBox>
-							
+						<gb:GroupBox Header="Changelog" Theme="{StaticResource GroupBoxClassic}">
+							<ScrollViewer Margin="5">
+								<ItemsControl ItemsSource="{Binding Log}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate>
+											<SelectableTextBlock Text="{Binding Entery}" />
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</ScrollViewer>
 						</gb:GroupBox>
 					</DockPanel>
 				</TabItem>
+				<TabItem Header="Update" Theme="{StaticResource CustomTabItm}" IsEnabled="{Binding CanUpdate}">
+					Hello World
+				</TabItem>
+				<TabItem Header="Information" Theme="{StaticResource CustomTabItm}">
+					<TabItem.Styles>
+						<Style Selector="SelectableTextBlock">
+							<Setter Property="HorizontalAlignment" Value="Right" />
+						</Style>
+					</TabItem.Styles>
+					<StackPanel>
+						<gb:GroupBox Header="About build that will be updated" Theme="{StaticResource GroupBoxClassic}">
+							<Grid Margin="20, 10" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto">
+								<TextBlock Text="Version:" Grid.Column="0" Grid.Row="0" />
+								<SelectableTextBlock Text="{Binding CurrentExe.Version}" Grid.Column="1" Grid.Row="0" />
+								<TextBlock Text="Build:" Grid.Column="0" Grid.Row="1" />
+								<SelectableTextBlock Text="{Binding CurrentExe.Build}" Grid.Column="1" Grid.Row="1" />
+								<TextBlock Text="CPU arciteture:" Grid.Column="0" Grid.Row="2" />
+								<SelectableTextBlock Text="{Binding CurrentExe.Arch}" Grid.Column="1" Grid.Row="2" />
+								<TextBlock Text="Executable:" Grid.Column="0" Grid.Row="3" />
+								<SelectableTextBlock Text="{Binding CurrentExe.VMExe}" Grid.Column="1" Grid.Row="3" />
+							</Grid>
+						</gb:GroupBox>
+						<gb:GroupBox Header="Firmware / ROMs that will be updated" Theme="{StaticResource GroupBoxClassic}">
+							<Grid Margin="20, 10" ColumnDefinitions="Auto, *" RowDefinitions="Auto">
+								<TextBlock Text="Path:" Grid.Column="0" Grid.Row="0" />
+								<SelectableTextBlock Text="{Binding CurrentExe.VMRoms}" Grid.Column="1" Grid.Row="0" />
+							</Grid>
+						</gb:GroupBox>
+					</StackPanel>
+				</TabItem>
 				<TabItem Header="Settings" Theme="{StaticResource CustomTabItm}">
-
 				</TabItem>
 			</TabControl>
+		</DockPanel>
+		<DockPanel IsVisible="{Binding !Has86BoxFolder, Mode=OneTime}">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
+				<Button Content="Close" HorizontalAlignment="Stretch" Margin="0,0,32,12" 
+						IsDefault="{Binding !Has86BoxFolder, Mode=OneTime}"
+						IsCancel="{Binding !Has86BoxFolder, Mode=OneTime}" Click="btnCancel_Click" />
+			</StackPanel>
+			<StackPanel VerticalAlignment="Center">
+				<TextBlock Foreground="Red" FontSize="36"
+						   HorizontalAlignment="Center"
+						   Text="Folder for 86Box not set" />
+				<TextBlock Foreground="Green"
+						   HorizontalAlignment="Center"
+						   Text="Please set 86Box path in program settings" />
+			</StackPanel>
 		</DockPanel>
 		<v:ctrlGrip />
 	</Grid>

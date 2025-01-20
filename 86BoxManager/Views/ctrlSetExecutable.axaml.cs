@@ -158,6 +158,7 @@ public class ctrlSetExecutableModel : ReactiveObject
 
         if (s == null)
         {
+            //For the designer
             ExeFiles.Add(new ExeModel()
             {
                 Name = "86Box 3.11"
@@ -213,17 +214,5 @@ public class ctrlSetExecutableModel : ReactiveObject
         }
 
         SelectedItem = exeModel;
-    }
-
-    public class ExeModel
-    {
-        public long? ID { get; set; }
-        public string Name { get; set; }
-        public string Version { get; set; }
-        public string VMExe { get; set; }
-        public string VMRoms { get; set; }
-        public string Arch { get; set; }
-        public string Build { get; set; }
-        public string Comment { get; set; }
     }
 }

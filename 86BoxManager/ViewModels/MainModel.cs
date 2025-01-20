@@ -281,6 +281,11 @@ namespace _86BoxManager.ViewModels
             _ui.ExitApplicationCmd();
         }
 
+        public void Update86Cmd()
+        {
+            _ui.Update86Cmd();
+        }
+
         public void AddVMCmd()
         {
             _ui.AddVMCmd();

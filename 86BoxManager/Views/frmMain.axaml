@@ -219,6 +219,8 @@
 							<Image Source="/Assets/Actions/32 - tools.png" />
 						</MenuItem.Icon>
 					</MenuItem>
+					<Separator/>
+					<MenuItem Header="Update 86Box" Command="{Binding Update86Cmd}" />
 				</MenuItem>
 			</Menu>
 			<Rectangle Fill="{DynamicResource LineColor}" Height="2"/>

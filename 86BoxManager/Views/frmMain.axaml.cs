@@ -46,6 +46,11 @@ namespace _86BoxManager.Views
             Close();
         }
 
+        public async void Update86Cmd()
+        {
+            await this.RunDialog(new dlgUpdater());
+        }
+
         public void AddVMCmd()
         {
             btnAdd_Click(null, null);
