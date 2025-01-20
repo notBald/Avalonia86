@@ -453,6 +453,59 @@ namespace _86BoxManager.Views
             Close(ResponseType.Cancel);
         }
 
+        /// <summary>
+        /// Todo: This code locks up the UI, and does not highlight the files it imported in any way.
+        /// </summary>
+        private async void btnImport_click(object sender, RoutedEventArgs e)
+        {
+            var text = "Select a folder to scan for 86Box executables";
+            var DefExePath = _m.CFGDir;
+
+            string path = string.IsNullOrWhiteSpace(DefExePath) ? "" : DefExePath;
+            var folder_name = await Dialogs.SelectFolder(path, text, this);
+
+            if (folder_name != null)
+            {
+                await Dialogs.ShowMessageBox("Warning: the UI will be unresponsive while importing.", MsBox.Avalonia.Enums.Icon.Warning, this);
+                try
+                {
+                    foreach (var exe in FolderHelper.GetExecutableFiles(folder_name, "86box", Platforms.Manager.IsExecutable))
+                    {
+                        bool add = true;
+
+                        foreach (var ex in _m.FilteredExecutables)
+                        {
+                            if (ex.VMPath == exe)
+                            {
+                                add = false;
+                                break;
+                            }
+                        }
+
+                        if (add)
+                        {
+                            var vi = Platforms.Manager.Get86BoxInfo(exe);
+                            if (vi != null)
+                            {
+
+                                var ver_str = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}";
+
+                                _m.Executables.AddOrUpdate(new dlgSettingsModel.ExeEntery()
+                                {
+                                    ID = -1 - _m.Executables.Count,
+                                    VMPath = exe,
+                                    Name = $"86Box {ver_str} - build {vi.FilePrivatePart}",
+                                    Version = ver_str,
+                                    Arch = vi.Arch,
+                                    Build = "" + vi.FilePrivatePart
+                                });
+                            }
+                        }
+                    }
+                } catch { }
+            }
+        }
+
         private async void btnAddExe_Click(object sender, RoutedEventArgs e)
         {
             var win = new dlgAddExe()

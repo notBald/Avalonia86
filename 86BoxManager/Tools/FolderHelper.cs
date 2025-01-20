@@ -210,58 +210,29 @@ namespace _86BoxManager.Tools
             public bool Completed { get; set; }
         }
 
+        public static List<string> GetExecutableFiles(string path, string startsWith, Func<string, bool> isExecutableCallback)
+        {
+            List<string> executableFiles = new List<string>();
+            ScanDirectory(path, startsWith, isExecutableCallback, executableFiles);
+            return executableFiles;
+        }
 
-        //public static void CopyFilesAndFolders(string sourceDir, string destinationDir, int copyDepth)
-        //{
-        //    if (copyDepth < 0)
-        //    {
-        //        throw new ArgumentException("Copy depth must be zero or greater.", nameof(copyDepth));
-        //    }
+        private static void ScanDirectory(string path, string startsWith, Func<string, bool> isExecutableCallback, List<string> executableFiles)
+        {
+            foreach (string file in Directory.GetFiles(path))
+            {
+                if (Path.GetFileName(file).StartsWith(startsWith, StringComparison.OrdinalIgnoreCase) &&
+                    isExecutableCallback(file))
+                {
+                    executableFiles.Add(file);
+                }
+            }
 
-        //    if (sourceDir == null || destinationDir == null)
-        //        throw new ArgumentNullException();
-
-
-        //    // Ensure the source directory exists
-        //    if (!Directory.Exists(sourceDir))
-        //    {
-        //        throw new DirectoryNotFoundException($"Source directory not found: {sourceDir}");
-        //    }
-
-        //    sourceDir = Path.GetFullPath(sourceDir);
-
-        //    // Create the destination directory
-        //    if (!Directory.Exists(destinationDir))
-        //        Directory.CreateDirectory(destinationDir);
-
-        //    destinationDir = Path.GetFullPath(destinationDir);
-
-        //    // Start the copy process
-        //    CopyDirectory(sourceDir, destinationDir, copyDepth, 0);
-        //}
-
-        //private static void CopyDirectory(string sourceDir, string destinationDir, int maxDepth, int currentDepth)
-        //{
-        //    // Copy all files in the current directory
-        //    foreach (var file in Directory.GetFiles(sourceDir))
-        //    {
-        //        string destFile = Path.Combine(destinationDir, Path.GetFileName(file));
-        //        File.Copy(file, destFile);
-        //    }
-
-        //    // If the current depth is less than the max depth, copy subdirectories
-        //    if (currentDepth < maxDepth)
-        //    {
-        //        foreach (var dir in Directory.GetDirectories(sourceDir))
-        //        {
-        //            string destDir = Path.Combine(destinationDir, Path.GetFileName(dir));
-        //            Directory.CreateDirectory(destDir);
-
-        //            // Recursively copy the contents of the subdirectory
-        //            CopyDirectory(dir, destDir, maxDepth, currentDepth + 1);
-        //        }
-        //    }
-        //}
+            foreach (string directory in Directory.GetDirectories(path))
+            {
+                ScanDirectory(directory, startsWith, isExecutableCallback, executableFiles);
+            }
+        }
 
         public static void SearchFolders(
         string filepath,

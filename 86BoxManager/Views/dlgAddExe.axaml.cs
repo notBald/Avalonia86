@@ -127,6 +127,7 @@ public partial class dlgAddExe : Window
             var vi = Platforms.Manager.Get86BoxInfo(_m.ExePath);
             if (vi != null)
             {
+                //Todo: this code is now in three locations.
                 var ver_str = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}";
 
                 if (vi.FilePrivatePart >= 3541) //Officially supported builds
