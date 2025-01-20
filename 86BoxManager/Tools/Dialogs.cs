@@ -39,8 +39,15 @@ namespace _86BoxManager.Tools
                 Icon = icon,
                 CanResize = false,
                 WindowStartupLocation = loc,
-                SizeToContent = SizeToContent.WidthAndHeight
+                SizeToContent = SizeToContent.WidthAndHeight,
             };
+
+            //This shouldn't be needed, but does not work anyway
+            //if (buttons == ButtonEnum.YesNo)
+            //{
+            //    opts.EnterDefaultButton = ClickEnum.Yes;
+            //    opts.EscDefaultButton = ClickEnum.No;
+            //}
             var window = MessageBoxManager.GetMessageBoxStandard(opts);
             var raw = parent != null ? window.ShowWindowDialogAsync(parent) : window.ShowAsync();
 

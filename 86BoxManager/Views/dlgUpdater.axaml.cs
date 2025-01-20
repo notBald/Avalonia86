@@ -39,12 +39,8 @@ public partial class dlgUpdater : Window
     }
 
     private void DlgUpdater_Loaded(object sender, RoutedEventArgs e)
-    {
-        int build;
-        if (!int.TryParse(_m.CurrentExe.Build, out build))
-            build = 2000;
-        
-        _dm.FetchMetadata(build);
+    {        
+        _dm.FetchMetadata(_m.CurrentBuild);
     }
 
     private void btnUpdatel_Click(object sender, RoutedEventArgs e)
@@ -75,13 +71,13 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
 
     public Download86Manager DM => _dm;
 
-    private int CurrentBuild
+    public int CurrentBuild
     {
         get
         {
             int b;
             if (!int.TryParse(CurrentExe.Build, out b))
-                b = 2000;
+                b = 6000;
 
             return b;
         }

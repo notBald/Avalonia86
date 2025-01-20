@@ -152,6 +152,8 @@ public partial class dlgAddExe : Window
 
                 _m._sugested_name = $"86Box {ver_str} - build {vi.FilePrivatePart}";
                 _m._sugested_ver = $"{ver_str}";
+                _m.Name = _m._sugested_name;
+                _m.Version = _m._sugested_ver;
 
                 _m.Arch = vi.Arch;
                 _m.Build = "" + vi.FilePrivatePart;
