@@ -222,7 +222,7 @@
 								<StackPanel Orientation="Vertical">
 									<WrapPanel Orientation="Horizontal">
 										<CheckBox IsChecked="{Binding EnableConsole}" Content="Enable 86Box console window" Margin="12" />
-										<CheckBox IsChecked="{Binding RenameFolders}" Content="Rename folders when changing the name of a VM" />
+										<CheckBox IsChecked="{Binding RenameFolders}" Content="Rename the VM's folder when changing the name of a VM" />
 									</WrapPanel>
 								</StackPanel>
 							</Border>
