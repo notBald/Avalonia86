@@ -1,6 +1,6 @@
 # Avalonia 86
 
-**Avalonia 86** i a configuration manager for the [86Box emulator](https://github.com/86Box/86Box).
+**Avalonia 86** is a configuration manager for the [86Box emulator](https://github.com/86Box/86Box).
 
 ![Desktop](/images/UI-white_and_dark.png?raw=true)
 
@@ -9,7 +9,7 @@
 - Create/Delete Virtual Machines
 - Sort them into categories
 - Display machine information and images
-- A tray icon so the Manager window doesn't get in your way
+- A tray icon so that the Manager window doesn't get in your way
 
 ## System requirements
 
@@ -43,6 +43,6 @@ See the [Linux Guide](Linux.md).
 4. Choose the `Release` or `Debug` configuration
 5. Build the solution
 
-## Lisence
+## License
 
 It's released under the MIT license, so it can be freely distributed with 86Box. See the `LICENSE` file for license information and `AUTHORS` for a complete list of contributors and authors.
