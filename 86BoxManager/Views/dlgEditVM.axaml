@@ -35,6 +35,9 @@
 		<Style Selector="TextBox">
 			<Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBrush}"/>
 		</Style>
+		<Style Selector="gb|GroupBox">
+			<Setter Property="BorderBrush" Value="{DynamicResource TabCtrlBorderBrush}"/>
+		</Style>
 	</Window.Styles>
 	<Grid>
 		<DockPanel Margin="12">
@@ -46,8 +49,7 @@
 				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
 					<StackPanel>
 						<gb:GroupBox Header="Fundamentals"
-									 Theme="{StaticResource GroupBoxClassic}"
-									 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+									 Theme="{StaticResource GroupBoxClassic}">
 							<DockPanel Margin="20, 10, 20, 0">
 								<DockPanel DockPanel.Dock="Left" Height="100" VerticalAlignment="Top">
 									<DockPanel DockPanel.Dock="Bottom">

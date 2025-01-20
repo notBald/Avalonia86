@@ -14,10 +14,12 @@
 		<Style Selector="TextBox">
 			<Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBrush}"/>
 		</Style>
+		<Style Selector="gb|GroupBox">
+			<Setter Property="BorderBrush" Value="{DynamicResource TabCtrlBorderBrush}"/>
+		</Style>
 	</UserControl.Styles>
 	<gb:GroupBox Header="Prefered 86Box executable" Margin="0,0,0,10"
-								   Theme="{StaticResource GroupBoxClassic}"
-								   BorderBrush="{StaticResource TabCtrlBorderBrush}">
+								   Theme="{StaticResource GroupBoxClassic}">
 		<StackPanel Margin="20, 10">
 			<ComboBox ItemsSource="{Binding ExeFiles}" SelectedItem="{Binding SelectedItem}" HorizontalAlignment="Stretch">
 				<ComboBox.ItemTemplate>

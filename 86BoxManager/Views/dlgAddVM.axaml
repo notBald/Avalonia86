@@ -57,6 +57,10 @@
 			<Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBrush}"/>
 		</Style>
 
+		<Style Selector="gb|GroupBox">
+			<Setter Property="BorderBrush" Value="{DynamicResource TabCtrlBorderBrush}"/>
+		</Style>
+
 		<!-- https://github.com/AvaloniaUI/Avalonia/blob/master/samples/RenderDemo/Pages/AnimationsPage.xaml -->
 		<Style Selector="Path.Working">
 			<Style.Animations>
@@ -94,16 +98,14 @@
 					<DockPanel>
 						<StackPanel Orientation="Vertical" DockPanel.Dock="Bottom" Margin="0,0,0,10">
 							<gb:GroupBox Header="Location for new or existing files"
-											 Theme="{StaticResource GroupBoxClassic}"
-											 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+											 Theme="{StaticResource GroupBoxClassic}">
 								<DockPanel Margin="12">
 									<Button DockPanel.Dock="Right" Click="btnSelFld_OnClick">Browse</Button>
 									<SelectableTextBlock Text="{Binding InstallPath, Mode=OneWay}"></SelectableTextBlock>
 								</DockPanel>						
 							</gb:GroupBox>
 							<gb:GroupBox Header="After registering the VM"
-											 Theme="{StaticResource GroupBoxClassic}"
-											 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+											 Theme="{StaticResource GroupBoxClassic}">
 								<StackPanel Spacing="5" Margin="12">
 									<RadioButton Name="cbxStartVM" GroupName="Startup"
 											  Content="Start the virtual machine"/>
@@ -116,8 +118,7 @@
 							</gb:GroupBox>
 						</StackPanel>
 						<gb:GroupBox Header="Fundamentals"
-										 Theme="{StaticResource GroupBoxClassic}"
-										 BorderBrush="{StaticResource TabCtrlBorderBrush}">
+									 Theme="{StaticResource GroupBoxClassic}">
 							<DockPanel Margin="10, 5">
 								<DockPanel DockPanel.Dock="Top">
 									<DockPanel DockPanel.Dock="Left" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

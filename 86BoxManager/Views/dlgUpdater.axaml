@@ -2,9 +2,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		xmlns:gb="using:GroupBox.Avalonia.Controls"
+		xmlns:vm="clr-namespace:_86BoxManager.ViewModels"
+		xmlns:v="clr-namespace:_86BoxManager.Views"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="_86BoxManager.Views.dlgUpdater"
-        Title="86Box Updater">
+		x:DataType="v:dlgUpdaterModel"
+        Title="86Box Updater"
+		Background="{DynamicResource TabDlgBackground}">
+	<Design.DataContext>
+		<v:dlgUpdaterModel />
+	</Design.DataContext>
 	<Window.Styles>
 		<Style Selector="Button">
 			<Setter Property="Background" Value="{DynamicResource DlgBtnBackground}"/>
@@ -15,8 +23,32 @@
 		<Style Selector="TextBox">
 			<Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBrush}"/>
 		</Style>
+		<Style Selector="gb|GroupBox">
+			<Setter Property="BorderBrush" Value="{DynamicResource TabCtrlBorderBrush}"/>
+		</Style>
 	</Window.Styles>
 	<Grid>
-		
+		<DockPanel Margin="12">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
+				<Button Name="btnApply" Content="Save settings" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsDefault="True" />
+				<Button Name="btnCancel" Content="Close" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsCancel="True" />
+			</StackPanel>
+			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10">
+				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
+					<DockPanel>
+						<Grid DockPanel.Dock="Top">
+							
+						</Grid>
+						<gb:GroupBox>
+							
+						</gb:GroupBox>
+					</DockPanel>
+				</TabItem>
+				<TabItem Header="Settings" Theme="{StaticResource CustomTabItm}">
+
+				</TabItem>
+			</TabControl>
+		</DockPanel>
+		<v:ctrlGrip />
 	</Grid>
 </Window>
