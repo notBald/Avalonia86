@@ -23,6 +23,7 @@ public class Download86Manager : ReactiveObject
     private const string ZIPFILE_86BOX = "86Box.zip";
     private const string ZIPFILE_ROMS = "Roms.zip";
     private const string JENKINS_BASE_URL = "https://ci.86box.net/job/86Box";
+    private const string JENKINS_LASTBUILD = JENKINS_BASE_URL + "/lastSuccessfulBuild";
 
     public event Action<string> Log;
 
@@ -59,12 +60,12 @@ public class Download86Manager : ReactiveObject
         IsWorking = true;
         IsFetching = true;
         _httpClient = new HttpClient();
-        string url = $"{JENKINS_BASE_URL}/api/json";
+        string url = $"{JENKINS_LASTBUILD}/api/json";
         AddLog("Fetching list of builds");
 
         ThreadPool.QueueUserWorkItem(async o =>
         {
-            JenkinsJob job;
+            JenkinsBuild job;
             AddLog("Connecting to: "+url);
             try
             {
@@ -80,20 +81,18 @@ public class Download86Manager : ReactiveObject
                     using (var json_str = await response.Content.ReadAsStreamAsync())
                     {
                         //AddLog($"Parsing {FolderSizeCalculator.ConvertBytesToReadableSize(json_str.Length)} of data");
-                        job = JsonSerializer.Deserialize<JenkinsJob>(json_str);
-                        if (job.LastSuccessfulBuild == null || job.LastSuccessfulBuild.Number < 6505 || job.LastSuccessfulBuild.Url == null)
+                        job = JsonSerializer.Deserialize<JenkinsBuild>(json_str);
+                        if (job.Artifacts == null || job.Number < 6507 || job.Url == null || job.Artifacts.Count < 1)
                         {
                             AddLog($"Parsing failed, invalid response");
                             Stop();
                             return;
                         }
-                        Debug.WriteLine(job.Builds.Count);
                     }
                 }
 
-                LatestBuild = job.LastCompletedBuild.Number;
-                //AddLog($"Latest build is {job.LastSuccessfulBuild.Number}");
-                var changelog = await FetchChangelog(job.LastSuccessfulBuild, current_build);
+                //AddLog($"Latest build is {job.Number}");
+                var changelog = await FetchChangelog(job, current_build);
 
                 if (changelog.Count == 0)
                     AddLog($" -- There was no enteries in the changelog --");
@@ -109,7 +108,7 @@ public class Download86Manager : ReactiveObject
         });
     }
 
-    private async Task<List<string>> FetchChangelog(JenkinsJob.Build build, int from)
+    private async Task<List<string>> FetchChangelog(JenkinsBuild build, int from)
     {
         List<string> changelog = new List<string>();
 
@@ -287,161 +286,6 @@ public class Download86Manager : ReactiveObject
             {
                 Aborted?.Invoke(ex.Message);
             }
-        }
-    }
-
-    private class JenkinsJob
-    {
-        [JsonPropertyName("_class")]
-        public string Class { get; set; }
-
-        [JsonPropertyName("actions")]
-        public List<JsonAction> Actions { get; set; }
-        [JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        [JsonPropertyName("displayName")]
-        public string DisplayName { get; set; }
-
-        [JsonPropertyName("fullDisplayName")]
-        public string FullDisplayName { get; set; }
-
-        [JsonPropertyName("fullName")]
-        public string FullName { get; set; }
-
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [JsonPropertyName("url")]
-        public string Url { get; set; }
-
-        [JsonPropertyName("buildable")]
-        public bool Buildable { get; set; }
-
-        [JsonPropertyName("builds")]
-        public List<Build> Builds { get; set; }
-
-        [JsonPropertyName("color")]
-        public string Color { get; set; }
-
-        [JsonPropertyName("firstBuild")]
-        public Build FirstBuild { get; set; }
-
-        [JsonPropertyName("healthReport")]
-        public List<HealthReport> healthReport { get; set; }
-
-        [JsonPropertyName("keepDependencies")]
-        public bool KeepDependencies { get; set; }
-
-        [JsonPropertyName("lastBuild")]
-        public Build LastBuild { get; set; }
-
-        [JsonPropertyName("lastCompletedBuild")]
-        public Build LastCompletedBuild { get; set; }
-
-        [JsonPropertyName("lastFailedBuild")]
-        public Build LastFailedBuild { get; set; }
-
-        [JsonPropertyName("lastStableBuild")]
-        public Build LastStableBuild { get; set; }
-
-        [JsonPropertyName("lastSuccessfulBuild")]
-        public Build LastSuccessfulBuild { get; set; }
-
-        [JsonPropertyName("lastUnstableBuild")]
-        public Build LastUnstableBuild { get; set; }
-
-        [JsonPropertyName("lastUnsuccessfulBuild")]
-        public Build LastUnsuccessfulBuild { get; set; }
-
-        [JsonPropertyName("nextBuildNumber")]
-        public int NextBuildNumber { get; set; }
-
-        [JsonPropertyName("property")]
-        public List<ParameterDefinitions> Property { get; set; }
-
-        [JsonPropertyName("concurrentBuild")]
-        public bool ConcurrentBuild { get; set; }
-
-        [JsonPropertyName("inQueue")]
-        public bool InQueue { get; set; }
-
-        [JsonPropertyName("queueItem")]
-        public object QueueItem { get; set; }
-
-        [JsonPropertyName("resumeBlocked")]
-        public bool ResumeBlocked { get; set; }
-
-        public class JsonAction
-        {
-            [JsonPropertyName("_class")]
-            public string Class { get; set; }
-        }
-
-        public class Build
-        {
-            [JsonPropertyName("_class")]
-            public string Class { get; set; }
-
-            [JsonPropertyName("number")]
-            public int Number { get; set; }
-
-            [JsonPropertyName("url")]
-            public string Url { get; set; }
-        }
-
-        public class HealthReport
-        {
-            [JsonPropertyName("description")]
-            public string Description { get; set; }
-
-            [JsonPropertyName("iconClassName")]
-            public string IconClassName { get; set; }
-
-            [JsonPropertyName("iconUrl")]
-            public string IconUrl { get; set; }
-
-            [JsonPropertyName("score")]
-            public int Score { get; set; }
-        }
-
-        public class ParameterDefinitions
-        {
-            [JsonPropertyName("_class")]
-            public string Class { get; set; }
-
-            [JsonPropertyName("parameterDefinitions")]
-            public List<ParameterDefinition> parameterDefinitions { get; set; }
-        }
-
-        public class ParameterDefinition
-        {
-            [JsonPropertyName("_class")]
-            public string Class { get; set; }
-
-            [JsonPropertyName("defaultParameterValue")]
-            public DefaultParameterValue DefaultParameterValue { get; set; }
-
-            [JsonPropertyName("description")]
-            public string Description { get; set; }
-
-            [JsonPropertyName("name")]
-            public string Name { get; set; }
-
-            [JsonPropertyName("type")]
-            public string Type { get; set; }
-        }
-
-        public class DefaultParameterValue
-        {
-            [JsonPropertyName("_class")]
-            public string Class { get; set; }
-
-            [JsonPropertyName("name")]
-            public string Name { get; set; }
-
-            [JsonPropertyName("value")]
-            public string Value { get; set; }
         }
     }
 
@@ -682,6 +526,204 @@ public class Download86Manager : ReactiveObject
         }
 
         public class BuildReference
+        {
+            [JsonPropertyName("number")]
+            public int Number { get; set; }
+
+            [JsonPropertyName("url")]
+            public string Url { get; set; }
+        }
+    }
+
+    public class JenkinsBuild
+    {
+        [JsonPropertyName("_class")]
+        public string Class { get; set; }
+
+        [JsonPropertyName("actions")]
+        public List<Action> Actions { get; set; }
+
+        [JsonPropertyName("artifacts")]
+        public List<Artifact> Artifacts { get; set; }
+
+        [JsonPropertyName("building")]
+        public bool Building { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("displayName")]
+        public string DisplayName { get; set; }
+
+        [JsonPropertyName("duration")]
+        public long Duration { get; set; }
+
+        [JsonPropertyName("estimatedDuration")]
+        public long EstimatedDuration { get; set; }
+
+        [JsonPropertyName("executor")]
+        public object Executor { get; set; }
+
+        [JsonPropertyName("fullDisplayName")]
+        public string FullDisplayName { get; set; }
+
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [JsonPropertyName("keepLog")]
+        public bool KeepLog { get; set; }
+
+        [JsonPropertyName("number")]
+        public int Number { get; set; }
+
+        [JsonPropertyName("queueId")]
+        public int QueueId { get; set; }
+
+        [JsonPropertyName("result")]
+        public string Result { get; set; }
+
+        [JsonPropertyName("timestamp")]
+        public long Timestamp { get; set; }
+
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
+
+        [JsonPropertyName("changeSets")]
+        public List<ChangeSet> ChangeSets { get; set; }
+
+        [JsonPropertyName("culprits")]
+        public List<Culprit> Culprits { get; set; }
+
+        [JsonPropertyName("inProgress")]
+        public bool InProgress { get; set; }
+
+        [JsonPropertyName("nextBuild")]
+        public object NextBuild { get; set; }
+
+        [JsonPropertyName("previousBuild")]
+        public Previousbuild PreviousBuild { get; set; }
+
+        public class Action
+        {
+            [JsonPropertyName("_class")]
+            public string Class { get; set; }
+
+            [JsonPropertyName("causes")]
+            public List<Cause> Causes { get; set; }
+
+            [JsonPropertyName("parameters")]
+            public List<Parameter> Parameters { get; set; }
+        }
+
+        public class Cause
+        {
+            [JsonPropertyName("_class")]
+            public string Class { get; set; }
+
+            [JsonPropertyName("shortDescription")]
+            public string ShortDescription { get; set; }
+        }
+
+        public class Parameter
+        {
+            [JsonPropertyName("_class")]
+            public string Class { get; set; }
+
+            [JsonPropertyName("name")]
+            public string Name { get; set; }
+
+            [JsonPropertyName("value")]
+            public string Value { get; set; }
+        }
+
+        public class Artifact
+        {
+            [JsonPropertyName("displayPath")]
+            public string DisplayPath { get; set; }
+
+            [JsonPropertyName("fileName")]
+            public string FileName { get; set; }
+
+            [JsonPropertyName("relativePath")]
+            public string RelativePath { get; set; }
+        }
+
+        public class ChangeSet
+        {
+            [JsonPropertyName("_class")]
+            public string Class { get; set; }
+
+            [JsonPropertyName("items")]
+            public List<Item> Items { get; set; }
+
+            [JsonPropertyName("kind")]
+            public string Kind { get; set; }
+        }
+
+        public class Item
+        {
+            [JsonPropertyName("_class")]
+            public string Class { get; set; }
+
+            [JsonPropertyName("affectedPaths")]
+            public List<string> AffectedPaths { get; set; }
+
+            [JsonPropertyName("commitId")]
+            public string CommitId { get; set; }
+
+            [JsonPropertyName("timestamp")]
+            public long Timestamp { get; set; }
+
+            [JsonPropertyName("author")]
+            public Author Author { get; set; }
+
+            [JsonPropertyName("authorEmail")]
+            public string AuthorEmail { get; set; }
+
+            [JsonPropertyName("comment")]
+            public string Comment { get; set; }
+
+            [JsonPropertyName("date")]
+            public string Date { get; set; }
+
+            [JsonPropertyName("id")]
+            public string Id { get; set; }
+
+            [JsonPropertyName("msg")]
+            public string Msg { get; set; }
+
+            [JsonPropertyName("paths")]
+            public List<Path> Paths { get; set; }
+        }
+
+        public class Author
+        {
+            [JsonPropertyName("absoluteUrl")]
+            public string AbsoluteUrl { get; set; }
+
+            [JsonPropertyName("fullName")]
+            public string FullName { get; set; }
+        }
+
+        public class Path
+        {
+            [JsonPropertyName("editType")]
+            public string EditType { get; set; }
+
+            [JsonPropertyName("file")]
+            public string File { get; set; }
+        }
+
+        public class Culprit
+        {
+            [JsonPropertyName("absoluteUrl")]
+            public string AbsoluteUrl { get; set; }
+
+            [JsonPropertyName("fullName")]
+            public string FullName { get; set; }
+        }
+
+        public class Previousbuild
         {
             [JsonPropertyName("number")]
             public int Number { get; set; }
