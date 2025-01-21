@@ -34,8 +34,8 @@
 			<Grid ColumnDefinitions="Auto, *, Auto" DockPanel.Dock="Bottom">
 				<Button IsEnabled="{Binding CanUpdate}" Margin="0, 0, 0, 0" Click="btnUpdatel_Click">Update to latest 86Box</Button>
 				<StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
-					<Button Content="Save settings" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsDefault="{Binding Has86BoxFolder, Mode=OneTime}" />
-					<Button Content="Close" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsCancel="{Binding Has86BoxFolder, Mode=OneTime}" Click="btnCancel_Click" />
+					<Button Content="Save settings" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsEnabled="{Binding HasChanges}" Click="btnSave_Click" />
+					<Button Content="Close" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsCancel="True" Click="btnCancel_Click" />
 				</StackPanel>
 			</Grid>
 			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10" SelectedIndex="{Binding TabIndex}">
@@ -129,7 +129,29 @@
 					<Grid RowDefinitions="*, *">
 						<gb:GroupBox Header="Preserving current build" Theme="{StaticResource GroupBoxClassic}">
 						</gb:GroupBox>
-						<gb:GroupBox Header="Select new build" Theme="{StaticResource GroupBoxClassic}" Grid.Row="1">
+						<gb:GroupBox Header="Select new build" Theme="{StaticResource GroupBoxClassic}" Grid.Row="1" Margin="0, 0, 0, 10">
+							<Grid ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto" Margin="5, 2">
+								<TextBlock Text="Select artifact:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+								<ComboBox ItemsSource="{Binding Artifacts}" SelectedItem="{Binding SelectedArtifact}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" />
+								<TextBlock Text="Prefered CPU arch:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" />
+								<ComboBox ItemsSource="{Binding Architectures}" SelectedItem="{Binding SelectedArch}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch">
+									<ComboBox.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding Name}" />
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
+								</ComboBox>
+								<TextBlock Text="Prefered OS:" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" />
+								<ComboBox ItemsSource="{Binding OSs}" SelectedItem="{Binding SelectedOS}" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Stretch">
+									<ComboBox.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding Name}" />
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
+								</ComboBox>
+								<CheckBox IsChecked="{Binding PrefNDR}" Content="Prefer New Dynamic Recompiler" Grid.Row="3" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
+								<CheckBox IsChecked="{Binding UpdateROMs}" Content="Also update ROMs / Firmware" Grid.Row="4" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
+							</Grid>
 						</gb:GroupBox>
 					</Grid>
 				</TabItem>

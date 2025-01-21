@@ -139,6 +139,33 @@ namespace _86BoxManager.Core
             set => SetProperty("compact_list", value);
         }
 
+        public string PreferedCPUArch
+        {
+            get => FetchProperty("pref_cpu_arch", (string) null);
+            set => SetProperty("pref_cpu_arch", value);
+        }
+
+        public string PreferedOS
+        {
+            get => FetchProperty("pref_os", (string)null);
+            set => SetProperty("pref_os", value);
+        }
+
+        /// <summary>
+        /// Prefer New Dynamic Recompiler
+        /// </summary>
+        public bool PrefNDR
+        {
+            get => FetchProperty("pref_ndr", false);
+            set => SetProperty("pref_ndr", value);
+        }
+
+        public bool UpdateROMs
+        {
+            get => FetchProperty("upt_roms", true);
+            set => SetProperty("upt_roms", value);
+        }
+
         public ThemeVariant Theme
         {
             get

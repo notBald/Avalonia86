@@ -13,6 +13,10 @@ using System.Collections.Generic;
 using Avalonia.Metadata;
 using DynamicData;
 using System.Collections.ObjectModel;
+using static _86BoxManager.Tools.JenkinsBase;
+using System.Reactive.Linq;
+using System.Runtime.InteropServices;
+using ZstdSharp.Unsafe;
 
 namespace _86BoxManager.Views;
 
@@ -52,12 +56,34 @@ public partial class dlgUpdater : Window
     {
         Close(ResponseType.Cancel);
     }
+
+    private void btnSave_Click(object sender, RoutedEventArgs e)
+    {
+        var s = AppSettings.Settings;
+        using (var t = s.BeginTransaction())
+        {
+            s.PrefNDR = _m.PrefNDR;
+            s.UpdateROMs = _m.UpdateROMs;
+            s.PreferedOS = _m.SelectedOS.ID;
+            s.PreferedCPUArch = _m.SelectedArch.ID;
+
+            t.Commit();
+        }
+
+        _m.Commit();
+        _m.RaisePropertyChanged(nameof(dlgUpdaterModel.HasChanges));
+    }
 }
 
 public class dlgUpdaterModel : ReactiveObject, IDisposable
 {
+    private dlgUpdaterModel _me;
+    private IDtoNAME _sel_os, _sel_arch;
+    bool _pref_ndr, _upt_roms;
+
     private readonly Download86Manager _dm;
     private int _tab_idx;
+    private readonly IDisposable _subscription;
 
     public ObservableCollection<LogEntery> Log { get; } = new();
 
@@ -69,7 +95,64 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
 
     public bool CanUpdate { get => _dm.LatestBuild != null && _dm.LatestBuild > CurrentBuild; }
 
+    public List<IDtoNAME> Architectures { get; private set; }
+    public List<IDtoNAME> OSs { get; private set; }
+
     public Download86Manager DM => _dm;
+
+    private readonly ReadOnlyObservableCollection<JenkinsBase.Artifact> _artifacts;
+    public ReadOnlyObservableCollection<JenkinsBase.Artifact> Artifacts => _artifacts;
+
+    public IDtoNAME SelectedArch
+    {
+        get => _sel_arch;
+        set
+        {
+            if (!ReferenceEquals(value, _sel_arch))
+            {
+                this.RaiseAndSetIfChanged(ref _sel_arch, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
+    public IDtoNAME SelectedOS 
+    { 
+        get => _sel_os;
+        set
+        {
+            if (!ReferenceEquals(value, _sel_os))
+            {
+                this.RaiseAndSetIfChanged(ref _sel_os, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
+    public bool PrefNDR 
+    {
+        get => _pref_ndr;
+        set
+        {
+            if (value != _pref_ndr)
+            {
+                this.RaiseAndSetIfChanged(ref _pref_ndr, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        } 
+    }
+    public bool UpdateROMs
+    {
+        get => _upt_roms;
+        set
+        {
+            if (value != _upt_roms)
+            {
+                this.RaiseAndSetIfChanged(ref _upt_roms, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
+
+    public Artifact SelectedArtifact { get; set; }
 
     public int CurrentBuild
     {
@@ -83,12 +166,36 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
         }
     }
 
+    public bool HasChanges
+    {
+        get
+        {
+            return !ReferenceEquals(_me.SelectedArch, SelectedArch) ||
+                   !ReferenceEquals(_me.SelectedOS, SelectedOS) ||
+                   _me.PrefNDR != PrefNDR ||
+                   _me.UpdateROMs != UpdateROMs;
+        }
+    }
+
     public ExeModel CurrentExe { get; private set; } = new();
 
     internal dlgUpdaterModel(AppSettings s, Download86Manager dm)
     {
         _dm = dm;
         Attach();
+
+        Architectures = new List<IDtoNAME> 
+        { 
+            new IDtoNAME() { ID = "arm", Name = "Arm 64" },
+            new IDtoNAME() { ID = "64", Name = "Intel/AMD x64"}
+        };
+
+        OSs = new()
+        {
+            new IDtoNAME() { ID = "linux", Name = "Linux" },
+            new IDtoNAME() { ID = "mac", Name = "macOS" },
+            new IDtoNAME() { ID = "windows", Name = "Windows" },
+        };
 
         if (Design.IsDesignMode)
         {
@@ -99,9 +206,54 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             CurrentExe.Build = "3110";
             CurrentExe.VMExe = @"c:\86Box\86Box.exe";
             CurrentExe.VMRoms = @"c:\86Box\roms";
+            SelectedArch = Architectures[0];
+            SelectedOS = OSs[0];
         }
         else
         {
+            var name = s.PreferedCPUArch;
+            if (name != null)
+            {
+                foreach (var arch in Architectures)
+                {
+                    if (string.Equals(name, arch.ID))
+                    {
+                        SelectedArch = arch;
+                        break;
+                    }
+                }
+            }
+            name = s.PreferedOS;
+            if (name != null)
+            {
+                foreach (var os in OSs)
+                {
+                    if (string.Equals(name, os.ID))
+                    {
+                        SelectedOS = os;
+                        break;
+                    }
+                }
+            }
+            if (SelectedOS == null)
+            {
+                if (NativeMSG.IsLinux)
+                    SelectedOS = OSs[0];
+                else if (NativeMSG.IsWindows)
+                    SelectedOS = OSs[2];
+                else
+                    SelectedOS = OSs[1];
+            }
+            if (SelectedArch == null)
+            {
+                if (RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
+                    SelectedArch = Architectures[0];
+                else
+                    SelectedArch = Architectures[1];
+            }
+            UpdateROMs = s.UpdateROMs;
+            PrefNDR = s.PrefNDR;
+
             var exe_fld = s.EXEdir;
             var rom_fld = s.ROMdir;
             Has86BoxFolder = !string.IsNullOrWhiteSpace(exe_fld) && Directory.Exists(exe_fld);
@@ -129,14 +281,50 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
                 CurrentExe.VMExe = exe;
             }
 
-            
+            _subscription = _dm.Artifacts.Connect()
+                .Filter(s => !s.FileName.Contains("source", StringComparison.OrdinalIgnoreCase))
+                //.ObserveOn(RxApp.MainThreadScheduler) //<-- We switch over to the UI thread.
+                .Bind(out _artifacts)
+                .Subscribe();
         }
+
+        Commit();
     }
 
     private void _dm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        //Note, LatestBuild is "invoked", meaning the background thread is waiting until we've
+        //      done our work. This isn't strickly needed, but I'm being extra safe.
         if (e.PropertyName == nameof(Download86Manager.LatestBuild))
+        {
+            Artifact candidate = null;
+            bool has_ndr = false;
+
+            //We adjust the selection to the prefered artifact
+            foreach (var art in Artifacts)
+            {
+                if (art.FileName.Contains(SelectedOS.ID, StringComparison.InvariantCultureIgnoreCase) 
+                    && art.FileName.Contains(SelectedArch.ID, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (candidate == null || has_ndr != PrefNDR)
+                    {
+                        candidate = art;
+                        has_ndr = art.FileName.Contains("-NDR-");
+                    }
+                }
+            }
+            if (candidate == null && Artifacts.Count > 0)
+                candidate = Artifacts[0];
+            SelectedArtifact = candidate;
+            this.RaisePropertyChanged(nameof(SelectedArtifact));
+
             this.RaisePropertyChanged(nameof(CanUpdate));
+        }
+    }
+
+    public void Commit()
+    {
+        _me = (dlgUpdaterModel)MemberwiseClone();
     }
 
     public void Dispose()
@@ -154,6 +342,8 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
     {
         _dm.Log -= AddToLog;
         _dm.PropertyChanged -= _dm_PropertyChanged;
+        if (_subscription != null)
+            _subscription.Dispose();
     }
 
     private void AddToLog(string s)
@@ -166,5 +356,16 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
         public DateTime Created { get; } = DateTime.Now;
 
         public string Entery { get; set; }
+    }
+
+    public class IDtoNAME
+    {
+        public string ID { get; set; }
+        public string Name { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
