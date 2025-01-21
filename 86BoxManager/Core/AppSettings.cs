@@ -166,6 +166,18 @@ namespace _86BoxManager.Core
             set => SetProperty("upt_roms", value);
         }
 
+        public bool PreserveROMs
+        {
+            get => FetchProperty("save_roms", false);
+            set => SetProperty("save_roms", value);
+        }
+
+        public string ArchivePath
+        {
+            get => FetchProperty("archive_path", (string)null);
+            set => SetProperty("archive_path", value);
+        }
+
         public ThemeVariant Theme
         {
             get

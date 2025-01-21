@@ -28,6 +28,10 @@
 		<Style Selector="gb|GroupBox">
 			<Setter Property="BorderBrush" Value="{DynamicResource TabCtrlBorderBrush}"/>
 		</Style>
+
+		<Style Selector="SelectableTextBlock.Error">
+			<Setter Property="Foreground" Value="Red" />
+		</Style>
 	</Window.Styles>
 	<Grid>
 		<DockPanel Margin="12" IsVisible="{Binding Has86BoxFolder, Mode=OneTime}">
@@ -50,8 +54,16 @@
 									<TextBlock Text="{Binding DM.LatestBuild, Mode=OneWay, TargetNullValue='N/A'}"
 										IsVisible="{Binding !DM.IsFetching, Mode=OneWay}" HorizontalAlignment="Center" 
 										Margin="10" FontSize="26"/>
-									<Grid Width="30" IsVisible="{Binding DM.IsFetching, Mode=OneWay}"
+									<TextBlock Text="N/A" Foreground="Red" IsVisible="{Binding HasCLError, Mode=OneWay}"
+											   HorizontalAlignment="Center"	Margin="10" FontSize="26"/>
+									<Grid Width="30"
 										  HorizontalAlignment="Center" VerticalAlignment="Center">
+										<Grid.IsVisible>
+											<MultiBinding Converter="{x:Static BoolConverters.And}">
+												<Binding Path="DM.IsFetching" Mode="OneWay" />
+												<Binding Path="!HasCLError" Mode="OneWay" />
+											</MultiBinding>
+										</Grid.IsVisible>
 										<Grid.Styles>
 											<Style Selector="Grid.working">
 												<Style.Animations>
@@ -84,10 +96,10 @@
 						</Grid>
 						<gb:GroupBox Header="Changelog" Theme="{StaticResource GroupBoxClassic}">
 							<ScrollViewer Margin="5">
-								<ItemsControl ItemsSource="{Binding Log}">
+								<ItemsControl ItemsSource="{Binding ChangeLog}">
 									<ItemsControl.ItemTemplate>
 										<DataTemplate>
-											<SelectableTextBlock Text="{Binding Entery}" />
+											<SelectableTextBlock Classes.Error="{Binding IsError}" Text="{Binding Entery}" />
 										</DataTemplate>
 									</ItemsControl.ItemTemplate>
 								</ItemsControl>
@@ -95,8 +107,42 @@
 						</gb:GroupBox>
 					</DockPanel>
 				</TabItem>
-				<TabItem Header="Update" Theme="{StaticResource CustomTabItm}" IsEnabled="{Binding CanUpdate}">
-					Hello World
+				<TabItem Header="Update" Theme="{StaticResource CustomTabItm}"> <!-- IsEnabled="{Binding CanUpdate}" -->
+					<DockPanel>
+						<StackPanel DockPanel.Dock="Top">
+							<gb:GroupBox Header="Select new version" Theme="{StaticResource GroupBoxClassic}">
+								<Grid Margin="20, 10" ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto">
+									<TextBlock Text="Select artifact:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+									<ComboBox ItemsSource="{Binding Artifacts}" SelectedItem="{Binding SelectedArtifact}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" />
+								</Grid>
+							</gb:GroupBox>
+							<gb:GroupBox Header="Archive current build" Theme="{StaticResource GroupBoxClassic}" IsVisible="{Binding CanArchive}">
+								<StackPanel Margin="20, 10">
+									<Grid ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto, Auto">
+										<TextBlock Text="Name:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+										<TextBox Text="{Binding ArchiveName}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" />
+										<TextBlock Text="Version:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="0, 2, 0, 0" />
+										<TextBox Text="{Binding ArchiveVersion}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" Margin="0, 2, 0, 0" />
+										<TextBlock Text="Comment:" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="0, 2, 0, 0" />
+										<TextBox Text="{Binding ArchiveComment}" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Stretch" Margin="0, 2, 0, 0" />
+									</Grid>
+									<TextBlock TextTrimming="CharacterEllipsis" Text="If you do not want this build archived, leave the Name blank." />
+								</StackPanel>
+							</gb:GroupBox>
+						</StackPanel>
+						<ProgressBar DockPanel.Dock="Bottom" Margin="0, 5, 0, 10" MinHeight="3" Height="3" Minimum="0" Maximum="1" Value="{Binding DM.Progress}" />
+						<gb:GroupBox Header="Update log" Theme="{StaticResource GroupBoxClassic}">
+							<ScrollViewer Margin="5">
+								<ItemsControl ItemsSource="{Binding UpdateLog}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate>
+											<SelectableTextBlock Classes.Error="{Binding IsError}" Text="{Binding Entery}" />
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</ScrollViewer>
+						</gb:GroupBox>
+					</DockPanel>
 				</TabItem>
 				<TabItem Header="Information" Theme="{StaticResource CustomTabItm}">
 					<TabItem.Styles>
@@ -126,31 +172,27 @@
 					</StackPanel>
 				</TabItem>
 				<TabItem Header="Settings" Theme="{StaticResource CustomTabItm}">
-					<Grid RowDefinitions="*, *">
+					<Grid RowDefinitions="Auto, *">
 						<gb:GroupBox Header="Preserving current build" Theme="{StaticResource GroupBoxClassic}">
+							<StackPanel Margin="5, 2" Spacing="5">
+								<TextBlock TextTrimming="CharacterEllipsis">
+									If you wish to keep the current version of 86Box, set an archive folder:
+								</TextBlock>
+								<DockPanel>
+									<Button DockPanel.Dock="Right" Content="Browse..." Margin="10, 0, 0, 0" Click="btnBrowse_Click" />
+									<TextBox Text="{Binding ArhivePath}" />
+								</DockPanel>
+								<CheckBox IsChecked="{Binding PreserveROMs}" IsEnabled="{Binding UpdateROMs}" Content="Also preserve ROMs / Firmware" />
+							</StackPanel>
 						</gb:GroupBox>
-						<gb:GroupBox Header="Select new build" Theme="{StaticResource GroupBoxClassic}" Grid.Row="1" Margin="0, 0, 0, 10">
-							<Grid ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto" Margin="5, 2">
-								<TextBlock Text="Select artifact:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
-								<ComboBox ItemsSource="{Binding Artifacts}" SelectedItem="{Binding SelectedArtifact}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" />
-								<TextBlock Text="Prefered CPU arch:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" />
-								<ComboBox ItemsSource="{Binding Architectures}" SelectedItem="{Binding SelectedArch}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch">
-									<ComboBox.ItemTemplate>
-										<DataTemplate>
-											<TextBlock Text="{Binding Name}" />
-										</DataTemplate>
-									</ComboBox.ItemTemplate>
-								</ComboBox>
-								<TextBlock Text="Prefered OS:" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" />
-								<ComboBox ItemsSource="{Binding OSs}" SelectedItem="{Binding SelectedOS}" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Stretch">
-									<ComboBox.ItemTemplate>
-										<DataTemplate>
-											<TextBlock Text="{Binding Name}" />
-										</DataTemplate>
-									</ComboBox.ItemTemplate>
-								</ComboBox>
-								<CheckBox IsChecked="{Binding PrefNDR}" Content="Prefer New Dynamic Recompiler" Grid.Row="3" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
-								<CheckBox IsChecked="{Binding UpdateROMs}" Content="Also update ROMs / Firmware" Grid.Row="4" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
+						<gb:GroupBox Header="Selection of new build" Theme="{StaticResource GroupBoxClassic}" Grid.Row="1" Margin="0, 0, 0, 10">
+							<Grid ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto, Auto, Auto" Margin="5, 2">
+								<TextBlock Text="Prefered CPU arch:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+								<ComboBox ItemsSource="{Binding Architectures}" SelectedItem="{Binding SelectedArch}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" />
+								<TextBlock Text="Prefered OS:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" />
+								<ComboBox ItemsSource="{Binding OSs}" SelectedItem="{Binding SelectedOS}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" />
+								<CheckBox IsChecked="{Binding PrefNDR}" Content="Prefer New Dynamic Recompiler" Grid.Row="2" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
+								<CheckBox IsChecked="{Binding UpdateROMs}" Content="Also update ROMs / Firmware" Grid.Row="3" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
 							</Grid>
 						</gb:GroupBox>
 					</Grid>

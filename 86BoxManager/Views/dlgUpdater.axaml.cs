@@ -17,6 +17,7 @@ using static _86BoxManager.Tools.JenkinsBase;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using ZstdSharp.Unsafe;
+using _86BoxManager.Xplat;
 
 namespace _86BoxManager.Views;
 
@@ -50,6 +51,8 @@ public partial class dlgUpdater : Window
     private void btnUpdatel_Click(object sender, RoutedEventArgs e)
     {
         _m.TabIndex = 1;
+        _m.DetachChangelog();
+        _dm.Update86Box(_m.SelectedArtifact, _dm.LatestBuild.Value, _m.UpdateROMs);
     }
 
     private void btnCancel_Click(object sender, RoutedEventArgs e)
@@ -64,8 +67,10 @@ public partial class dlgUpdater : Window
         {
             s.PrefNDR = _m.PrefNDR;
             s.UpdateROMs = _m.UpdateROMs;
+            s.PreserveROMs = _m.PreserveROMs;
             s.PreferedOS = _m.SelectedOS.ID;
             s.PreferedCPUArch = _m.SelectedArch.ID;
+            s.ArchivePath = _m.ArhivePath;
 
             t.Commit();
         }
@@ -73,19 +78,38 @@ public partial class dlgUpdater : Window
         _m.Commit();
         _m.RaisePropertyChanged(nameof(dlgUpdaterModel.HasChanges));
     }
+
+    private async void btnBrowse_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var text = "Select a folder where 86Box builds will be archived";
+
+        var fldName = await Dialogs.SelectFolder(_m.CurrentExe.VMExe ?? AppDomain.CurrentDomain.BaseDirectory, text, parent: this);
+
+        if (!string.IsNullOrWhiteSpace(fldName))
+        {
+            _m.ArhivePath = fldName;
+
+            if (!FolderHelper.IsDirectoryWritable(fldName))
+            {
+                await Dialogs.ShowMessageBox("The selected folder is not writable.", MsBox.Avalonia.Enums.Icon.Warning, this);
+            }
+        }
+    }
 }
 
 public class dlgUpdaterModel : ReactiveObject, IDisposable
 {
     private dlgUpdaterModel _me;
     private IDtoNAME _sel_os, _sel_arch;
-    bool _pref_ndr, _upt_roms;
+    bool _pref_ndr, _upt_roms, _save_roms;
+    string _archive_path;
 
     private readonly Download86Manager _dm;
     private int _tab_idx;
     private readonly IDisposable _subscription;
 
-    public ObservableCollection<LogEntery> Log { get; } = new();
+    public ObservableCollection<LogEntery> ChangeLog { get; } = new();
+    public ObservableCollection<LogEntery> UpdateLog { get; } = new();
 
     public bool Has86BoxFolder { get; private set; }
     public bool Has86BoxExe { get; private set; }
@@ -95,6 +119,8 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
 
     public bool CanUpdate { get => _dm.LatestBuild != null && _dm.LatestBuild > CurrentBuild; }
 
+    public bool CanArchive { get => !string.IsNullOrWhiteSpace(_archive_path); }
+
     public List<IDtoNAME> Architectures { get; private set; }
     public List<IDtoNAME> OSs { get; private set; }
 
@@ -102,6 +128,11 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
 
     private readonly ReadOnlyObservableCollection<JenkinsBase.Artifact> _artifacts;
     public ReadOnlyObservableCollection<JenkinsBase.Artifact> Artifacts => _artifacts;
+
+    /// <summary>
+    /// True if there is an error in the change log
+    /// </summary>
+    public bool HasCLError { get; private set; }
 
     public IDtoNAME SelectedArch
     {
@@ -152,6 +183,37 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
         }
     }
 
+    public bool PreserveROMs
+    {
+        get => _save_roms;
+        set
+        {
+            if (value != _save_roms)
+            {
+                this.RaiseAndSetIfChanged(ref _save_roms, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
+
+    public string ArhivePath
+    {
+        get => _archive_path;
+        set
+        {
+            if (value != _archive_path)
+            {
+                this.RaiseAndSetIfChanged(ref _archive_path, value);
+                this.RaisePropertyChanged(nameof(CanArchive));
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
+
+    public string ArchiveName { get; set; }
+    public string ArchiveVersion { get; set; }
+    public string ArchiveComment { get; set; }
+
     public Artifact SelectedArtifact { get; set; }
 
     public int CurrentBuild
@@ -173,7 +235,9 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             return !ReferenceEquals(_me.SelectedArch, SelectedArch) ||
                    !ReferenceEquals(_me.SelectedOS, SelectedOS) ||
                    _me.PrefNDR != PrefNDR ||
-                   _me.UpdateROMs != UpdateROMs;
+                   _me.UpdateROMs != UpdateROMs ||
+                   _me.PreserveROMs != PreserveROMs ||
+                   !string.Equals(_me.ArhivePath, ArhivePath);
         }
     }
 
@@ -182,7 +246,7 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
     internal dlgUpdaterModel(AppSettings s, Download86Manager dm)
     {
         _dm = dm;
-        Attach();
+        AttachChangelog();
 
         Architectures = new List<IDtoNAME> 
         { 
@@ -252,7 +316,9 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
                     SelectedArch = Architectures[1];
             }
             UpdateROMs = s.UpdateROMs;
+            PreserveROMs = s.PreserveROMs;
             PrefNDR = s.PrefNDR;
+            ArhivePath = s.ArchivePath;
 
             var exe_fld = s.EXEdir;
             var rom_fld = s.ROMdir;
@@ -279,6 +345,9 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
                 if (!string.IsNullOrWhiteSpace(info.Arch))
                     CurrentExe.Arch = info.Arch;
                 CurrentExe.VMExe = exe;
+
+                ArchiveName = $"86Box {CurrentExe.Version} - build {CurrentExe.Build}";
+                ArchiveVersion = CurrentExe.Version;
             }
 
             _subscription = _dm.Artifacts.Connect()
@@ -332,23 +401,52 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
         Detach();
     }
 
-    private void Attach()
+    private void AttachChangelog()
     {
-        _dm.Log += AddToLog;
+        _dm.Log += AddToChangeLog;
+        _dm.ErrorLog += ErrorToChangeLog;
         _dm.PropertyChanged += _dm_PropertyChanged;
+    }
+
+    public void DetachChangelog()
+    {
+        _dm.Log -= AddToChangeLog;
+        _dm.Log += AddToUpdateLog;
+        _dm.ErrorLog -= ErrorToChangeLog;
+        _dm.ErrorLog += ErrorToUpdateLog;
     }
 
     private void Detach()
     {
-        _dm.Log -= AddToLog;
+        _dm.Log -= AddToChangeLog;
+        _dm.Log -= AddToUpdateLog;
+        _dm.ErrorLog -= ErrorToUpdateLog;
+        _dm.ErrorLog -= ErrorToChangeLog;
         _dm.PropertyChanged -= _dm_PropertyChanged;
         if (_subscription != null)
             _subscription.Dispose();
     }
 
-    private void AddToLog(string s)
+    private void AddToChangeLog(string s)
     {
-        Log.Add(new LogEntery() { Entery = s });
+        ChangeLog.Add(new LogEntery() { Entery = s });
+    }
+
+    private void ErrorToChangeLog(string s)
+    {
+        HasCLError = true;
+        ChangeLog.Add(new LogEntery() { Entery = s, IsError = true });
+        this.RaisePropertyChanged(nameof(HasCLError));
+    }
+
+    private void AddToUpdateLog(string s)
+    {
+        UpdateLog.Add(new LogEntery() { Entery = s });
+    }
+
+    private void ErrorToUpdateLog(string s)
+    {
+        UpdateLog.Add(new LogEntery() { Entery = s, IsError = true });
     }
 
     public class LogEntery
@@ -356,6 +454,8 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
         public DateTime Created { get; } = DateTime.Now;
 
         public string Entery { get; set; }
+
+        public bool IsError { get; set; }
     }
 
     public class IDtoNAME

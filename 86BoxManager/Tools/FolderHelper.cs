@@ -11,6 +11,38 @@ namespace _86BoxManager.Tools
     {
         public delegate bool ProgressCallback(int number);
 
+        public static bool IsDirectoryWritable(string directoryPath)
+        {
+            try
+            {
+                // Generate a random file name
+                string testFilePath = GetUniqueFileName(directoryPath);
+
+                // Create and delete the file
+                using (FileStream fs = File.Create(testFilePath, 1, FileOptions.DeleteOnClose))
+                {
+                    // If we can create and delete the file, the directory is writable
+                    return true;
+                }
+            }
+            catch
+            {
+                // If an exception is thrown, the directory is not writable
+                return false;
+            }
+        }
+
+        private static string GetUniqueFileName(string directoryPath)
+        {
+            string fileName;
+            do
+            {
+                fileName = Path.Combine(directoryPath, Path.GetRandomFileName());
+            } while (File.Exists(fileName));
+
+            return fileName;
+        }
+
         public static void CopyFilesAndFolders(string sourceDir, string destinationDir, int copyDepth, ProgressCallback progressCallback = null)
         {
             if (copyDepth < 0)

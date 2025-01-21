@@ -14,16 +14,18 @@ namespace _86BoxManager.Tools;
 
 public class Download86Manager : ReactiveObject
 {
-    private bool _is_working, _is_fetching_log;
+    private double _current_progress;
+    private bool _is_working, _is_fetching_log, _is_updating;
     private int? _latest_build;
     private HttpClient _httpClient;
 
-    private const string ZIPFILE_86BOX = "86Box.zip";
-    private const string ZIPFILE_ROMS = "Roms.zip";
     private const string JENKINS_BASE_URL = "https://ci.86box.net/job/86Box";
     private const string JENKINS_LASTBUILD = JENKINS_BASE_URL + "/lastSuccessfulBuild";
+    private const string ZIPFILE_ROMS = "Roms.zip";
+    private const string ROMS_COMMITS_URL = "https://api.github.com/repos/86Box/roms/commits";
 
     public event Action<string> Log;
+    public event Action<string> ErrorLog;
 
     /// <summary>
     /// Download manager is running
@@ -49,13 +51,18 @@ public class Download86Manager : ReactiveObject
         private set => this.RaiseAndSetIfChanged(ref _is_fetching_log, value);
     }
 
+    public bool IsUpdating
+    {
+        get => _is_updating;
+        private set => this.RaiseAndSetIfChanged(ref _is_updating, value);
+    }
+
     public int? LatestBuild
     {
         get => _latest_build;
         private set
         {
-            //Using Invoke to give the dialog a chance to read from the non
-            //thread safe hashsets.
+            //Invoke isn't strickly needed, but avoids potential race conditions.
             Dispatcher.UIThread.Invoke(() =>
             {
                 this.RaiseAndSetIfChanged(ref _latest_build, value);
@@ -63,7 +70,87 @@ public class Download86Manager : ReactiveObject
         }
     }
 
+    public double Progress
+    {
+        get => _current_progress;
+        set
+        {
+            Dispatcher.UIThread.Post(() => this.RaiseAndSetIfChanged(ref _current_progress, value));
+        }
+    }
+
     public SourceCache<JenkinsBase.Artifact, string> Artifacts = new(s => s.FileName);
+
+    public void Update86Box(JenkinsBase.Artifact build, int number, bool update_roms)
+    {
+        IsWorking = true;
+        IsUpdating = true;
+        Progress = 0;
+        if (_httpClient == null)
+            _httpClient = new HttpClient();
+        AddLog($"Downloading artifact: {build.FileName}");
+        string url = $"{JENKINS_BASE_URL}/{number}/artifact/{build.RelativePath}";
+
+        ThreadPool.QueueUserWorkItem(async o =>
+        {
+            AddLog("Connecting to: " + url);
+            long total_bytes_read = 0;
+            long bytes_to_read;
+            long estimated_bytes_to_read;
+
+            try
+            {
+                var artifact_zip_data = new MemoryStream();
+
+                using (var response = await _httpClient.GetAsync(url))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Error("Failed to contact server");
+                        Stop();
+                        return;
+                    }
+
+                    bytes_to_read = response.Content.Headers.ContentLength ?? 40 * 1024 * 1024;
+                    estimated_bytes_to_read = bytes_to_read;
+                    if (update_roms)
+                    {
+                        estimated_bytes_to_read *= 3;
+                    }
+
+                    AddLog($"Downloading {FolderSizeCalculator.ConvertBytesToReadableSize(bytes_to_read)}");
+                    using (var zip = await response.Content.ReadAsStreamAsync())
+                    {
+                        var buffer = new byte[81920];
+                        int bytes_read;
+
+                        while ((bytes_read = await zip.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                        {
+                            artifact_zip_data.Write(buffer, 0, bytes_read);
+                            total_bytes_read += bytes_read;
+                            Progress = (double)total_bytes_read / estimated_bytes_to_read;
+                        }
+                    }
+                }
+
+                AddLog($"Finished downloading 86Box artifact");
+
+                if (update_roms)
+                {
+                    AddLog("");
+                    AddLog("Downloading latest ROMs");
+                }
+            }
+            catch (Exception e)
+            {
+                Error(e.Message);
+            }
+            finally
+            {
+                Stop();
+            }
+        });
+    }
 
     public void FetchMetadata(int current_build)
     {
@@ -77,13 +164,14 @@ public class Download86Manager : ReactiveObject
         {
             JenkinsBuild job;
             AddLog("Connecting to: "+url);
+
             try
             {
                 using (var response = await _httpClient.GetAsync(url))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
-                        AddLog("Failed to contact server");
+                        Error("Failed to contact server");
                         Stop();
                         return;
                     }
@@ -94,7 +182,7 @@ public class Download86Manager : ReactiveObject
                         job = JsonSerializer.Deserialize<JenkinsBuild>(json_str);
                         if (job.Artifacts == null || job.Number < 6507 || job.Url == null || job.Artifacts.Count < 1)
                         {
-                            AddLog($"Parsing failed, invalid response");
+                            Error($"Parsing failed, invalid response");
                             Stop();
                             return;
                         }
@@ -117,6 +205,10 @@ public class Download86Manager : ReactiveObject
                     AddLog($" -- There was 1 entery in the changelog --");
                 else
                     AddLog($" -- Changelog has {changelog.Count} enteries --");
+            }
+            catch (Exception e)
+            {
+                Error(e.Message);
             }
             finally 
             {
@@ -153,7 +245,7 @@ public class Download86Manager : ReactiveObject
 
             if (!sucess)
             {
-                AddLog($"Fetching of changelog for build {c} failed, aborting");
+                Error($"Fetching of changelog for build {c} failed, aborting");
                 break;
             }
         }
@@ -199,6 +291,7 @@ public class Download86Manager : ReactiveObject
         {
             IsFetching = false;
             IsWorking = false;
+            IsUpdating = false;
         });
     }
 
@@ -211,99 +304,13 @@ public class Download86Manager : ReactiveObject
         });
     }
 
-    private class DownloadWorker
+    private void Error(string s)
     {
-        public event Action<string> Aborted;
-        public event Action<string> Initiated;
-        public event Action<string> Extracting;
-        public event Action<long, long> DownloadUpdated;
-        public event Action TaskCompleted;
-
-        private string _sourceUrl;
-        private string _targetFile;
-        private HttpClient _httpClient;
-
-        public DownloadWorker(string source, string target)
+        Dispatcher.UIThread.Post(() =>
         {
-            _sourceUrl = source;
-            _targetFile = target;
-            _httpClient = new HttpClient();
-        }
-
-        public async Task Run()
-        {
-            if (string.IsNullOrEmpty(_sourceUrl)) throw new ArgumentException("No source url specified.");
-            if (string.IsNullOrEmpty(_targetFile)) throw new ArgumentException("No target file specified.");
-
-            Initiated?.Invoke("Please wait...");
-
-            try
-            {
-                var response = await _httpClient.GetAsync(_sourceUrl, HttpCompletionOption.ResponseHeadersRead);
-                response.EnsureSuccessStatusCode();
-
-                var totalBytes = response.Content.Headers.ContentLength ?? -1L;
-                var canReportProgress = totalBytes != -1;
-
-                using (var fileStream = new FileStream(_targetFile, FileMode.Create, FileAccess.Write, FileShare.None))
-                using (var httpStream = await response.Content.ReadAsStreamAsync())
-                {
-                    var buffer = new byte[81920];
-                    var totalRead = 0L;
-                    int bytesRead;
-
-                    while ((bytesRead = await httpStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                    {
-                        await fileStream.WriteAsync(buffer, 0, bytesRead);
-                        totalRead += bytesRead;
-
-                        if (canReportProgress)
-                        {
-                            DownloadUpdated?.Invoke(totalRead, totalBytes);
-                        }
-                    }
-                }
-
-                Extracting?.Invoke("Extracting...");
-                ExtractFiles(_targetFile);
-                TaskCompleted?.Invoke();
-            }
-            catch (Exception ex)
-            {
-                Aborted?.Invoke(ex.Message);
-            }
-        }
-
-        private void ExtractFiles(string filePath)
-        {
-            try
-            {
-                if (filePath.Contains(ZIPFILE_86BOX))
-                {
-                    ZipFile.ExtractToDirectory(filePath, ".");
-                    File.Delete(filePath);
-                }
-                else if (filePath.Contains(ZIPFILE_ROMS))
-                {
-                    using (var archive = ZipFile.OpenRead(filePath))
-                    {
-                        foreach (var entry in archive.Entries)
-                        {
-                            if (entry.FullName != "roms-master/")
-                            {
-                                var destinationPath = Path.GetFullPath(Path.Combine(".", entry.FullName.Replace("roms-master/", "roms/")));
-                                entry.ExtractToFile(destinationPath, true);
-                            }
-                        }
-                    }
-                    File.Delete(filePath);
-                }
-            }
-            catch (Exception ex)
-            {
-                Aborted?.Invoke(ex.Message);
-            }
-        }
+            if (ErrorLog != null)
+                ErrorLog(s);
+        });
     }
 
     public sealed class JenkinsRun : JenkinsBase

@@ -39,13 +39,13 @@
 					</Style>
 				</Grid.Styles>
 				<TextBlock Text="Version:" Grid.Column="0" Grid.Row="0" />
-				<SelectableTextBlock TextTrimming="WordEllipsis" Text="{Binding SelVersion}" Grid.Column="1" Grid.Row="0" />
+				<SelectableTextBlock TextTrimming="CharacterEllipsis" Text="{Binding SelVersion}" Grid.Column="1" Grid.Row="0" />
 				<TextBlock Text="CPU architecture:" Grid.Column="0" Grid.Row="1" />
 				<SelectableTextBlock Text="{Binding SelectedItem.Arch}" Grid.Column="1" Grid.Row="1" />
 				<TextBlock Text="86Box executable:" Grid.Column="0" Grid.Row="2" />
-				<SelectableTextBlock TextTrimming="WordEllipsis" Text="{Binding SelExePath}" Grid.Column="1" Grid.Row="2" />
+				<SelectableTextBlock TextTrimming="CharacterEllipsis" Text="{Binding SelExePath}" Grid.Column="1" Grid.Row="2" />
 				<TextBlock Text="Firmware folder:" Grid.Column="0" Grid.Row="3" />
-				<SelectableTextBlock TextTrimming="WordEllipsis" Text="{Binding SelExeRomDir}" Grid.Column="1" Grid.Row="3" />
+				<SelectableTextBlock TextTrimming="CharacterEllipsis" Text="{Binding SelExeRomDir}" Grid.Column="1" Grid.Row="3" />
 				<TextBlock Text="Comment:" Grid.Column="0" Grid.Row="4" />
 				<SelectableTextBlock Text="{Binding SelectedItem.Comment}" Grid.Column="1" Grid.Row="4" />
 			</Grid>
