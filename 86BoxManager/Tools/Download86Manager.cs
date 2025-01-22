@@ -81,7 +81,7 @@ public class Download86Manager : ReactiveObject
 
     public SourceCache<JenkinsBase.Artifact, string> Artifacts = new(s => s.FileName);
 
-    public void Update86Box(JenkinsBase.Artifact build, int number, bool update_roms)
+    public void Update86Box(JenkinsBase.Artifact build, int number, bool update_roms, Func<(string, List<ExtractedFile>), bool> files)
     {
         IsWorking = true;
         IsUpdating = true;
@@ -100,7 +100,7 @@ public class Download86Manager : ReactiveObject
 
             try
             {
-                var artifact_zip_data = new MemoryStream();
+                var zip_data = new MemoryStream();
 
                 using (var response = await _httpClient.GetAsync(url))
                 {
@@ -126,19 +126,33 @@ public class Download86Manager : ReactiveObject
 
                         while ((bytes_read = await zip.ReadAsync(buffer, 0, buffer.Length)) > 0)
                         {
-                            artifact_zip_data.Write(buffer, 0, bytes_read);
+                            zip_data.Write(buffer, 0, bytes_read);
                             total_bytes_read += bytes_read;
                             Progress = (double)total_bytes_read / estimated_bytes_to_read;
                         }
                     }
                 }
 
-                AddLog($"Finished downloading 86Box artifact");
+                //This is a quick opperation, so I won't bother with having a progress bar or doing it on antoher thread, etc.
+                AddLog($"Finished downloading 86Box artifact - Verifying");
+                var box_files = ExtractFilesFromZip(zip_data);
+
+                bool cont = true;
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    cont = files(("86box", box_files));
+                });
+                if (!cont)
+                {
+                    Stop();
+                    return;
+                }
 
                 if (update_roms)
                 {
                     AddLog("");
                     AddLog("Downloading latest ROMs");
+                    zip_data.Position = 0;
                 }
             }
             catch (Exception e)
@@ -150,6 +164,32 @@ public class Download86Manager : ReactiveObject
                 Stop();
             }
         });
+    }
+
+    private List<ExtractedFile> ExtractFilesFromZip(MemoryStream zipStream)
+    {
+        var extractedFiles = new List<ExtractedFile>();
+
+        using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+        {
+            foreach (var entry in archive.Entries)
+            {
+                using (var entryStream = entry.Open())
+                {
+                    var memoryStream = new MemoryStream();
+                    entryStream.CopyTo(memoryStream);
+                    memoryStream.Position = 0; // Reset the position to the beginning
+
+                    extractedFiles.Add(new ExtractedFile
+                    {
+                        FilePath = entry.FullName,
+                        FileData = memoryStream
+                    });
+                }
+            }
+        }
+
+        return extractedFiles;
     }
 
     public void FetchMetadata(int current_build)
@@ -321,5 +361,16 @@ public class Download86Manager : ReactiveObject
     public sealed class JenkinsBuild : JenkinsBase
     {
         // Additional properties specific to JenkinsBuild can be added here
+    }
+
+    public class ExtractedFile
+    {
+        public string FilePath { get; set; }
+        public MemoryStream FileData { get; set; }
+
+        public override string ToString()
+        {
+            return FilePath;
+        }
     }
 }

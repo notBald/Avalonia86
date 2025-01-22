@@ -107,7 +107,7 @@
 						</gb:GroupBox>
 					</DockPanel>
 				</TabItem>
-				<TabItem Header="Update" Theme="{StaticResource CustomTabItm}"> <!-- IsEnabled="{Binding CanUpdate}" -->
+				<TabItem Header="Update" Theme="{StaticResource CustomTabItm}" IsEnabled="{Binding CanUpdate}">
 					<DockPanel>
 						<StackPanel DockPanel.Dock="Top">
 							<gb:GroupBox Header="Select new version" Theme="{StaticResource GroupBoxClassic}">
@@ -171,7 +171,7 @@
 						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>
-				<TabItem Header="Settings" Theme="{StaticResource CustomTabItm}">
+				<TabItem Header="Settings" Theme="{StaticResource CustomTabItm}" IsEnabled="{Binding !DM.IsUpdating}">
 					<Grid RowDefinitions="Auto, *">
 						<gb:GroupBox Header="Preserving current build" Theme="{StaticResource GroupBoxClassic}">
 							<StackPanel Margin="5, 2" Spacing="5">

@@ -55,7 +55,7 @@
 		</DrawingGroup>
 	</DrawingImage>
 
-	<!-- Trying to get the existing style to work the way I want was a headache, so we create the template from scratch. Note, how we set
+	<!-- Trying to get the existing style to work the way I want was a headache, so we create the template from scratch. Beware how we set
 		 values straight into the template rather than bothering with style atributes. 
 	-->
 	<ControlTheme x:Key="CustomTabCtrl" TargetType="TabControl">
@@ -67,7 +67,7 @@
 						 then not drawing the lower boarder on TabItem. ZIndex is key here. -->
 					<ItemsPresenter Name="PART_ItemsPresenter"
 									ItemsPanel="{TemplateBinding ItemsPanel}"
-									DockPanel.Dock="{TemplateBinding TabStripPlacement}"
+									DockPanel.Dock="Top"
 									ZIndex="5" />
 					<ContentPresenter Name="PART_SelectedContentHost"
 									  Margin="0, -1, 0, 0"
@@ -108,6 +108,10 @@
 		<Style Selector="^:selected /template/ Border">
 			<Setter Property="Background" Value="{DynamicResource TabCtrlBackgroundBrush}" />
 			<Setter Property="BorderThickness" Value="1, 1, 1, 0" />
+		</Style>
+
+		<Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Opacity" Value="0.5" />
 		</Style>
 	</ControlTheme>
 </ResourceDictionary>

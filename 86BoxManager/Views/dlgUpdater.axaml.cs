@@ -8,6 +8,7 @@ using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 using ReactiveUI;
 using System;
 using System.IO;
+using IOPath = System.IO.Path;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Avalonia.Metadata;
@@ -52,7 +53,76 @@ public partial class dlgUpdater : Window
     {
         _m.TabIndex = 1;
         _m.DetachChangelog();
-        _dm.Update86Box(_m.SelectedArtifact, _dm.LatestBuild.Value, _m.UpdateROMs);
+        _dm.Update86Box(_m.SelectedArtifact, _dm.LatestBuild.Value, _m.UpdateROMs, store_files);
+    }
+
+    private bool store_files((string name, List<Download86Manager.ExtractedFile> files) input)
+    {
+        if (input.name == "86box")
+        {
+            string store_path = IOPath.GetFileName(_m.CurrentExe.VMExe);
+
+            if (!string.IsNullOrEmpty(_m.ArhivePath) && !string.IsNullOrEmpty(_m.ArchiveName))
+            {
+                var path = IOPath.Combine(_m.ArhivePath, _m.ArchiveName);
+                _m.AddToUpdateLog($" - Archiving to: {path}");
+
+                try
+                {
+                    //Move files
+                    Directory.CreateDirectory(path);
+                    var dir = IOPath.GetDirectoryName(_m.CurrentExe.VMExe);
+                    foreach(var file in Directory.GetFiles(dir))
+                    {
+                        File.Move(file, IOPath.Combine(path, IOPath.GetFileName(file)));
+                    }
+
+                    if (_m.PreserveROMs)
+                    {
+                        //If we're downloading new roms, move them.
+                        //Else, copy.
+                        throw new NotImplementedException();
+                    }
+
+                    //Adds a new entery
+                    using (var t = AppSettings.Settings.BeginTransaction())
+                    {
+                        string exe_name = IOPath.Combine(path, store_path);
+                        AppSettings.Settings.AddExe(_m.ArchiveName, exe_name, null, _m.ArchiveComment, _m.ArchiveVersion, _m.CurrentExe.Arch, _m.CurrentExe.Build, false);
+                        t.Commit();
+                    }
+                }
+                catch (Exception e)
+                {
+                    _m.ErrorToUpdateLog("Error: " + e.Message);
+                    _m.ErrorToUpdateLog("Failed to arhive current version - stopping.");
+                    return false; 
+                }
+
+                _m.AddToUpdateLog($" - Writing new 86Box to: {store_path}");
+
+                foreach(var file in input.files)
+                {
+                    var dest = IOPath.Combine(store_path, file.FilePath);
+                    if (File.Exists(dest))
+                        File.Delete(dest);
+                    File.WriteAllBytes(dest, file.FileData.ToArray());
+                }
+
+                _m.AddToUpdateLog($"86Box has been updated.");
+
+                _m.CurrentExe.Build = _m.DM.LatestBuild.Value.ToString(); //<-- Prevents the "update" button from enabeling again.
+                _m.CurrentExe.RaisePropertyChanged(nameof(ExeModel.Build)); 
+                _m.CurrentExe.Version = "Unknown";
+                _m.CurrentExe.RaisePropertyChanged(nameof(ExeModel.Version));
+                _m.CurrentExe.Name = "Latest";
+                _m.CurrentExe.RaisePropertyChanged(nameof(ExeModel.Name));
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void btnCancel_Click(object sender, RoutedEventArgs e)
@@ -439,12 +509,12 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
         this.RaisePropertyChanged(nameof(HasCLError));
     }
 
-    private void AddToUpdateLog(string s)
+    public void AddToUpdateLog(string s)
     {
         UpdateLog.Add(new LogEntery() { Entery = s });
     }
 
-    private void ErrorToUpdateLog(string s)
+    public void ErrorToUpdateLog(string s)
     {
         UpdateLog.Add(new LogEntery() { Entery = s, IsError = true });
     }
