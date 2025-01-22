@@ -247,6 +247,9 @@ public class Download86Manager : ReactiveObject
 
                     //This is a quick opperation, so I won't bother with having a progress bar or doing it on antoher thread, etc.
                     AddLog($"Finished downloading ROM files - Verifying");
+                    zip_data.Position = 0;
+                    //Linux gets a valid Zip file, extraction just fails for some reason. Todo: Use the other Zip libary.
+                    //File.WriteAllBytes(Environment.GetEnvironmentVariable("HOME") + "/zip.zip", zip_data.ToArray());
                     var box_files = ExtractFilesFromZip(zip_data);
 
                     if (!files(("ROMs", box_files)))

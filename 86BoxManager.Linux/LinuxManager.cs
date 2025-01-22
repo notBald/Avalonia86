@@ -1,12 +1,9 @@
-﻿using System.IO;
-using System.Linq;
-using _86BoxManager.API;
+﻿using _86BoxManager.API;
 using _86BoxManager.Common;
 using _86BoxManager.Unix;
 using System;
-using Mono.Unix;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
 
 namespace _86BoxManager.Linux
 {

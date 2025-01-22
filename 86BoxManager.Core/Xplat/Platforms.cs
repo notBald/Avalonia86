@@ -1,4 +1,4 @@
-using System;//
+using System;
 using System.Runtime.InteropServices;
 using _86BoxManager.API;
 using _86BoxManager.Windows;
