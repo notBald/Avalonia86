@@ -41,6 +41,7 @@
 						<MultiBinding Converter="{x:Static BoolConverters.And}">
 							<Binding Path="CanUpdate" Mode="OneWay" />
 							<Binding Path="!DM.IsWorking" Mode="OneWay" />
+							<Binding Path="!HasUpdated" Mode="OneWay" />
 						</MultiBinding>
 					</Button.IsEnabled>
 					Update to latest 86Box
@@ -150,7 +151,7 @@
 										<TextBlock Text="Comment:" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="0, 2, 0, 0" />
 										<TextBox Text="{Binding ArchiveComment}" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Stretch" Margin="0, 2, 0, 0" />
 									</Grid>
-									<TextBlock TextTrimming="CharacterEllipsis" Text="If you do not want this build archived, leave the Name blank." />
+									<TextBlock TextTrimming="CharacterEllipsis" Text="If you do not want this build archived, leave the name blank." />
 								</StackPanel>
 							</gb:GroupBox>
 						</StackPanel>
@@ -206,7 +207,7 @@
 								</TextBlock>
 								<DockPanel>
 									<Button DockPanel.Dock="Right" Content="Browse..." Margin="10, 0, 0, 0" Click="btnBrowse_Click" />
-									<TextBox Text="{Binding ArhivePath}" />
+									<TextBox Text="{Binding ArchivePath}" />
 								</DockPanel>
 								<CheckBox IsChecked="{Binding PreserveROMs}" IsEnabled="{Binding UpdateROMs}" Content="Also preserve ROMs / Firmware" />
 							</StackPanel>

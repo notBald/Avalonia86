@@ -22,8 +22,9 @@ public class Download86Manager : ReactiveObject
 
     private const string JENKINS_BASE_URL = "https://ci.86box.net/job/86Box";
     private const string JENKINS_LASTBUILD = JENKINS_BASE_URL + "/lastSuccessfulBuild";
-    private const string ZIPFILE_ROMS = "Roms.zip";
-    private const string ROMS_COMMITS_URL = "https://api.github.com/repos/86Box/roms/commits";
+    private const string ROMS_URL = "https://api.github.com/repos/86Box/roms/";
+    private const string ROMS_COMMITS_URL = $"{ROMS_URL}commits";
+    private const string ROMS_ZIP_URL = $"https://github.com/86Box/roms/archive/refs/heads/master.zip";
 
     public event Action<string> Log;
     public event Action<string> ErrorLog;
@@ -108,16 +109,12 @@ public class Download86Manager : ReactiveObject
         IsUpdating = true;
         Progress = 0;
 
-        using var httpClient = GetHttpClient();
-
         AddLog($"Downloading artifact: {build.FileName}");
         string url = $"{JENKINS_BASE_URL}/{number}/artifact/{build.RelativePath}";
 
         ThreadPool.QueueUserWorkItem(async o =>
         {
-            Error("I'm tired");
-            Stop();
-            return;
+            using var httpClient = GetHttpClient();
 
             AddLog("Connecting to: " + url);
             long total_bytes_read = 0;
@@ -163,13 +160,7 @@ public class Download86Manager : ReactiveObject
                 AddLog($"Finished downloading 86Box artifact - Verifying");
                 var box_files = ExtractFilesFromZip(zip_data);
 
-                bool cont = true;
-                Dispatcher.UIThread.Invoke(() =>
-                {
-                    //Doing this on the UI thread until this function is thread safe
-                    cont = files(("86box", box_files));
-                });
-                if (!cont)
+                if (!files(("86box", box_files)))
                 {
                     Stop();
                     return;
@@ -179,12 +170,49 @@ public class Download86Manager : ReactiveObject
                 {
                     AddLog("");
                     AddLog("Downloading latest ROMs");
+                    AddLog("Connecting to: " + ROMS_ZIP_URL);
                     zip_data.Position = 0;
 
-                    throw new NotImplementedException();
+                    using (var response = await httpClient.GetAsync(ROMS_ZIP_URL))
+                    {
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            Error("Failed to contact server");
+                            Stop();
+                            return;
+                        }
+
+                        var roms_bytes = response.Content.Headers.ContentLength ?? 80 * 1024 * 1024;
+                        bytes_to_read += roms_bytes;
+                        AddLog($"Downloading {FolderSizeCalculator.ConvertBytesToReadableSize(roms_bytes)}");
+
+                        using (var zip = await response.Content.ReadAsStreamAsync())
+                        {
+                            var buffer = new byte[81920];
+                            int bytes_read;
+
+                            while ((bytes_read = await zip.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                            {
+                                zip_data.Write(buffer, 0, bytes_read);
+                                total_bytes_read += bytes_read;
+                                Progress = (double)total_bytes_read / estimated_bytes_to_read;
+                            }
+                        }
+                    }
+
+                    //This is a quick opperation, so I won't bother with having a progress bar or doing it on antoher thread, etc.
+                    AddLog($"Finished downloading ROM files - Verifying");
+                    box_files = ExtractFilesFromZip(zip_data);
+
+                    if (!files(("ROMs", box_files)))
+                    {
+                        Stop();
+                        return;
+                    }
                 }
 
-                throw new NotImplementedException();
+                AddLog($" -- Job done -- ");
+                Stop();
             }
             catch (Exception e)
             {
@@ -201,7 +229,7 @@ public class Download86Manager : ReactiveObject
     {
         var extractedFiles = new List<ExtractedFile>();
 
-        using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+        using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Read, true))
         {
             foreach (var entry in archive.Entries)
             {
@@ -323,6 +351,9 @@ public class Download86Manager : ReactiveObject
     private async Task<List<string>> FetchChangelog(JenkinsBuild build, int from, HttpClient httpClient)
     {
         List<string> changelog = new List<string>();
+
+        if (from == -1)
+            from = build.Number - 1;
 
         if (build.Number < from)
         {

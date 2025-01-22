@@ -20,6 +20,8 @@ using System.Runtime.InteropServices;
 using ZstdSharp.Unsafe;
 using _86BoxManager.Xplat;
 using System.Globalization;
+using Avalonia.Threading;
+using System.Xml.Linq;
 
 namespace _86BoxManager.Views;
 
@@ -61,41 +63,110 @@ public partial class dlgUpdater : Window
 
     private bool store_files((string name, List<Download86Manager.ExtractedFile> files) input)
     {
-        //Todo: don't do this on the UI thread. 
-
         if (input.name == "86box")
         {
-            string store_path = IOPath.GetFileName(_m.CurrentExe.VMExe);
+            string store_path = null;
+            string archive_path = null;
+            string vm_exe = null;
+            string archive_name = null;
+            string rom_dir = null;
+            bool preserve_roms = false;
+            bool dl_roms = false;
 
-            if (!string.IsNullOrEmpty(_m.ArhivePath) && !string.IsNullOrEmpty(_m.ArchiveName))
+            //The propper way of doing this is to collect all this info first. For now, we
+            //disable the settings tab and anything that can change state while proceesing
+            //is going on.
+            Dispatcher.UIThread.Invoke(() =>
             {
-                var path = IOPath.Combine(_m.ArhivePath, _m.ArchiveName);
-                _m.AddToUpdateLog($" - Archiving to: {path}");
+                vm_exe = _m.CurrentExe.VMExe;
+                if (!File.Exists(vm_exe))
+                    store_path = AppSettings.Settings.EXEdir;
+                else
+                    store_path = IOPath.GetDirectoryName(vm_exe);
+                archive_name = _m.ArchiveName;
+                archive_path = _m.ArchivePath;
+                preserve_roms = _m.PreserveROMs;
+                dl_roms = _m.DownloadROMs;
+                rom_dir = _m.CurrentExe.VMRoms;
+            });
+
+
+            if (!string.IsNullOrEmpty(archive_path) && !string.IsNullOrEmpty(archive_name))
+            {
+                var path = FolderHelper.EnsureUniqueFolderName(archive_path, archive_name);
+
+                _m.AddToUpdateLog($"Archiving to: {path}");
 
                 try
                 {
                     //Move files
                     Directory.CreateDirectory(path);
-                    var dir = IOPath.GetDirectoryName(_m.CurrentExe.VMExe);
+                    var dir = IOPath.GetDirectoryName(vm_exe);
                     foreach(var file in Directory.GetFiles(dir))
                     {
-                        File.Move(file, IOPath.Combine(path, IOPath.GetFileName(file)));
+                        var name = IOPath.GetFileName(file);
+                        File.Move(file, IOPath.Combine(path, name));
+                        _m.AddToUpdateLog($" - {name}");
                     }
 
-                    if (_m.PreserveROMs)
+                    if (preserve_roms && Directory.Exists(rom_dir))
                     {
+                        var dest_dir = IOPath.Combine(path, "roms");
+
                         //If we're downloading new roms, move them.
-                        //Else, copy.
-                        throw new NotImplementedException();
+                        if (dl_roms)
+                        {
+                            try 
+                            {
+                                _m.AddToUpdateLog("Moving ROMs to archive");
+                                _m.AddToUpdateLog(" - Source: " + rom_dir);
+                                _m.AddToUpdateLog(" - Dest: " + dest_dir);
+                                Directory.Move(rom_dir, dest_dir); 
+                            }
+                            catch { _m.ErrorToUpdateLog("Failed to archive roms"); }
+                        }
+                        else
+                        {
+                            //Not downloading new roms, don't archive. 
+                            //try
+                            //{
+                            //    _m.AddToUpdateLog("Copy ROMs to archive");
+                            //    _m.AddToUpdateLog(" - Source: " + rom_dir);
+                            //    _m.AddToUpdateLog(" - Dest: " + dest_dir);
+                            //    string[] files = Directory.GetFiles(rom_dir, "*.*", SearchOption.AllDirectories);
+                            //    _m.AddToUpdateLog(" - Files to copy: " + files.Length);
+
+                            //    Directory.CreateDirectory(dest_dir);
+                            //    foreach (string file in files)
+                            //    {
+                            //        // Determine the destination path
+                            //        string relativePath = file.Substring(rom_dir.Length + 1);
+                            //        string destFile = IOPath.Combine(dest_dir, relativePath);
+
+                            //        // Ensure the destination subdirectory exists
+                            //        Directory.CreateDirectory(IOPath.GetDirectoryName(destFile));
+
+                            //        // Copy the file
+                            //        File.Copy(file, destFile, true); // true to overwrite existing files
+                            //    }
+                            //}
+                            //catch { _m.ErrorToUpdateLog("Failed to archive roms"); }
+                        }
                     }
 
                     //Adds a new entery
-                    using (var t = AppSettings.Settings.BeginTransaction())
+                    Dispatcher.UIThread.Invoke(() =>
                     {
-                        string exe_name = IOPath.Combine(path, store_path);
-                        AppSettings.Settings.AddExe(_m.ArchiveName, exe_name, null, _m.ArchiveComment, _m.ArchiveVersion, _m.CurrentExe.Arch, _m.CurrentExe.Build, false);
-                        t.Commit();
-                    }
+                        using (var t = AppSettings.Settings.BeginTransaction())
+                        {
+                            string exe_name = IOPath.Combine((string)path, store_path);
+                            AppSettings.Settings.AddExe(_m.ArchiveName, exe_name, null, _m.ArchiveComment, _m.ArchiveVersion, _m.CurrentExe.Arch, _m.CurrentExe.Build, false);
+                            t.Commit();
+                        }
+
+                        _m.AddToUpdateLog($"Entery for {_m.ArchiveName} created");
+                        _m.AddToUpdateLog($"");
+                    });                    
                 }
                 catch (Exception e)
                 {
@@ -103,28 +174,86 @@ public partial class dlgUpdater : Window
                     _m.ErrorToUpdateLog("Failed to arhive current version - stopping.");
                     return false; 
                 }
+            }
 
-                _m.AddToUpdateLog($" - Writing new 86Box to: {store_path}");
+            _m.AddToUpdateLog($"Writing new 86Box to: {store_path}");
 
-                foreach(var file in input.files)
-                {
-                    var dest = IOPath.Combine(store_path, file.FilePath);
-                    if (File.Exists(dest))
-                        File.Delete(dest);
-                    File.WriteAllBytes(dest, file.FileData.ToArray());
-                }
+            foreach (var file in input.files)
+            {
+                if (file.FileData.Length == 0)
+                    continue;
 
-                _m.AddToUpdateLog($"86Box has been updated.");
+                var dest = IOPath.Combine(store_path, file.FilePath);
+                var dest_dir = IOPath.GetDirectoryName(dest);
+                if (!Directory.Exists(dest_dir))
+                    Directory.CreateDirectory(dest_dir);
+                else if (File.Exists(dest))
+                    File.Delete(dest);
+                _m.AddToUpdateLog($" - {IOPath.GetFileName(dest)}");
+                File.WriteAllBytes(dest, file.FileData.ToArray());
+            }
 
+            _m.AddToUpdateLog($"86Box has been updated.");
+
+            Dispatcher.UIThread.Invoke(() =>
+            {
                 _m.CurrentExe.Build = _m.DM.LatestBuild.Value.ToString(); //<-- Prevents the "update" button from enabeling again.
-                _m.CurrentExe.RaisePropertyChanged(nameof(ExeModel.Build)); 
+                _m.CurrentExe.RaisePropertyChanged(nameof(ExeModel.Build));
                 _m.CurrentExe.Version = "Unknown";
                 _m.CurrentExe.RaisePropertyChanged(nameof(ExeModel.Version));
                 _m.CurrentExe.Name = "Latest";
                 _m.CurrentExe.RaisePropertyChanged(nameof(ExeModel.Name));
+            });
 
-                return true;
+            return true;
+        }
+
+        if (input.name == "ROMs")
+        {
+            string rom_dir = null;
+
+            //The propper way of doing this is to collect all this info first. For now, we
+            //disable the settings tab and anything that can change state while proceesing
+            //is going on.
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                rom_dir = _m.CurrentExe.VMRoms;
+            });
+            try
+            {
+                _m.AddToUpdateLog($"Writing {input.files.Count} ROMs to: {rom_dir}");
+                Directory.CreateDirectory(rom_dir);
+                int strip = 0;
+                if (input.files.Count > 0)
+                {
+                    strip = input.files[0].FilePath.Length;
+                }
+
+                foreach (var file in input.files)
+                {
+                    if (file.FileData.Length == 0)
+                        continue;
+
+                    var dest = IOPath.Combine(rom_dir, file.FilePath.Substring(strip));
+                    var dest_dir = IOPath.GetDirectoryName(dest);
+                    if (!Directory.Exists(dest_dir))
+                        Directory.CreateDirectory(dest_dir);
+                    else if (File.Exists(dest))
+                        File.Delete(dest);
+                    File.WriteAllBytes(dest, file.FileData.ToArray());
+                }
+
+                _m.AddToUpdateLog($"ROMs has been updated.");
+
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    _m.RomsLastUpdated = _m.DM.LatestRomCommit;
+                    _m.RaisePropertyChanged(nameof(dlgUpdaterModel.RomsLastUpdated));
+                });
             }
+            catch (Exception e) { _m.ErrorToUpdateLog("Failed to update ROMs: "+e.Message); }
+
+            return true;
         }
 
         return false;
@@ -145,7 +274,7 @@ public partial class dlgUpdater : Window
             s.PreserveROMs = _m.PreserveROMs;
             s.PreferedOS = _m.SelectedOS.ID;
             s.PreferedCPUArch = _m.SelectedArch.ID;
-            s.ArchivePath = _m.ArhivePath;
+            s.ArchivePath = _m.ArchivePath;
 
             t.Commit();
         }
@@ -162,7 +291,7 @@ public partial class dlgUpdater : Window
 
         if (!string.IsNullOrWhiteSpace(fldName))
         {
-            _m.ArhivePath = fldName;
+            _m.ArchivePath = fldName;
 
             if (!FolderHelper.IsDirectoryWritable(fldName))
             {
@@ -213,7 +342,7 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
     /// </summary>
     public bool HasCLError { get; private set; }
 
-    public DateTime? RomsLastUpdated { get; private set; }
+    public DateTime? RomsLastUpdated { get; set; }
     public string RomsLastUpdatedStr
     {
         get
@@ -287,7 +416,7 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
         }
     }
 
-    public string ArhivePath
+    public string ArchivePath
     {
         get => _archive_path;
         set
@@ -313,7 +442,7 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
         {
             int b;
             if (!int.TryParse(CurrentExe.Build, out b))
-                b = 6000;
+                b = -1;
 
             return b;
         }
@@ -328,7 +457,7 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
                    _me.PrefNDR != PrefNDR ||
                    _me.UpdateROMs != UpdateROMs ||
                    _me.PreserveROMs != PreserveROMs ||
-                   !string.Equals(_me.ArhivePath, ArhivePath);
+                   !string.Equals(_me.ArchivePath, ArchivePath);
         }
     }
 
@@ -409,7 +538,7 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             UpdateROMs = s.UpdateROMs;
             PreserveROMs = s.PreserveROMs;
             PrefNDR = s.PrefNDR;
-            ArhivePath = s.ArchivePath;
+            ArchivePath = s.ArchivePath;
 
             var exe_fld = s.EXEdir;
             Has86BoxFolder = !string.IsNullOrWhiteSpace(exe_fld) && Directory.Exists(exe_fld);
@@ -540,7 +669,7 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
 
     private void ErrorToChangeLog(string s)
     {
-        HasCLError = true;
+        HasCLError = DM.LatestBuild == null;
         ChangeLog.Add(new LogEntery() { Entery = s, IsError = true });
         this.RaisePropertyChanged(nameof(HasCLError));
     }
