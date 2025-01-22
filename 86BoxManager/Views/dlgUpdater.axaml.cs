@@ -19,6 +19,7 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using ZstdSharp.Unsafe;
 using _86BoxManager.Xplat;
+using System.Globalization;
 
 namespace _86BoxManager.Views;
 
@@ -53,7 +54,9 @@ public partial class dlgUpdater : Window
     {
         _m.TabIndex = 1;
         _m.DetachChangelog();
+        _m.HasUpdated = true;
         _dm.Update86Box(_m.SelectedArtifact, _dm.LatestBuild.Value, _m.UpdateROMs, store_files);
+        _m.RaisePropertyChanged(nameof(dlgUpdaterModel.HasUpdated));
     }
 
     private bool store_files((string name, List<Download86Manager.ExtractedFile> files) input)
@@ -151,7 +154,7 @@ public partial class dlgUpdater : Window
         _m.RaisePropertyChanged(nameof(dlgUpdaterModel.HasChanges));
     }
 
-    private async void btnBrowse_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void btnBrowse_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         var text = "Select a folder where 86Box builds will be archived";
 
@@ -187,9 +190,13 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
     public bool Has86BoxExe { get; private set; }
     public bool BoxFolderExist { get; private set; }
 
+    public bool HasUpdated { get; set; }
+
     public int TabIndex { get => _tab_idx; set => this.RaiseAndSetIfChanged(ref _tab_idx, value); }
 
     public bool CanUpdate { get => _dm.LatestBuild != null && _dm.LatestBuild > CurrentBuild; }
+
+    public bool DownloadROMs { get; set; }
 
     public bool CanArchive { get => !string.IsNullOrWhiteSpace(_archive_path); }
 
@@ -205,6 +212,18 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
     /// True if there is an error in the change log
     /// </summary>
     public bool HasCLError { get; private set; }
+
+    public DateTime? RomsLastUpdated { get; private set; }
+    public string RomsLastUpdatedStr
+    {
+        get
+        {
+            var d = RomsLastUpdated;
+            if (d == null) return "N/A";
+
+            return d.Value.ToString("d", CultureInfo.CurrentCulture);
+        }
+    }
 
     public IDtoNAME SelectedArch
     {
@@ -393,7 +412,6 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             ArhivePath = s.ArchivePath;
 
             var exe_fld = s.EXEdir;
-            var rom_fld = s.ROMdir;
             Has86BoxFolder = !string.IsNullOrWhiteSpace(exe_fld) && Directory.Exists(exe_fld);
 
             if (!Has86BoxFolder)
@@ -403,7 +421,17 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             CurrentExe.Arch = "N/A";
             CurrentExe.Build = "N/A";
             CurrentExe.VMExe = "N/A";
-            CurrentExe.VMRoms = "N/A";
+            //CurrentExe.VMRoms = "N/A";
+
+            //We will always have a ROM folder, as the 86Box folder is required to exist. Though, the roms
+            //folder might not exist.
+            CurrentExe.VMRoms = s.ROMdir;
+            if (string.IsNullOrWhiteSpace(CurrentExe.VMRoms) || !FolderHelper.IsValidFilePath(CurrentExe.VMRoms))
+                CurrentExe.VMRoms = IOPath.Combine(exe_fld, "roms");
+
+            //I'm not sure about this.
+            if (Directory.Exists(CurrentExe.VMRoms))
+                RomsLastUpdated = FolderHelper.GetAModifiedDate(CurrentExe.VMRoms);
 
             var (exe, info) = VMCenter.GetPathExeInfo();
             if (info != null)
@@ -457,8 +485,14 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             if (candidate == null && Artifacts.Count > 0)
                 candidate = Artifacts[0];
             SelectedArtifact = candidate;
-            this.RaisePropertyChanged(nameof(SelectedArtifact));
 
+            if (UpdateROMs && (_dm.LatestRomCommit == null || RomsLastUpdated == null || _dm.LatestRomCommit.Value > RomsLastUpdated.Value))
+            {
+                DownloadROMs = true;
+            }
+
+            this.RaisePropertyChanged(nameof(SelectedArtifact));
+            this.RaisePropertyChanged(nameof(DownloadROMs));
             this.RaisePropertyChanged(nameof(CanUpdate));
         }
     }

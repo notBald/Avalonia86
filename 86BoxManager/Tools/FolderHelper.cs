@@ -10,6 +10,34 @@ namespace _86BoxManager.Tools
     internal static class FolderHelper
     {
         public delegate bool ProgressCallback(int number);
+        public static bool IsValidFilePath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return false;
+            }
+
+            // Check for invalid characters
+            foreach (char c in Path.GetInvalidPathChars())
+            {
+                if (path.Contains(c))
+                {
+                    return false;
+                }
+            }
+
+            // Check if the path is well-formed
+            try
+            {
+                string fullPath = Path.GetFullPath(path);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         public static bool IsDirectoryWritable(string directoryPath)
         {
@@ -399,6 +427,24 @@ namespace _86BoxManager.Tools
                 return Directory.GetCreationTime(path);
             }
             catch { return DateTime.Now; }
+        }
+
+        public static DateTime? GetAModifiedDate(string folderPath)
+        {
+            if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
+                return null;
+
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles(folderPath, "*.*", SearchOption.AllDirectories))
+                    return File.GetLastWriteTime(file);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            return null;
         }
 
         public static string EnsureUniqueFolderName(string path, string folderName)

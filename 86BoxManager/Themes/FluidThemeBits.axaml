@@ -37,6 +37,10 @@
 			<SolidColorBrush x:Key="SystemControlBackgroundListLowBrush" Color="{StaticResource SystemListLowColor}" />
 
 			<!-- Colors used by the Combobox (Avalonia.Themes.Fluent/Accents/BaseResources.xaml) -->
+			<SolidColorBrush x:Key="SystemControlBackgroundBaseLowBrush" Color="{StaticResource SystemBaseLowColor}" />
+			<SolidColorBrush x:Key="SystemControlDisabledBaseLowBrush" Color="{StaticResource SystemBaseLowColor}" />
+			<SolidColorBrush x:Key="SystemControlDisabledBaseMediumLowBrush"
+                       Color="{StaticResource SystemBaseMediumLowColor}" />
 			<SolidColorBrush x:Key="SystemControlBackgroundAltMediumLowBrush" Color="{StaticResource SystemAltMediumLowColor}" />
 			<SolidColorBrush x:Key="SystemControlForegroundBaseHighBrush" Color="{StaticResource SystemBaseHighColor}" />
 			<SolidColorBrush x:Key="SystemControlForegroundBaseMediumBrush" Color="{StaticResource SystemBaseMediumColor}" />
@@ -203,6 +207,10 @@
 			<SolidColorBrush x:Key="SystemControlBackgroundListLowBrush" Color="{StaticResource SystemListLowColor}" />
 
 			<!-- Colors used by the Combobox (Avalonia.Themes.Fluent/Accents/BaseResources.xaml) -->
+			<SolidColorBrush x:Key="SystemControlBackgroundBaseLowBrush" Color="{StaticResource SystemBaseLowColor}" />
+			<SolidColorBrush x:Key="SystemControlDisabledBaseLowBrush" Color="{StaticResource SystemBaseLowColor}" />
+			<SolidColorBrush x:Key="SystemControlDisabledBaseMediumLowBrush"
+                       Color="{StaticResource SystemBaseMediumLowColor}" />
 			<SolidColorBrush x:Key="SystemControlBackgroundAltMediumLowBrush" Color="{StaticResource SystemAltMediumLowColor}" />
 			<SolidColorBrush x:Key="SystemControlForegroundBaseHighBrush" Color="{StaticResource SystemBaseHighColor}" />
 			<SolidColorBrush x:Key="SystemControlForegroundBaseMediumBrush" Color="{StaticResource SystemBaseMediumColor}" />

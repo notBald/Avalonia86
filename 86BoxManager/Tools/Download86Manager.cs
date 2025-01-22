@@ -1,14 +1,15 @@
 ﻿using Avalonia.Threading;
+using DynamicData;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using DynamicData;
 
 namespace _86BoxManager.Tools;
 
@@ -17,7 +18,7 @@ public class Download86Manager : ReactiveObject
     private double _current_progress;
     private bool _is_working, _is_fetching_log, _is_updating;
     private int? _latest_build;
-    private HttpClient _httpClient;
+    private DateTime? _last_commit;
 
     private const string JENKINS_BASE_URL = "https://ci.86box.net/job/86Box";
     private const string JENKINS_LASTBUILD = JENKINS_BASE_URL + "/lastSuccessfulBuild";
@@ -70,6 +71,19 @@ public class Download86Manager : ReactiveObject
         }
     }
 
+    public DateTime? LatestRomCommit
+    {
+        get => _last_commit;
+        set
+        {
+            //Invoke isn't strickly needed, but avoids potential race conditions.
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                this.RaiseAndSetIfChanged(ref _last_commit, value);
+            });
+        }
+    }
+
     public double Progress
     {
         get => _current_progress;
@@ -81,18 +95,30 @@ public class Download86Manager : ReactiveObject
 
     public SourceCache<JenkinsBase.Artifact, string> Artifacts = new(s => s.FileName);
 
+    private HttpClient GetHttpClient()
+    {
+        var h = new HttpClient();
+        h.DefaultRequestHeaders.Add("User-Agent", "Avalonia86");
+        return h;
+    }
+
     public void Update86Box(JenkinsBase.Artifact build, int number, bool update_roms, Func<(string, List<ExtractedFile>), bool> files)
     {
         IsWorking = true;
         IsUpdating = true;
         Progress = 0;
-        if (_httpClient == null)
-            _httpClient = new HttpClient();
+
+        using var httpClient = GetHttpClient();
+
         AddLog($"Downloading artifact: {build.FileName}");
         string url = $"{JENKINS_BASE_URL}/{number}/artifact/{build.RelativePath}";
 
         ThreadPool.QueueUserWorkItem(async o =>
         {
+            Error("I'm tired");
+            Stop();
+            return;
+
             AddLog("Connecting to: " + url);
             long total_bytes_read = 0;
             long bytes_to_read;
@@ -102,7 +128,7 @@ public class Download86Manager : ReactiveObject
             {
                 var zip_data = new MemoryStream();
 
-                using (var response = await _httpClient.GetAsync(url))
+                using (var response = await httpClient.GetAsync(url))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
@@ -199,20 +225,51 @@ public class Download86Manager : ReactiveObject
 
     public void FetchMetadata(int current_build)
     {
+        const string jenkins_url = $"{JENKINS_LASTBUILD}/api/json";
+        const string github_url = $"{ROMS_COMMITS_URL}?per_page=1";
+
         IsWorking = true;
-        IsFetching = true;
-        _httpClient = new HttpClient();
-        string url = $"{JENKINS_LASTBUILD}/api/json";
-        AddLog("Fetching list of builds");
+        IsFetching = true;        
 
         ThreadPool.QueueUserWorkItem(async o =>
         {
-            JenkinsBuild job;
-            AddLog("Connecting to: "+url);
+            using var httpClient = GetHttpClient();
 
             try
             {
-                using (var response = await _httpClient.GetAsync(url))
+                GithubCommit[] gjob;
+
+                AddLog("Connecting to: " + ROMS_COMMITS_URL);
+                using (var response = await httpClient.GetAsync(github_url))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Error("Failed to contact server");
+                        Stop();
+                        return;
+                    }
+
+                    using (var json_str = await response.Content.ReadAsStreamAsync())
+                    {
+                        gjob = JsonSerializer.Deserialize<GithubCommit[]>(json_str);
+                    }
+                }
+
+                if (gjob.Length == 0 || gjob[0].Commit == null || gjob[0].Commit.Committer == null)
+                {
+                    Error($"Parsing failed, invalid response");
+                    Stop();
+                    return;
+                }
+
+                var date = gjob[0].Commit.Committer.Date;
+                AddLog("ROMs last updated: " + date.ToString("d", CultureInfo.CurrentCulture));
+                AddLog("");
+                LatestRomCommit = date;
+
+                JenkinsBuild job;
+                AddLog("Connecting to: " + jenkins_url);
+                using (var response = await httpClient.GetAsync(jenkins_url))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
@@ -225,13 +282,14 @@ public class Download86Manager : ReactiveObject
                     {
                         //AddLog($"Parsing {FolderSizeCalculator.ConvertBytesToReadableSize(json_str.Length)} of data");
                         job = JsonSerializer.Deserialize<JenkinsBuild>(json_str);
-                        if (job.Artifacts == null || job.Number < 6507 || job.Url == null || job.Artifacts.Count < 1)
-                        {
-                            Error($"Parsing failed, invalid response");
-                            Stop();
-                            return;
-                        }
                     }
+                }
+
+                if (job.Artifacts == null || job.Number < 6507 || job.Url == null || job.Artifacts.Count < 1)
+                {
+                    Error($"Parsing failed, invalid response");
+                    Stop();
+                    return;
                 }
 
                 //Note, SourceCache is thread safe
@@ -242,7 +300,7 @@ public class Download86Manager : ReactiveObject
                 LatestBuild = job.Number;
 
                 //AddLog($"Latest build is {job.Number}");
-                var changelog = await FetchChangelog(job, current_build);
+                var changelog = await FetchChangelog(job, current_build, httpClient);
 
                 if (changelog.Count == 0)
                     AddLog($" -- There was no enteries in the changelog --");
@@ -262,7 +320,7 @@ public class Download86Manager : ReactiveObject
         });
     }
 
-    private async Task<List<string>> FetchChangelog(JenkinsBuild build, int from)
+    private async Task<List<string>> FetchChangelog(JenkinsBuild build, int from, HttpClient httpClient)
     {
         List<string> changelog = new List<string>();
 
@@ -284,7 +342,7 @@ public class Download86Manager : ReactiveObject
         {
             bool sucess = false;
 
-            try { sucess = await FetchChangelog(c, changelog); }
+            try { sucess = await FetchChangelog(c, changelog, httpClient); }
             catch
             { }
 
@@ -298,11 +356,11 @@ public class Download86Manager : ReactiveObject
         return changelog;
     }
 
-    private async Task<bool> FetchChangelog(int build, List<string> changelog)
+    private async Task<bool> FetchChangelog(int build, List<string> changelog, HttpClient httpClient)
     {
         string url = $"{JENKINS_BASE_URL}/{build}/api/json";
         JenkinsRun job;
-        using (var response = await _httpClient.GetAsync(url))
+        using (var response = await httpClient.GetAsync(url))
         {
             response.EnsureSuccessStatusCode();
             using (var json_str = await response.Content.ReadAsStreamAsync())

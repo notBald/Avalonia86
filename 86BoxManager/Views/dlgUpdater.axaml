@@ -36,7 +36,15 @@
 	<Grid>
 		<DockPanel Margin="12" IsVisible="{Binding Has86BoxFolder, Mode=OneTime}">
 			<Grid ColumnDefinitions="Auto, *, Auto" DockPanel.Dock="Bottom">
-				<Button IsEnabled="{Binding CanUpdate}" Margin="0, 0, 0, 0" Click="btnUpdatel_Click">Update to latest 86Box</Button>
+				<Button Margin="0, 0, 0, 0" Click="btnUpdatel_Click">
+					<Button.IsEnabled>
+						<MultiBinding Converter="{x:Static BoolConverters.And}">
+							<Binding Path="CanUpdate" Mode="OneWay" />
+							<Binding Path="!DM.IsWorking" Mode="OneWay" />
+						</MultiBinding>
+					</Button.IsEnabled>
+					Update to latest 86Box
+				</Button>
 				<StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
 					<Button Content="Save settings" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsEnabled="{Binding HasChanges}" Click="btnSave_Click" />
 					<Button Content="Close" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsCancel="True" Click="btnCancel_Click" />
@@ -111,12 +119,28 @@
 					<DockPanel>
 						<StackPanel DockPanel.Dock="Top">
 							<gb:GroupBox Header="Select new version" Theme="{StaticResource GroupBoxClassic}">
-								<Grid Margin="20, 10" ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto">
+								<Grid Margin="20, 10" ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto">
 									<TextBlock Text="Select artifact:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
-									<ComboBox ItemsSource="{Binding Artifacts}" SelectedItem="{Binding SelectedArtifact}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" />
+									<ComboBox ItemsSource="{Binding Artifacts}" 
+											  SelectedItem="{Binding SelectedArtifact}" 
+											  Grid.Column="2" Grid.Row="0" 
+											  HorizontalAlignment="Stretch" 
+											  IsEnabled="{Binding !HasUpdated}"/>
+									<CheckBox IsChecked="{Binding DownloadROMs}" 
+											  Grid.Row="1" Grid.ColumnSpan="3" 
+											  Content="Also download ROMs" 
+											  Margin="0, 10, 0, 0" 
+											  HorizontalAlignment="Right"
+											  IsEnabled="{Binding !HasUpdated}"/>
 								</Grid>
 							</gb:GroupBox>
-							<gb:GroupBox Header="Archive current build" Theme="{StaticResource GroupBoxClassic}" IsVisible="{Binding CanArchive}">
+							<gb:GroupBox Header="Archive current build" Theme="{StaticResource GroupBoxClassic}">
+								<gb:GroupBox.IsVisible>
+									<MultiBinding Converter="{x:Static BoolConverters.And}">
+										<Binding Path="CanArchive" Mode="OneWay" />
+										<Binding Path="!HasUpdated" Mode="OneWay" />
+									</MultiBinding>
+								</gb:GroupBox.IsVisible>
 								<StackPanel Margin="20, 10">
 									<Grid ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto, Auto">
 										<TextBlock Text="Name:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
@@ -164,9 +188,11 @@
 							</Grid>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Firmware / ROMs that will be updated" Theme="{StaticResource GroupBoxClassic}">
-							<Grid Margin="20, 10" ColumnDefinitions="Auto, *" RowDefinitions="Auto">
+							<Grid Margin="20, 10" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
 								<TextBlock Text="Path:" Grid.Column="0" Grid.Row="0" />
 								<SelectableTextBlock Text="{Binding CurrentExe.VMRoms}" Grid.Column="1" Grid.Row="0" />
+								<TextBlock Text="Last updated:" Grid.Column="0" Grid.Row="1" />
+								<SelectableTextBlock Text="{Binding RomsLastUpdatedStr}" Grid.Column="1" Grid.Row="1" />
 							</Grid>
 						</gb:GroupBox>
 					</StackPanel>
@@ -186,13 +212,16 @@
 							</StackPanel>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Selection of new build" Theme="{StaticResource GroupBoxClassic}" Grid.Row="1" Margin="0, 0, 0, 10">
-							<Grid ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto, Auto, Auto" Margin="5, 2">
+							<Grid ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto" Margin="5, 2">
 								<TextBlock Text="Prefered CPU arch:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
 								<ComboBox ItemsSource="{Binding Architectures}" SelectedItem="{Binding SelectedArch}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" />
 								<TextBlock Text="Prefered OS:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" />
 								<ComboBox ItemsSource="{Binding OSs}" SelectedItem="{Binding SelectedOS}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" />
 								<CheckBox IsChecked="{Binding PrefNDR}" Content="Prefer New Dynamic Recompiler" Grid.Row="2" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
 								<CheckBox IsChecked="{Binding UpdateROMs}" Content="Also update ROMs / Firmware" Grid.Row="3" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
+								<TextBlock Grid.Row="4" Grid.ColumnSpan="3" FontStyle="Italic" TextWrapping="WrapWithOverflow">
+									If update roms is set, Avalonia86 will check the box if the stored ROMs are older than the last Github commit on the ROMs repository. 
+								</TextBlock>
 							</Grid>
 						</gb:GroupBox>
 					</Grid>
