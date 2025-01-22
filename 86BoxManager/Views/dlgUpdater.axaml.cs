@@ -58,6 +58,8 @@ public partial class dlgUpdater : Window
 
     private bool store_files((string name, List<Download86Manager.ExtractedFile> files) input)
     {
+        //Todo: don't do this on the UI thread. 
+
         if (input.name == "86box")
         {
             string store_path = IOPath.GetFileName(_m.CurrentExe.VMExe);

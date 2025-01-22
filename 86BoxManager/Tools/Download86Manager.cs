@@ -140,6 +140,7 @@ public class Download86Manager : ReactiveObject
                 bool cont = true;
                 Dispatcher.UIThread.Invoke(() =>
                 {
+                    //Doing this on the UI thread until this function is thread safe
                     cont = files(("86box", box_files));
                 });
                 if (!cont)
@@ -153,7 +154,11 @@ public class Download86Manager : ReactiveObject
                     AddLog("");
                     AddLog("Downloading latest ROMs");
                     zip_data.Position = 0;
+
+                    throw new NotImplementedException();
                 }
+
+                throw new NotImplementedException();
             }
             catch (Exception e)
             {
