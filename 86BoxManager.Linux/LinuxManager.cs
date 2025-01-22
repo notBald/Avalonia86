@@ -14,6 +14,29 @@ namespace _86BoxManager.Linux
     {
         public LinuxManager() : base(GetTmpDir()) { }
 
+        public override IVerInfo Get86BoxInfo(Stream file)
+        {
+            CommonVerInfo ei = null;
+
+            if (AppImageChecker.TryGetAppInfo(file, out var info))
+            {
+                if (info.Version != null)
+                {
+                    var version = AppImageInfo.ParseVersion(info.Version);
+                    ei = new CommonVerInfo()
+                    {
+                        FilePrivatePart = version[3],
+                        FileMajorPart = version[0],
+                        FileMinorPart = version[1],
+                        FileBuildPart = version[2],
+                        Arch = info.Arch
+                    };
+                }
+            }
+
+            return ei;
+        }
+
         public override IVerInfo Get86BoxInfo(string path)
         {
             CommonVerInfo ei = null;

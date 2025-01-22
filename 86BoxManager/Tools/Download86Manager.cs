@@ -1,7 +1,10 @@
-﻿using Avalonia.Threading;
+﻿using _86BoxManager.Xplat;
+using Avalonia.Threading;
 using DynamicData;
+using DynamicData.Kernel;
 using ReactiveUI;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -157,13 +160,55 @@ public class Download86Manager : ReactiveObject
                 }
 
                 //This is a quick opperation, so I won't bother with having a progress bar or doing it on antoher thread, etc.
-                AddLog($"Finished downloading 86Box artifact - Verifying");
-                var box_files = ExtractFilesFromZip(zip_data);
-
-                if (!files(("86box", box_files)))
+                if (build.FileName.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    Stop();
-                    return;
+                    AddLog($"Finished downloading 86Box artifact - Verifying");
+                    var box_files = ExtractFilesFromZip(zip_data);
+
+                    if (!files(("86box", box_files)))
+                    {
+                        Stop();
+                        return;
+                    }
+                }
+                else if (build.FileName.EndsWith(".AppImage", StringComparison.InvariantCultureIgnoreCase)) 
+                {
+                    AddLog($"Finished downloading 86Box artifact - Verifying:");
+                    try
+                    {
+                        zip_data.Position = 0;
+
+                        //var test = Platforms.RequestManager(System.Runtime.InteropServices.OSPlatform.Linux);
+                        //var vii = test.Get86BoxInfo(zip_data);
+
+                        var vi = Platforms.Manager.Get86BoxInfo(zip_data);
+                        if (vi == null)
+                        {
+                            Error(" - AppImage is not valid");
+                            Stop();
+                            return;
+                        }
+
+                        AddLog($" - 86Box version {vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart} - Build: {vi.FilePrivatePart}");
+                    } catch { AddLog(" - Skipping validation"); }
+
+                    zip_data.Position = 0;
+                    var ef = new ExtractedFile() { FileData = zip_data, FilePath = build.FileName };
+                    var l = new List<ExtractedFile>
+                    {
+                        new ExtractedFile() { FilePath = "", FileData = new MemoryStream() },
+                        ef
+                    };
+
+                    if (!files(("86box.AppImage", l)))
+                    {
+                        Stop();
+                        return;
+                    }
+                }
+                else 
+                {
+                    throw new NotSupportedException(build.FileName);
                 }
 
                 if (update_roms)
@@ -202,7 +247,7 @@ public class Download86Manager : ReactiveObject
 
                     //This is a quick opperation, so I won't bother with having a progress bar or doing it on antoher thread, etc.
                     AddLog($"Finished downloading ROM files - Verifying");
-                    box_files = ExtractFilesFromZip(zip_data);
+                    var box_files = ExtractFilesFromZip(zip_data);
 
                     if (!files(("ROMs", box_files)))
                     {

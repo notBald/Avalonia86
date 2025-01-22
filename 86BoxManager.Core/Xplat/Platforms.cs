@@ -41,5 +41,13 @@ namespace _86BoxManager.Xplat
 
             throw new InvalidOperationException("Not supported OS! Sorry!");
         }
+
+        public static IManager RequestManager(OSPlatform os)
+        {
+            if (OSPlatform.Linux == os)
+                return new LinuxManager();
+
+            return null;
+        }
     }
 }

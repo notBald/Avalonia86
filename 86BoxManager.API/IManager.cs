@@ -13,6 +13,8 @@ namespace _86BoxManager.API
 
         IVerInfo Get86BoxInfo(string path);
 
+        IVerInfo Get86BoxInfo(Stream file);
+
         IVerInfo GetBoxVersion(string exeDir);
 
         bool IsExecutable(string path);

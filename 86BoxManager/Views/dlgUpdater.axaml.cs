@@ -63,7 +63,7 @@ public partial class dlgUpdater : Window
 
     private bool store_files((string name, List<Download86Manager.ExtractedFile> files) input)
     {
-        if (input.name == "86box")
+        if (input.name == "86box" || input.name == "86box.AppImage")
         {
             string store_path = null;
             string archive_path = null;
