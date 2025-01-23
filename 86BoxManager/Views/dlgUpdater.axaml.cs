@@ -77,7 +77,7 @@ public partial class dlgUpdater : Window
         var dj = new Download86Manager.DownloadJob(_m.SelectedArtifact, _dm.LatestBuild.Value)
         {
             Move86BoxToArchive = !string.IsNullOrWhiteSpace(_m.ArchiveName),
-            DownloadROMs = _m.UpdateROMs,
+            DownloadROMs = _m.DownloadROMs,
             ArchiveName = _m.ArchiveName,
             ArchivePath = _m.ArchivePath,
             PreserveROMs = _m.PreserveROMs,

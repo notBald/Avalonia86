@@ -3,20 +3,16 @@ using _86BoxManager.Views;
 using _86BoxManager.Xplat;
 using Avalonia.Threading;
 using DynamicData;
-using DynamicData.Kernel;
 using ReactiveUI;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
-using System.Runtime.Intrinsics.Arm;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using static _86BoxManager.Tools.ProgressCalculator;
 
 namespace _86BoxManager.Tools;
 
@@ -220,7 +216,7 @@ public class Download86Manager : ReactiveObject
     {
         //Since  this is done on the UI thread, it's thread safe, as the other
         //thread will never set this false until we're off the UI thread.
-        //if (!IsWorking) //<-- Need to make this function capable of running in parralell before uncommenting this
+        if (!IsWorking)
             IsWorking = true;
         IsUpdating = true;
         Progress = 0;
@@ -230,18 +226,45 @@ public class Download86Manager : ReactiveObject
 
         //Todo: Adjust this to only include the operations that will actually be done. Don't
         //      remove enteries in the array, just set them to zero.
-        var calc = new ProgressCalculator(
-        [
-            33, //Download86Box
+        double[] prog = [
+            26, //Download86Box
             3,  //VerifyExtract86Box
             1,  //Move86BoxToArchive
             1,  //MoveROMsToArchive
             1,  //Store86BoxToDisk
-            21, //DownloadROMs
-            20, //ExtractROMs
-            20  //WriteROMsToDisk
-        ]);
+            38, //DownloadROMs
+            15, //ExtractROMs
+            15  //WriteROMsToDisk
+        ];
 
+        if (!job.Move86BoxToArchive)
+        {
+            prog[Operation.Move86BoxToArchive] = 0;
+            prog[Operation.MoveROMsToArchive] = 0;
+        }
+        if (!job.PreserveROMs)
+            prog[Operation.MoveROMsToArchive] = 0;
+        if (!job.DownloadROMs)
+        {
+            prog[Operation.DownloadROMs] = 0;
+            prog[Operation.ExtractROMs] = 0;
+            prog[Operation.WriteROMsToDisk] = 0;
+            prog[Operation.MoveROMsToArchive] = 0;
+        }
+
+        {
+            double total = 0;
+            foreach(var val in prog)
+                total += val;
+
+            if (total < 100)
+            {
+                for(int c=0; c < prog.Length; c++)
+                    prog[c] = prog[c] / total * 100;
+            }
+        }
+
+        var calc = new ProgressCalculator(prog);
         ThreadPool.QueueUserWorkItem(async o =>
         {
             using var httpClient = GetHttpClient();
@@ -557,6 +580,8 @@ public class Download86Manager : ReactiveObject
 
         for (int c = 0; c < files.Count; c++)
         {
+            Progress = calc.CalculateProgress(Download86Manager.Operation.Store86BoxToDisk, c, files.Count);
+
             var file = files[c];
 
             if (file.FileData.Length == 0)
@@ -570,9 +595,8 @@ public class Download86Manager : ReactiveObject
                 File.Delete(dest);
             job.AddLog($" - {Path.GetFileName(dest)}");
             File.WriteAllBytes(dest, file.FileData.ToArray());
-
-            Progress = calc.CalculateProgress(Download86Manager.Operation.Store86BoxToDisk, c, files.Count);
         }
+        Progress = calc.CalculateProgress(Download86Manager.Operation.Store86BoxToDisk, 1, 1);
 
         job.AddLog($"86Box has been updated.");
 
