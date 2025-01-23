@@ -220,7 +220,11 @@
 						</MenuItem.Icon>
 					</MenuItem>
 					<Separator/>
-					<MenuItem Header="Update 86Box" Command="{Binding Update86Cmd}" />
+					<MenuItem Header="Update 86Box" Command="{Binding Update86Cmd}">
+						<MenuItem.Icon>
+							<Image Source="/Assets/Actions/27 - update 32x32.png" />
+						</MenuItem.Icon>
+					</MenuItem>
 				</MenuItem>
 			</Menu>
 			<Rectangle Fill="{DynamicResource LineColor}" Height="2"/>
