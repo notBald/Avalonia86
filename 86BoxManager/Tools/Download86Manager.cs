@@ -770,6 +770,10 @@ public class Download86Manager : ReactiveObject
             return changelog;
         }
 
+        //Limit how many we fetch
+        if (build.Number - from > 50)
+            from = build.Number - 50;
+
         fjob.AddLog($"Fetching changelog going from {from} to {build.Number}");
         fjob.AddLog($" -- Changelog start --");
         for (int c = from + 1; c <= build.Number; c++)
