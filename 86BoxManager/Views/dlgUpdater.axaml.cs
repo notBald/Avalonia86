@@ -34,10 +34,18 @@ public partial class dlgUpdater : Window
         if (!Design.IsDesignMode)
             Loaded += DlgUpdater_Loaded;
         Closed += DlgUpdater_Closed;
+
+        _m.UpdateLog.CollectionChanged += UpdateLog_CollectionChanged;
+    }
+
+    private void UpdateLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        Dispatcher.UIThread.Post(() => UptScrollViewer.ScrollToEnd());
     }
 
     private void DlgUpdater_Closed(object sender, EventArgs e)
     {
+        _m.UpdateLog.CollectionChanged -= UpdateLog_CollectionChanged;
         _m.Dispose();
     }
 
@@ -55,9 +63,9 @@ public partial class dlgUpdater : Window
         _m.RaisePropertyChanged(nameof(dlgUpdaterModel.HasUpdated));
     }
 
-    private bool store_files((string name, List<Download86Manager.ExtractedFile> files) input)
+    private bool store_files(string name, List<Download86Manager.ExtractedFile> files, ProgressCalculator calc)
     {
-        if (input.name == "86box" || input.name == "86box.AppImage")
+        if (name == "86box" || name == "86box.AppImage")
         {
             string store_path = null;
             string archive_path = null;
@@ -96,11 +104,14 @@ public partial class dlgUpdater : Window
                     //Move files
                     Directory.CreateDirectory(path);
                     var dir = IOPath.GetDirectoryName(vm_exe);
-                    foreach(var file in Directory.GetFiles(dir))
+                    var dir_files = Directory.GetFiles(dir);
+                    for (int c = 0; c < dir_files.Length; c++)
                     {
-                        var name = IOPath.GetFileName(file);
-                        File.Move(file, IOPath.Combine(path, name));
-                        _m.AddToUpdateLog($" - {name}");
+                        var fname = IOPath.GetFileName(dir_files[c]);
+                        File.Move(dir_files[c], IOPath.Combine(path, fname));
+                        _m.AddToUpdateLog($" - {fname}");
+
+                        _dm.Progress = calc.CalculateProgress(Download86Manager.Operation.Move86BoxToArchive, c, dir_files.Length);
                     }
 
                     if (preserve_roms && Directory.Exists(rom_dir))
@@ -115,7 +126,8 @@ public partial class dlgUpdater : Window
                                 _m.AddToUpdateLog("Moving ROMs to archive");
                                 _m.AddToUpdateLog(" - Source: " + rom_dir);
                                 _m.AddToUpdateLog(" - Dest: " + dest_dir);
-                                Directory.Move(rom_dir, dest_dir); 
+                                Directory.Move(rom_dir, dest_dir);
+                                _dm.Progress = calc.CalculateProgress(Download86Manager.Operation.MoveROMsToArchive, 0, 1);
                             }
                             catch { _m.ErrorToUpdateLog("Failed to archive roms"); }
                         }
@@ -160,7 +172,9 @@ public partial class dlgUpdater : Window
 
                         _m.AddToUpdateLog($"Entery for {_m.ArchiveName} created");
                         _m.AddToUpdateLog($"");
-                    });                    
+                    });
+
+                    _dm.Progress = calc.CalculateProgress(Download86Manager.Operation.Move86BoxToArchive, 1, 1);
                 }
                 catch (Exception e)
                 {
@@ -172,8 +186,10 @@ public partial class dlgUpdater : Window
 
             _m.AddToUpdateLog($"Writing new 86Box to: {store_path}");
 
-            foreach (var file in input.files)
+            for (int c = 0; c < files.Count; c++)
             {
+                var file = files[c];
+
                 if (file.FileData.Length == 0)
                     continue;
 
@@ -185,6 +201,8 @@ public partial class dlgUpdater : Window
                     File.Delete(dest);
                 _m.AddToUpdateLog($" - {IOPath.GetFileName(dest)}");
                 File.WriteAllBytes(dest, file.FileData.ToArray());
+
+                _dm.Progress = calc.CalculateProgress(Download86Manager.Operation.Store86BoxToDisk, c, files.Count);
             }
 
             _m.AddToUpdateLog($"86Box has been updated.");
@@ -202,7 +220,7 @@ public partial class dlgUpdater : Window
             return true;
         }
 
-        if (input.name == "ROMs")
+        if (name == "ROMs")
         {
             string rom_dir = null;
 
@@ -215,16 +233,18 @@ public partial class dlgUpdater : Window
             });
             try
             {
-                _m.AddToUpdateLog($"Writing {input.files.Count} ROMs to: {rom_dir}");
+                _m.AddToUpdateLog($"Writing {files.Count} ROMs to: {rom_dir}");
                 Directory.CreateDirectory(rom_dir);
                 int strip = 0;
-                if (input.files.Count > 0)
+                if (files.Count > 0)
                 {
-                    strip = input.files[0].FilePath.Length;
+                    strip = files[0].FilePath.Length;
                 }
 
-                foreach (var file in input.files)
+                for (int c = 0; c < files.Count; c++)
                 {
+                    var file = files[c];
+
                     if (file.FileData.Length == 0)
                         continue;
 
@@ -235,7 +255,11 @@ public partial class dlgUpdater : Window
                     else if (File.Exists(dest))
                         File.Delete(dest);
                     File.WriteAllBytes(dest, file.FileData.ToArray());
+
+                    _dm.Progress = calc.CalculateProgress(Download86Manager.Operation.WriteROMsToDisk, c, files.Count);
                 }
+
+                _dm.Progress = calc.CalculateProgress(Download86Manager.Operation.WriteROMsToDisk, 1, 1);
 
                 _m.AddToUpdateLog($"ROMs has been updated.");
 

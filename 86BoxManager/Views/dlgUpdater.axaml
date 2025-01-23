@@ -40,7 +40,6 @@
 					<Button.IsEnabled>
 						<MultiBinding Converter="{x:Static BoolConverters.And}">
 							<Binding Path="CanUpdate" Mode="OneWay" />
-							<Binding Path="!DM.IsWorking" Mode="OneWay" />
 							<Binding Path="!HasUpdated" Mode="OneWay" />
 						</MultiBinding>
 					</Button.IsEnabled>
@@ -48,7 +47,7 @@
 				</Button>
 				<StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
 					<Button Content="Save settings" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsEnabled="{Binding HasChanges}" Click="btnSave_Click" />
-					<Button Content="Close" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsCancel="True" Click="btnCancel_Click" />
+					<Button Content="Close" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsEnabled="{Binding !DM.IsUpdating}" IsCancel="True" Click="btnCancel_Click" />
 				</StackPanel>
 			</Grid>
 			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10" SelectedIndex="{Binding TabIndex}">
@@ -155,9 +154,9 @@
 								</StackPanel>
 							</gb:GroupBox>
 						</StackPanel>
-						<ProgressBar DockPanel.Dock="Bottom" Margin="0, 5, 0, 10" MinHeight="3" Height="3" Minimum="0" Maximum="1" Value="{Binding DM.Progress}" />
+						<ProgressBar DockPanel.Dock="Bottom" Margin="0, 5, 0, 10" MinHeight="3" Height="3" Minimum="0" Maximum="100" Value="{Binding DM.Progress}" />
 						<gb:GroupBox Header="Update log" Theme="{StaticResource GroupBoxClassic}">
-							<ScrollViewer Margin="5">
+							<ScrollViewer Margin="5" Name="UptScrollViewer">
 								<ItemsControl ItemsSource="{Binding UpdateLog}">
 									<ItemsControl.ItemTemplate>
 										<DataTemplate>

@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using static _86BoxManager.Tools.ProgressCalculator;
 
 namespace _86BoxManager.Tools;
 
@@ -31,6 +32,17 @@ public class Download86Manager : ReactiveObject
 
     public event Action<string> Log;
     public event Action<string> ErrorLog;
+    public static class Operation
+    {
+        public const int Download86Box = 0;
+        public const int VerifyExtract86Box = 1;
+        public const int Move86BoxToArchive = 2;
+        public const int MoveROMsToArchive = 3;
+        public const int Store86BoxToDisk = 4;
+        public const int DownloadROMs = 5;
+        public const int ExtractROMs = 6;
+        public const int WriteROMsToDisk = 7;
+    }
 
     /// <summary>
     /// Download manager is running
@@ -106,55 +118,91 @@ public class Download86Manager : ReactiveObject
         return h;
     }
 
-    public void Update86Box(JenkinsBase.Artifact build, int number, bool update_roms, Func<(string, List<ExtractedFile>), bool> files)
+    public delegate bool HandleFiles(string name, List<ExtractedFile> files, ProgressCalculator calc);
+
+    /// <summary>
+    /// Downloads new 86Box
+    /// </summary>
+    /// <param name="build"></param>
+    /// <param name="number"></param>
+    /// <param name="update_roms"></param>
+    /// <param name="files"></param>
+    /// <remarks>
+    ///About the progress bar
+    ///  1. Download 86Box
+    ///  2. Verify/Extract 86Box
+    ///  3. Move 86Box to archive
+    ///  4. Move ROMs to archive
+    ///  5. Store 86Box to disk
+    ///  6. Download ROMs
+    ///  7. Extract ROMs
+    ///  8. Write ROMs to disk
+    ///
+    ///Some of these operation can in theory be done in parallel.
+    ///
+    /// 33% will be dedicated to 1.
+    ///  3% goes to 2.
+    ///  1% goes to 3, 4 and 5.
+    /// 20% go to 6, 7, 8 each.
+    /// </remarks>
+    public void Update86Box(JenkinsBase.Artifact build, int number, bool update_roms, HandleFiles files)
     {
-        IsWorking = true;
+        //Since  this is done on the UI thread, it's thread safe, as the other
+        //thread will never set this false until we're off the UI thread.
+        //if (!IsWorking) //<-- Need to make this function capable of running in parralell before uncommenting this
+            IsWorking = true;
         IsUpdating = true;
         Progress = 0;
 
         AddLog($"Downloading artifact: {build.FileName}");
         string url = $"{JENKINS_BASE_URL}/{number}/artifact/{build.RelativePath}";
 
+        //Todo: Adjust this to only include the operations that will actually be done. Don't
+        //      remove enteries in the array, just set them to zero.
+        var calc = new ProgressCalculator(
+        [
+            33, //Download86Box
+            3,  //VerifyExtract86Box
+            1,  //Move86BoxToArchive
+            1,  //MoveROMsToArchive
+            1,  //Store86BoxToDisk
+            21, //DownloadROMs
+            20, //ExtractROMs
+            20  //WriteROMsToDisk
+        ]);
+
         ThreadPool.QueueUserWorkItem(async o =>
         {
             using var httpClient = GetHttpClient();
 
             AddLog("Connecting to: " + url);
-            long total_bytes_read = 0;
-            long bytes_to_read;
-            long estimated_bytes_to_read;
 
             try
             {
                 var zip_data = new MemoryStream();
 
-                using (var response = await httpClient.GetAsync(url))
+                using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
                         Error("Failed to contact server");
-                        Stop();
                         return;
                     }
 
-                    bytes_to_read = response.Content.Headers.ContentLength ?? 40 * 1024 * 1024;
-                    estimated_bytes_to_read = bytes_to_read;
-                    if (update_roms)
-                    {
-                        estimated_bytes_to_read *= 3;
-                    }
+                    var total_bytes_to_read = response.Content.Headers.ContentLength ?? 40 * 1024 * 1024;
 
-                    AddLog($"Downloading {FolderSizeCalculator.ConvertBytesToReadableSize(bytes_to_read)}");
+                    AddLog($"Downloading {FolderSizeCalculator.ConvertBytesToReadableSize(total_bytes_to_read)}");
                     using (var zip = await response.Content.ReadAsStreamAsync())
                     {
                         var buffer = new byte[81920];
                         int bytes_read;
+                        int total_bytes_read = 0;
 
                         while ((bytes_read = await zip.ReadAsync(buffer, 0, buffer.Length)) > 0)
                         {
                             zip_data.Write(buffer, 0, bytes_read);
                             total_bytes_read += bytes_read;
-                            Progress = (double)total_bytes_read / estimated_bytes_to_read;
+                            Progress = calc.CalculateProgress(Operation.Download86Box, total_bytes_read, total_bytes_to_read);
                         }
                     }
                 }
@@ -163,11 +211,10 @@ public class Download86Manager : ReactiveObject
                 if (build.FileName.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase))
                 {
                     AddLog($"Finished downloading 86Box artifact - Verifying");
-                    var box_files = ExtractFilesFromZip(zip_data);
+                    var box_files = ExtractFilesFromZip(Operation.VerifyExtract86Box, zip_data, calc);
 
-                    if (!files(("86box", box_files)))
+                    if (!files("86box", box_files, calc))
                     {
-                        Stop();
                         return;
                     }
                 }
@@ -185,7 +232,6 @@ public class Download86Manager : ReactiveObject
                         if (vi == null)
                         {
                             Error(" - AppImage is not valid");
-                            Stop();
                             return;
                         }
 
@@ -200,9 +246,8 @@ public class Download86Manager : ReactiveObject
                         ef
                     };
 
-                    if (!files(("86box.AppImage", l)))
+                    if (!files("86box.AppImage", l, calc))
                     {
-                        Stop();
                         return;
                     }
                 }
@@ -218,29 +263,28 @@ public class Download86Manager : ReactiveObject
                     AddLog("Connecting to: " + ROMS_ZIP_URL);
                     zip_data.Position = 0;
 
-                    using (var response = await httpClient.GetAsync(ROMS_ZIP_URL))
+                    using (var response = await httpClient.GetAsync(ROMS_ZIP_URL, HttpCompletionOption.ResponseHeadersRead))
                     {
                         if (!response.IsSuccessStatusCode)
                         {
                             Error("Failed to contact server");
-                            Stop();
                             return;
                         }
 
                         var roms_bytes = response.Content.Headers.ContentLength ?? 80 * 1024 * 1024;
-                        bytes_to_read += roms_bytes;
                         AddLog($"Downloading {FolderSizeCalculator.ConvertBytesToReadableSize(roms_bytes)}");
 
                         using (var zip = await response.Content.ReadAsStreamAsync())
                         {
                             var buffer = new byte[81920];
                             int bytes_read;
+                            int total_bytes_read = 0;
 
                             while ((bytes_read = await zip.ReadAsync(buffer, 0, buffer.Length)) > 0)
                             {
                                 zip_data.Write(buffer, 0, bytes_read);
                                 total_bytes_read += bytes_read;
-                                Progress = (double)total_bytes_read / estimated_bytes_to_read;
+                                Progress = calc.CalculateProgress(Operation.DownloadROMs, total_bytes_read , roms_bytes);
                             }
                         }
                     }
@@ -250,17 +294,15 @@ public class Download86Manager : ReactiveObject
                     zip_data.Position = 0;
                     //Linux gets a valid Zip file, extraction just fails for some reason. Todo: Use the other Zip libary.
                     //File.WriteAllBytes(Environment.GetEnvironmentVariable("HOME") + "/zip.zip", zip_data.ToArray());
-                    var box_files = ExtractFilesFromZip(zip_data);
+                    var box_files = ExtractFilesFromZip(Operation.ExtractROMs, zip_data, calc);
 
-                    if (!files(("ROMs", box_files)))
+                    if (!files("ROMs", box_files, calc))
                     {
-                        Stop();
                         return;
                     }
                 }
 
                 AddLog($" -- Job done -- ");
-                Stop();
             }
             catch (Exception e)
             {
@@ -268,17 +310,27 @@ public class Download86Manager : ReactiveObject
             }
             finally
             {
-                Stop();
+                Dispatcher.UIThread.Post(() =>
+                {
+                    //Since we are on the UI thread and IsWorking is only
+                    //flipped on the UI thread, this is thead safe to do.
+                    IsUpdating = false;
+                    IsWorking = IsFetching;
+                });
             }
         });
     }
 
-    private List<ExtractedFile> ExtractFilesFromZip(MemoryStream zipStream)
+    private List<ExtractedFile> ExtractFilesFromZip(int operation, MemoryStream zipStream, ProgressCalculator calc)
     {
         var extractedFiles = new List<ExtractedFile>();
 
         using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Read, true))
         {
+            var total = archive.Entries.Count;
+            int nr = 0;
+            Progress = calc.CalculateProgress(operation, nr++, total);
+
             foreach (var entry in archive.Entries)
             {
                 using (var entryStream = entry.Open())
@@ -293,6 +345,8 @@ public class Download86Manager : ReactiveObject
                         FileData = memoryStream
                     });
                 }
+
+                Progress = calc.CalculateProgress(operation, nr++, total);
             }
         }
 
@@ -321,7 +375,6 @@ public class Download86Manager : ReactiveObject
                     if (!response.IsSuccessStatusCode)
                     {
                         Error("Failed to contact server");
-                        Stop();
                         return;
                     }
 
@@ -334,7 +387,6 @@ public class Download86Manager : ReactiveObject
                 if (gjob.Length == 0 || gjob[0].Commit == null || gjob[0].Commit.Committer == null)
                 {
                     Error($"Parsing failed, invalid response");
-                    Stop();
                     return;
                 }
 
@@ -350,7 +402,6 @@ public class Download86Manager : ReactiveObject
                     if (!response.IsSuccessStatusCode)
                     {
                         Error("Failed to contact server");
-                        Stop();
                         return;
                     }
 
@@ -364,7 +415,6 @@ public class Download86Manager : ReactiveObject
                 if (job.Artifacts == null || job.Number < 6507 || job.Url == null || job.Artifacts.Count < 1)
                 {
                     Error($"Parsing failed, invalid response");
-                    Stop();
                     return;
                 }
 
@@ -391,7 +441,13 @@ public class Download86Manager : ReactiveObject
             }
             finally 
             {
-                Stop();
+                Dispatcher.UIThread.Post(() =>
+                {
+                    //Since we are on the UI thread and IsWorking is only
+                    //flipped on the UI thread, this is thead safe to do.
+                    IsFetching = false;
+                    IsWorking = IsUpdating;
+                });
             }
         });
     }
@@ -465,16 +521,6 @@ public class Download86Manager : ReactiveObject
         }
 
         return true;
-    }
-
-    private void Stop()
-    {
-        Dispatcher.UIThread.Post(() =>
-        {
-            IsFetching = false;
-            IsWorking = false;
-            IsUpdating = false;
-        });
     }
 
     private void AddLog(string s)
