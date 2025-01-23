@@ -1,4 +1,6 @@
-﻿using _86BoxManager.Xplat;
+﻿using _86BoxManager.Core;
+using _86BoxManager.Views;
+using _86BoxManager.Xplat;
 using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Kernel;
@@ -10,6 +12,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Runtime.Intrinsics.Arm;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,9 +33,9 @@ public class Download86Manager : ReactiveObject
     private const string ROMS_COMMITS_URL = $"{ROMS_URL}commits";
     private const string ROMS_ZIP_URL = $"https://github.com/86Box/roms/archive/refs/heads/master.zip";
 
-    public event Action<string> Log;
-    public event Action<string> ErrorLog;
-    public static class Operation
+    //public event Action<string> Log;
+    //public event Action<string> ErrorLog;
+    private static class Operation
     {
         public const int Download86Box = 0;
         public const int VerifyExtract86Box = 1;
@@ -42,6 +45,74 @@ public class Download86Manager : ReactiveObject
         public const int DownloadROMs = 5;
         public const int ExtractROMs = 6;
         public const int WriteROMsToDisk = 7;
+    }
+
+    public abstract class LogJob
+    {
+        public event Action<string> Log;
+        public event Action<string> ErrorLog;
+
+        public void AddLog(string s)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (Log != null)
+                    Log(s);
+            });
+        }
+
+        public void Error(string s)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (ErrorLog != null)
+                    ErrorLog(s);
+            });
+        }
+    }
+
+    public sealed class DownloadJob : LogJob
+    {
+        public JenkinsBase.Artifact Build { get; private set; }
+        public readonly int Number;
+
+        public bool Move86BoxToArchive { get; set; }
+        public bool DownloadROMs { get; set; }
+
+        public string ArchiveName { get; set; }
+        public string ArchivePath { get; set; }
+        public bool PreserveROMs { get; set; }
+        public string ArchiveVersion { get; set; }
+        public string ArchiveComment { get; set; }
+
+        //Beware. Not a thread safe object
+        public ExeModel CurrentExe { get; set; }
+
+        public event Action Update;
+
+        public void FireUpdate() 
+        {
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                Update?.Invoke();
+            });
+        }
+
+        public DownloadJob(JenkinsBase.Artifact build, int build_number)
+        {
+            Build = build;
+            Number = build_number;
+        }
+    }
+
+    public sealed class FetchJob : LogJob
+    {
+        public readonly int BuildNr;
+
+        public FetchJob(int buildNr)
+        {
+            BuildNr = buildNr;
+        }
     }
 
     /// <summary>
@@ -145,7 +216,7 @@ public class Download86Manager : ReactiveObject
     ///  1% goes to 3, 4 and 5.
     /// 20% go to 6, 7, 8 each.
     /// </remarks>
-    public void Update86Box(JenkinsBase.Artifact build, int number, bool update_roms, HandleFiles files)
+    public void Update86Box(DownloadJob job)
     {
         //Since  this is done on the UI thread, it's thread safe, as the other
         //thread will never set this false until we're off the UI thread.
@@ -154,8 +225,8 @@ public class Download86Manager : ReactiveObject
         IsUpdating = true;
         Progress = 0;
 
-        AddLog($"Downloading artifact: {build.FileName}");
-        string url = $"{JENKINS_BASE_URL}/{number}/artifact/{build.RelativePath}";
+        job.AddLog($"Downloading artifact: {job.Build.FileName}");
+        string url = $"{JENKINS_BASE_URL}/{job.Number}/artifact/{job.Build.RelativePath}";
 
         //Todo: Adjust this to only include the operations that will actually be done. Don't
         //      remove enteries in the array, just set them to zero.
@@ -175,7 +246,7 @@ public class Download86Manager : ReactiveObject
         {
             using var httpClient = GetHttpClient();
 
-            AddLog("Connecting to: " + url);
+            job.AddLog("Connecting to: " + url);
 
             try
             {
@@ -185,13 +256,13 @@ public class Download86Manager : ReactiveObject
                 {
                     if (!response.IsSuccessStatusCode)
                     {
-                        Error("Failed to contact server");
+                        job.Error("Failed to contact server");
                         return;
                     }
 
                     var total_bytes_to_read = response.Content.Headers.ContentLength ?? 40 * 1024 * 1024;
 
-                    AddLog($"Downloading {FolderSizeCalculator.ConvertBytesToReadableSize(total_bytes_to_read)}");
+                    job.AddLog($"Downloading {FolderSizeCalculator.ConvertBytesToReadableSize(total_bytes_to_read)}");
                     using (var zip = await response.Content.ReadAsStreamAsync())
                     {
                         var buffer = new byte[81920];
@@ -208,19 +279,19 @@ public class Download86Manager : ReactiveObject
                 }
 
                 //This is a quick opperation, so I won't bother with having a progress bar or doing it on antoher thread, etc.
-                if (build.FileName.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase))
+                if (job.Build.FileName.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    AddLog($"Finished downloading 86Box artifact - Verifying");
+                    job.AddLog($"Finished downloading 86Box artifact - Verifying");
                     var box_files = ExtractFilesFromZip(Operation.VerifyExtract86Box, zip_data, calc);
 
-                    if (!files("86box", box_files, calc))
+                    if (!store_86_files(box_files, calc, job))
                     {
                         return;
                     }
                 }
-                else if (build.FileName.EndsWith(".AppImage", StringComparison.InvariantCultureIgnoreCase)) 
+                else if (job.Build.FileName.EndsWith(".AppImage", StringComparison.InvariantCultureIgnoreCase)) 
                 {
-                    AddLog($"Finished downloading 86Box artifact - Verifying:");
+                    job.AddLog($"Finished downloading 86Box artifact - Verifying:");
                     try
                     {
                         zip_data.Position = 0;
@@ -231,48 +302,48 @@ public class Download86Manager : ReactiveObject
                         var vi = Platforms.Manager.Get86BoxInfo(zip_data);
                         if (vi == null)
                         {
-                            Error(" - AppImage is not valid");
+                            job.Error(" - AppImage is not valid");
                             return;
                         }
 
-                        AddLog($" - 86Box version {vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart} - Build: {vi.FilePrivatePart}");
-                    } catch { AddLog(" - Skipping validation"); }
+                        job.AddLog($" - 86Box version {vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart} - Build: {vi.FilePrivatePart}");
+                    } catch { job.AddLog(" - Skipping validation"); }
 
                     zip_data.Position = 0;
-                    var ef = new ExtractedFile() { FileData = zip_data, FilePath = build.FileName };
+                    var ef = new ExtractedFile() { FileData = zip_data, FilePath = job.Build.FileName };
                     var l = new List<ExtractedFile>
                     {
                         new ExtractedFile() { FilePath = "", FileData = new MemoryStream() },
                         ef
                     };
 
-                    if (!files("86box.AppImage", l, calc))
+                    if (!store_86_files(l, calc, job))
                     {
                         return;
                     }
                 }
                 else 
                 {
-                    throw new NotSupportedException(build.FileName);
+                    throw new NotSupportedException(job.Build.FileName);
                 }
 
-                if (update_roms)
+                if (job.DownloadROMs)
                 {
-                    AddLog("");
-                    AddLog("Downloading latest ROMs");
-                    AddLog("Connecting to: " + ROMS_ZIP_URL);
+                    job.AddLog("");
+                    job.AddLog("Downloading latest ROMs");
+                    job.AddLog("Connecting to: " + ROMS_ZIP_URL);
                     zip_data.Position = 0;
 
                     using (var response = await httpClient.GetAsync(ROMS_ZIP_URL, HttpCompletionOption.ResponseHeadersRead))
                     {
                         if (!response.IsSuccessStatusCode)
                         {
-                            Error("Failed to contact server");
+                            job.Error("Failed to contact server");
                             return;
                         }
 
                         var roms_bytes = response.Content.Headers.ContentLength ?? 80 * 1024 * 1024;
-                        AddLog($"Downloading {FolderSizeCalculator.ConvertBytesToReadableSize(roms_bytes)}");
+                        job.AddLog($"Downloading {FolderSizeCalculator.ConvertBytesToReadableSize(roms_bytes)}");
 
                         using (var zip = await response.Content.ReadAsStreamAsync())
                         {
@@ -290,23 +361,23 @@ public class Download86Manager : ReactiveObject
                     }
 
                     //This is a quick opperation, so I won't bother with having a progress bar or doing it on antoher thread, etc.
-                    AddLog($"Finished downloading ROM files - Verifying");
+                    job.AddLog($"Finished downloading ROM files - Verifying");
                     zip_data.Position = 0;
                     //Linux gets a valid Zip file, extraction just fails for some reason. Todo: Use the other Zip libary.
                     //File.WriteAllBytes(Environment.GetEnvironmentVariable("HOME") + "/zip.zip", zip_data.ToArray());
                     var box_files = ExtractFilesFromZip(Operation.ExtractROMs, zip_data, calc);
 
-                    if (!files("ROMs", box_files, calc))
+                    if (!store_rom_files(box_files, calc, job))
                     {
                         return;
                     }
                 }
 
-                AddLog($" -- Job done -- ");
+                job.AddLog($" -- Job done -- ");
             }
             catch (Exception e)
             {
-                Error(e.Message);
+                job.Error(e.Message);
             }
             finally
             {
@@ -319,6 +390,203 @@ public class Download86Manager : ReactiveObject
                 });
             }
         });
+    }
+
+    private bool store_rom_files(List<ExtractedFile> files, ProgressCalculator calc, DownloadJob job)
+    {
+        string rom_dir = null;
+
+        //The propper way of doing this is to collect all this info first. For now, we
+        //disable the settings tab and anything that can change state while proceesing
+        //is going on.
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            rom_dir = job.CurrentExe.VMRoms;
+        });
+        try
+        {
+            job.AddLog($"Writing {files.Count} ROMs to: {rom_dir}");
+            Directory.CreateDirectory(rom_dir);
+            int strip = 0;
+            if (files.Count > 0)
+            {
+                strip = files[0].FilePath.Length;
+            }
+
+            for (int c = 0; c < files.Count; c++)
+            {
+                var file = files[c];
+
+                if (file.FileData.Length == 0)
+                    continue;
+
+                var dest = Path.Combine(rom_dir, file.FilePath.Substring(strip));
+                var dest_dir = Path.GetDirectoryName(dest);
+                if (!Directory.Exists(dest_dir))
+                    Directory.CreateDirectory(dest_dir);
+                else if (File.Exists(dest))
+                    File.Delete(dest);
+                File.WriteAllBytes(dest, file.FileData.ToArray());
+
+                Progress = calc.CalculateProgress(Download86Manager.Operation.WriteROMsToDisk, c, files.Count);
+            }
+
+            Progress = calc.CalculateProgress(Download86Manager.Operation.WriteROMsToDisk, 1, 1);
+
+            job.AddLog($"ROMs has been updated.");
+            job.FireUpdate();
+            
+        }
+        catch (Exception e) { job.Error("Failed to update ROMs: " + e.Message); }
+
+        return true;
+    }
+
+    private bool store_86_files(List<ExtractedFile> files, ProgressCalculator calc, DownloadJob job)
+    {
+        string store_path = null;
+        string vm_exe = null;
+        string rom_dir = null;
+
+        //The propper way of doing this is to collect all this info first. For now, we
+        //disable the settings tab and anything that can change state while proceesing
+        //is going on.
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            vm_exe = job.CurrentExe.VMExe;
+            if (!File.Exists(vm_exe))
+                store_path = AppSettings.Settings.EXEdir;
+            else
+                store_path = Path.GetDirectoryName(vm_exe);
+            rom_dir = job.CurrentExe.VMRoms;
+        });
+
+
+        if (!string.IsNullOrEmpty(job.ArchivePath) && !string.IsNullOrEmpty(job.ArchiveName))
+        {
+            var path = FolderHelper.EnsureUniqueFolderName(job.ArchivePath, job.ArchiveName);
+
+            job.AddLog($"Archiving to: {path}");
+
+            try
+            {
+                //Move files
+                Directory.CreateDirectory(path);
+                var dir = Path.GetDirectoryName(vm_exe);
+                var dir_files = Directory.GetFiles(dir);
+                for (int c = 0; c < dir_files.Length; c++)
+                {
+                    var fname = Path.GetFileName(dir_files[c]);
+                    File.Move(dir_files[c], Path.Combine(path, fname));
+                    job.AddLog($" - {fname}");
+
+                    Progress = calc.CalculateProgress(Operation.Move86BoxToArchive, c, dir_files.Length);
+                }
+
+                if (job.PreserveROMs && Directory.Exists(rom_dir))
+                {
+                    var dest_dir = Path.Combine(path, "roms");
+
+                    //If we're downloading new roms, move them.
+                    if (job.DownloadROMs)
+                    {
+                        try
+                        {
+                            job.AddLog("Moving ROMs to archive");
+                            job.AddLog(" - Source: " + rom_dir);
+                            job.AddLog(" - Dest: " + dest_dir);
+                            Directory.Move(rom_dir, dest_dir);
+                            Progress = calc.CalculateProgress(Download86Manager.Operation.MoveROMsToArchive, 0, 1);
+                        }
+                        catch { job.Error("Failed to archive roms"); }
+                    }
+                    else
+                    {
+                        //Not downloading new roms, don't archive. 
+                        //try
+                        //{
+                        //    _m.AddToUpdateLog("Copy ROMs to archive");
+                        //    _m.AddToUpdateLog(" - Source: " + rom_dir);
+                        //    _m.AddToUpdateLog(" - Dest: " + dest_dir);
+                        //    string[] files = Directory.GetFiles(rom_dir, "*.*", SearchOption.AllDirectories);
+                        //    _m.AddToUpdateLog(" - Files to copy: " + files.Length);
+
+                        //    Directory.CreateDirectory(dest_dir);
+                        //    foreach (string file in files)
+                        //    {
+                        //        // Determine the destination path
+                        //        string relativePath = file.Substring(rom_dir.Length + 1);
+                        //        string destFile = IOPath.Combine(dest_dir, relativePath);
+
+                        //        // Ensure the destination subdirectory exists
+                        //        Directory.CreateDirectory(IOPath.GetDirectoryName(destFile));
+
+                        //        // Copy the file
+                        //        File.Copy(file, destFile, true); // true to overwrite existing files
+                        //    }
+                        //}
+                        //catch { _m.ErrorToUpdateLog("Failed to archive roms"); }
+                    }
+                }
+
+                //Adds a new entery
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    using (var t = AppSettings.Settings.BeginTransaction())
+                    {
+                        string exe_name = Path.Combine((string)path, store_path);
+                        AppSettings.Settings.AddExe(job.ArchiveName, exe_name, null, job.ArchiveComment, job.ArchiveVersion, job.CurrentExe.Arch, job.CurrentExe.Build, false);
+                        t.Commit();
+                    }
+
+                    job.AddLog($"Entery for {job.ArchiveName} created");
+                    job.AddLog($"");
+                });
+
+                Progress = calc.CalculateProgress(Download86Manager.Operation.Move86BoxToArchive, 1, 1);
+            }
+            catch (Exception e)
+            {
+                job.Error("Error: " + e.Message);
+                job.Error("Failed to arhive current version - stopping.");
+                return false;
+            }
+        }
+
+        job.AddLog($"Writing new 86Box to: {store_path}");
+
+        for (int c = 0; c < files.Count; c++)
+        {
+            var file = files[c];
+
+            if (file.FileData.Length == 0)
+                continue;
+
+            var dest = Path.Combine(store_path, file.FilePath);
+            var dest_dir = Path.GetDirectoryName(dest);
+            if (!Directory.Exists(dest_dir))
+                Directory.CreateDirectory(dest_dir);
+            else if (File.Exists(dest))
+                File.Delete(dest);
+            job.AddLog($" - {Path.GetFileName(dest)}");
+            File.WriteAllBytes(dest, file.FileData.ToArray());
+
+            Progress = calc.CalculateProgress(Download86Manager.Operation.Store86BoxToDisk, c, files.Count);
+        }
+
+        job.AddLog($"86Box has been updated.");
+
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            job.CurrentExe.Build = LatestBuild.Value.ToString();
+            job.CurrentExe.RaisePropertyChanged(nameof(ExeModel.Build));
+            job.CurrentExe.Version = "Unknown";
+            job.CurrentExe.RaisePropertyChanged(nameof(ExeModel.Version));
+            job.CurrentExe.Name = "Latest";
+            job.CurrentExe.RaisePropertyChanged(nameof(ExeModel.Name));
+        });
+
+        return true;
     }
 
     private List<ExtractedFile> ExtractFilesFromZip(int operation, MemoryStream zipStream, ProgressCalculator calc)
@@ -353,7 +621,7 @@ public class Download86Manager : ReactiveObject
         return extractedFiles;
     }
 
-    public void FetchMetadata(int current_build)
+    public void FetchMetadata(FetchJob fjob)
     {
         const string jenkins_url = $"{JENKINS_LASTBUILD}/api/json";
         const string github_url = $"{ROMS_COMMITS_URL}?per_page=1";
@@ -369,12 +637,12 @@ public class Download86Manager : ReactiveObject
             {
                 GithubCommit[] gjob;
 
-                AddLog("Connecting to: " + ROMS_COMMITS_URL);
+                fjob.AddLog("Connecting to: " + ROMS_COMMITS_URL);
                 using (var response = await httpClient.GetAsync(github_url))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
-                        Error("Failed to contact server");
+                        fjob.Error("Failed to contact server");
                         return;
                     }
 
@@ -386,22 +654,22 @@ public class Download86Manager : ReactiveObject
 
                 if (gjob.Length == 0 || gjob[0].Commit == null || gjob[0].Commit.Committer == null)
                 {
-                    Error($"Parsing failed, invalid response");
+                    fjob.Error($"Parsing failed, invalid response");
                     return;
                 }
 
                 var date = gjob[0].Commit.Committer.Date;
-                AddLog("ROMs last updated: " + date.ToString("d", CultureInfo.CurrentCulture));
-                AddLog("");
+                fjob.AddLog("ROMs last updated: " + date.ToString("d", CultureInfo.CurrentCulture));
+                fjob.AddLog("");
                 LatestRomCommit = date;
 
                 JenkinsBuild job;
-                AddLog("Connecting to: " + jenkins_url);
+                fjob.AddLog("Connecting to: " + jenkins_url);
                 using (var response = await httpClient.GetAsync(jenkins_url))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
-                        Error("Failed to contact server");
+                        fjob.Error("Failed to contact server");
                         return;
                     }
 
@@ -414,7 +682,7 @@ public class Download86Manager : ReactiveObject
 
                 if (job.Artifacts == null || job.Number < 6507 || job.Url == null || job.Artifacts.Count < 1)
                 {
-                    Error($"Parsing failed, invalid response");
+                    fjob.Error($"Parsing failed, invalid response");
                     return;
                 }
 
@@ -426,18 +694,18 @@ public class Download86Manager : ReactiveObject
                 LatestBuild = job.Number;
 
                 //AddLog($"Latest build is {job.Number}");
-                var changelog = await FetchChangelog(job, current_build, httpClient);
+                var changelog = await FetchChangelog(job, fjob, httpClient);
 
                 if (changelog.Count == 0)
-                    AddLog($" -- There was no enteries in the changelog --");
+                    fjob.AddLog($" -- There was no enteries in the changelog --");
                 else if (changelog.Count == 1)
-                    AddLog($" -- There was 1 entery in the changelog --");
+                    fjob.AddLog($" -- There was 1 entery in the changelog --");
                 else
-                    AddLog($" -- Changelog has {changelog.Count} enteries --");
+                    fjob.AddLog($" -- Changelog has {changelog.Count} enteries --");
             }
             catch (Exception e)
             {
-                Error(e.Message);
+                fjob.Error(e.Message);
             }
             finally 
             {
@@ -452,38 +720,39 @@ public class Download86Manager : ReactiveObject
         });
     }
 
-    private async Task<List<string>> FetchChangelog(JenkinsBuild build, int from, HttpClient httpClient)
+    private async Task<List<string>> FetchChangelog(JenkinsBuild build, FetchJob fjob, HttpClient httpClient)
     {
         List<string> changelog = new List<string>();
+        int from = fjob.BuildNr;
 
         if (from == -1)
             from = build.Number - 1;
 
         if (build.Number < from)
         {
-            AddLog($"Skipping fetching changelog: local build newer than server build");
+            fjob.AddLog($"Skipping fetching changelog: local build newer than server build");
             return changelog;
         }
 
         if (build.Number == from)
         {
-            AddLog($"Skipping fetching changelog: local build is same as server build");
+            fjob.AddLog($"Skipping fetching changelog: local build is same as server build");
             return changelog;
         }
 
-        AddLog($"Fetching changelog going from {from} to {build.Number}");
-        AddLog($" -- Changelog start --");
+        fjob.AddLog($"Fetching changelog going from {from} to {build.Number}");
+        fjob.AddLog($" -- Changelog start --");
         for (int c = from + 1; c <= build.Number; c++)
         {
             bool sucess = false;
 
-            try { sucess = await FetchChangelog(c, changelog, httpClient); }
+            try { sucess = await FetchChangelog(c, changelog, httpClient, fjob); }
             catch
             { }
 
             if (!sucess)
             {
-                Error($"Fetching of changelog for build {c} failed, aborting");
+                fjob.Error($"Fetching of changelog for build {c} failed, aborting");
                 break;
             }
         }
@@ -491,7 +760,7 @@ public class Download86Manager : ReactiveObject
         return changelog;
     }
 
-    private async Task<bool> FetchChangelog(int build, List<string> changelog, HttpClient httpClient)
+    private async Task<bool> FetchChangelog(int build, List<string> changelog, HttpClient httpClient, FetchJob fjob)
     {
         string url = $"{JENKINS_BASE_URL}/{build}/api/json";
         JenkinsRun job;
@@ -515,30 +784,12 @@ public class Download86Manager : ReactiveObject
                 if (!string.IsNullOrWhiteSpace(change.Msg))
                 {
                     changelog.Add(change.Msg);
-                    AddLog($"{change.Author?.FullName ?? "Unknown"}: {change.Msg}");
+                    fjob.AddLog($"{change.Author?.FullName ?? "Unknown"}: {change.Msg}");
                 }
             }
         }
 
         return true;
-    }
-
-    private void AddLog(string s)
-    {
-        Dispatcher.UIThread.Post(() =>
-        {
-            if (Log != null)
-                Log(s);
-        });
-    }
-
-    private void Error(string s)
-    {
-        Dispatcher.UIThread.Post(() =>
-        {
-            if (ErrorLog != null)
-                ErrorLog(s);
-        });
     }
 
     public sealed class JenkinsRun : JenkinsBase
