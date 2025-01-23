@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using _86BoxManager.Common;
+using Mono.Unix;
 using Mono.Unix.Native;
 
 namespace _86BoxManager.Linux
@@ -32,12 +34,18 @@ namespace _86BoxManager.Linux
 
         public override string DetermineExeName(string path, string[] exeNames)
         {
+            return DetermineExe(path, exeNames);
+        }
+
+        internal static string DetermineExe(string path, string[] exeNames)
+        {
             var di = new DirectoryInfo(path);
             var fileStat = new Stat();
+            FileInfo newestExe = null;
 
             foreach (var exeName in exeNames)
             {
-                foreach(var exe in di.GetFiles(exeName + "*"))
+                foreach (var exe in di.GetFiles(exeName + "*"))
                 {
                     Syscall.stat(exe.FullName, out fileStat);
 
@@ -46,12 +54,27 @@ namespace _86BoxManager.Linux
                                         (fileStat.st_mode & FilePermissions.S_IXOTH) != 0;
 
                     if (isExecutable)
-                        return exe.Name;
+                    {
+                        if (newestExe == null || exe.LastWriteTime > newestExe.LastWriteTime)
+                        {
+                            newestExe = exe;
+                        }
+                    }
                 }
             }
 
-            return "86Box";
+            return newestExe?.Name ?? "86Box";
         }
 
+        public override bool SetExecutable(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+                return false;
+
+            UnixFileInfo fileInfo = new UnixFileInfo(filePath);
+            fileInfo.FileAccessPermissions |= FileAccessPermissions.UserExecute | FileAccessPermissions.GroupExecute | FileAccessPermissions.OtherExecute;
+
+            return true;
+        }
     }
 }

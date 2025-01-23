@@ -15,5 +15,7 @@ namespace _86BoxManager.API
         void EditFile(string file);
 
         string DetermineExeName(string exePath, string[] exeNames);
+
+        bool SetExecutable(string filePath);
     }
 }

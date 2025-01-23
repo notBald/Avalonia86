@@ -29,5 +29,12 @@ namespace _86BoxManager.Mac
             start.ArgumentList.Add(folder);
             Process.Start(start);
         }
+
+        public override bool SetExecutable(string filePath)
+        {
+            //Not implemented. I don't know how to do it.
+
+            return false;
+        }
     }
 }

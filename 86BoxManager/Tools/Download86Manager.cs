@@ -206,11 +206,6 @@ public class Download86Manager : ReactiveObject
     ///  8. Write ROMs to disk
     ///
     ///Some of these operation can in theory be done in parallel.
-    ///
-    /// 33% will be dedicated to 1.
-    ///  3% goes to 2.
-    ///  1% goes to 3, 4 and 5.
-    /// 20% go to 6, 7, 8 each.
     /// </remarks>
     public void Update86Box(DownloadJob job)
     {
@@ -224,8 +219,8 @@ public class Download86Manager : ReactiveObject
         job.AddLog($"Downloading artifact: {job.Build.FileName}");
         string url = $"{JENKINS_BASE_URL}/{job.Number}/artifact/{job.Build.RelativePath}";
 
-        //Todo: Adjust this to only include the operations that will actually be done. Don't
-        //      remove enteries in the array, just set them to zero.
+        //The progress bar is split into sections. Each section is taking a percentage out
+        //of one hundred.
         double[] prog = [
             26, //Download86Box
             3,  //VerifyExtract86Box
@@ -237,6 +232,9 @@ public class Download86Manager : ReactiveObject
             15  //WriteROMsToDisk
         ];
 
+        //Removes jobs that won't be done. Note, this isn't perfect, it might
+        //decide to skip a job for one reason or another. But, this is what
+        //it hopes to do.
         if (!job.Move86BoxToArchive)
         {
             prog[Operation.Move86BoxToArchive] = 0;
@@ -252,6 +250,7 @@ public class Download86Manager : ReactiveObject
             prog[Operation.MoveROMsToArchive] = 0;
         }
 
+        //Adjusts the progress bar so that it adds up to 100
         {
             double total = 0;
             foreach(var val in prog)
@@ -340,10 +339,12 @@ public class Download86Manager : ReactiveObject
                         ef
                     };
 
-                    if (!store_86_files(l, calc, job))
+                    if (!store_86_files(l, calc, job, true))
                     {
                         return;
                     }
+
+
                 }
                 else 
                 {
@@ -355,7 +356,8 @@ public class Download86Manager : ReactiveObject
                     job.AddLog("");
                     job.AddLog("Downloading latest ROMs");
                     job.AddLog("Connecting to: " + ROMS_ZIP_URL);
-                    zip_data.Position = 0;
+                    //Do not reuse memory stream. Linux fails to unzip.
+                    zip_data = new MemoryStream();
 
                     using (var response = await httpClient.GetAsync(ROMS_ZIP_URL, HttpCompletionOption.ResponseHeadersRead))
                     {
@@ -386,8 +388,6 @@ public class Download86Manager : ReactiveObject
                     //This is a quick opperation, so I won't bother with having a progress bar or doing it on antoher thread, etc.
                     job.AddLog($"Finished downloading ROM files - Verifying");
                     zip_data.Position = 0;
-                    //Linux gets a valid Zip file, extraction just fails for some reason. Todo: Use the other Zip libary.
-                    //File.WriteAllBytes(Environment.GetEnvironmentVariable("HOME") + "/zip.zip", zip_data.ToArray());
                     var box_files = ExtractFilesFromZip(Operation.ExtractROMs, zip_data, calc);
 
                     if (!store_rom_files(box_files, calc, job))
@@ -465,7 +465,7 @@ public class Download86Manager : ReactiveObject
         return true;
     }
 
-    private bool store_86_files(List<ExtractedFile> files, ProgressCalculator calc, DownloadJob job)
+    private bool store_86_files(List<ExtractedFile> files, ProgressCalculator calc, DownloadJob job, bool set_executable = false)
     {
         string store_path = null;
         string vm_exe = null;
@@ -595,6 +595,12 @@ public class Download86Manager : ReactiveObject
                 File.Delete(dest);
             job.AddLog($" - {Path.GetFileName(dest)}");
             File.WriteAllBytes(dest, file.FileData.ToArray());
+
+            if (set_executable)
+            {
+                if (!Platforms.Shell.SetExecutable(dest))
+                    job.Error($"Failed to set {file.FilePath} executable.");
+            }
         }
         Progress = calc.CalculateProgress(Download86Manager.Operation.Store86BoxToDisk, 1, 1);
 

@@ -38,5 +38,7 @@ namespace _86BoxManager.Common
         {
             return names[0];
         }
+
+        public abstract bool SetExecutable(string filePath);
     }
 }

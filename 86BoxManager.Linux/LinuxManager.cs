@@ -92,7 +92,8 @@ namespace _86BoxManager.Linux
             bool found_version = false;
 
             var info = new CommonVerInfo();
-            var appImage = Directory.GetFiles(exeDir, "86Box*").FirstOrDefault();
+            var exe_name = LinuxShell.DetermineExe(exeDir, ["86Box"]);
+            var appImage = Directory.GetFiles(exeDir, exe_name).FirstOrDefault();
             if (appImage != null && AppImageChecker.TryGetAppInfo(appImage, out var app_info))
             {
                 Console.WriteLine("Hello AppImage: "+appImage);

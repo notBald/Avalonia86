@@ -31,5 +31,10 @@ namespace _86BoxManager.Windows
 
             SetCurrentProcessExplicitAppUserModelID(appId);
         }
+
+        public override bool SetExecutable(string filePath)
+        {
+            return true;
+        }
     }
 }
