@@ -69,7 +69,7 @@
 						HorizontalAlignment="Stretch" VerticalAlignment="Center"
 						Click="btnApply_Click"/>
 			</StackPanel>
-			<TabControl SelectedIndex="0" Theme="{StaticResource CustomTabCtrl}" >
+			<TabControl SelectedIndex="{Binding SelectedTabIdx}" Theme="{StaticResource CustomTabCtrl}" >
 				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
 					<DockPanel>
 						<gb:GroupBox Header="Paths" DockPanel.Dock="Top"
@@ -110,8 +110,10 @@
 						<gb:GroupBox Header="Apperance" VerticalAlignment="Top"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<Grid Margin="9" ColumnDefinitions="*, *">
-								<StackPanel Grid.Column="0" Margin="12">
+								<StackPanel Grid.Column="0" Margin="12" Spacing="5">
 									<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" />
+									<CheckBox IsChecked="{Binding ToolBar86Settings}" Content="Enable 86Box Settings toolbar button" />
+									<CheckBox IsChecked="{Binding ToolBarPSSettings}" Content="Enable Executable Settings toolbar button" />
 								</StackPanel>
 								<StackPanel Grid.Column="1" Margin="12">
 									<TextBlock Text="Application theme: " Margin="0, 0, 0, 5" />

@@ -177,6 +177,10 @@ namespace _86BoxManager.Views
             _m.CompactList = false;
             _m.RenameFolders = true;
             _m.SelectedTheme = ThemeVariant.Default;
+            _m.ToolBar86Settings = true;
+            _m.ToolBarPSSettings = false;
+            _m.IsDefChecked = true;
+            _m.IsExeListChanged = false;
             _m.RaisePropertyChanged(nameof(dlgSettingsModel.HasChanges));
         }
 
@@ -336,6 +340,8 @@ namespace _86BoxManager.Views
                     s.AllowInstances = _m.AllowInstances;
                     s.CompactMachineList = _m.CompactList;
                     s.Theme = _m.SelectedTheme;
+                    s.Has86ToolbarBtn = _m.ToolBar86Settings;
+                    s.HasPSToolbarBtn = _m.ToolBarPSSettings;
 
                     foreach (var exe in _m.Executables.Items)
                     {
@@ -404,6 +410,8 @@ namespace _86BoxManager.Views
             _m.AllowInstances = s.AllowInstances;
             _m.CompactList = s.CompactMachineList;
             _m.SelectedTheme = s.Theme;
+            _m.ToolBarPSSettings = s.HasPSToolbarBtn;
+            _m.ToolBar86Settings = s.Has86ToolbarBtn;
 
             if (string.IsNullOrWhiteSpace(_m.ExeDir) || string.IsNullOrWhiteSpace(_m.CFGDir))
             {
@@ -615,6 +623,7 @@ namespace _86BoxManager.Views
         private bool _min_start, _min_tray, _close_tray;
         private bool _enable_logging, _enable_tray, _rename_folders;
         private bool _is_default_selected, _is_exe_list_changed;
+        private bool _has_86_toolbar, _has_ps_toolbar;
         private string _log_path;
         private bool _allow_instances, _enable_console;
         private bool _compact_list;
@@ -627,6 +636,32 @@ namespace _86BoxManager.Views
         readonly IDisposable _exe_sub;
 
         dlgSettingsModel _me;
+
+        public bool ToolBar86Settings
+        {
+            get => _has_86_toolbar;
+            set
+            {
+                if (_has_86_toolbar != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _has_86_toolbar, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
+
+        public bool ToolBarPSSettings
+        {
+            get => _has_ps_toolbar;
+            set
+            {
+                if (_has_ps_toolbar != value)
+                {
+                    this.RaiseAndSetIfChanged(ref _has_ps_toolbar, value);
+                    this.RaisePropertyChanged(nameof(HasChanges));
+                }
+            }
+        }
 
         public ExeEntery SelectedExe 
         { 
@@ -723,6 +758,8 @@ namespace _86BoxManager.Views
                        _me.LogPath != LogPath ||
                        _me.CompactList != CompactList ||
                        _me.RenameFolders != RenameFolders ||
+                       _me.ToolBar86Settings != ToolBar86Settings ||
+                       _me.ToolBarPSSettings != ToolBarPSSettings ||
                        !ReferenceEquals(_me.SelectedTheme, SelectedTheme);
             }
         }
@@ -929,6 +966,8 @@ namespace _86BoxManager.Views
             }
         }
 
+        public int SelectedTabIdx { get; set; }
+
         public ThemeVariant[] Themes { get; private set; }
 
         public dlgSettingsModel()
@@ -957,6 +996,10 @@ namespace _86BoxManager.Views
                     s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.IsTrayEnabled)));
                 if (!ReferenceEquals(_me.SelectedTheme, SelectedTheme))
                     s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.Theme)));
+                if (_me.ToolBarPSSettings != ToolBarPSSettings)
+                    s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.HasPSToolbarBtn)));
+                if (_me.ToolBar86Settings != ToolBar86Settings)
+                    s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.Has86ToolbarBtn)));
             }
         }
 

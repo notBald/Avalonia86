@@ -68,6 +68,24 @@ namespace _86BoxManager.Core
         }
 
         /// <summary>
+        /// Whenever to use a sys tray or not
+        /// </summary>
+        public bool Has86ToolbarBtn
+        {
+            get => FetchProperty("enable_86_btn", true);
+            set => SetProperty("enable_86_btn", value);
+        }
+
+        /// <summary>
+        /// Whenever to use a sys tray or not
+        /// </summary>
+        public bool HasPSToolbarBtn
+        {
+            get => FetchProperty("enable_ps_btn", false);
+            set => SetProperty("enable_ps_btn", value);
+        }
+
+        /// <summary>
         /// Whenever to close the frontent to the sys tray
         /// </summary>
         public bool CloseTray

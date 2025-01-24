@@ -164,10 +164,9 @@ namespace _86BoxManager.ViewModels
             }
         }
 
-        public bool CompactList
-        {
-            get => Settings.CompactMachineList;
-        }
+        public bool CompactList { get => Settings.CompactMachineList; }
+        public bool Toolbar86Btn { get => Settings.Has86ToolbarBtn; }
+        public bool ToolbarPSBtn { get => Settings.HasPSToolbarBtn; }
 
         public bool IsTrayEnabled { get => Settings.IsTrayEnabled; }
 
@@ -240,6 +239,14 @@ namespace _86BoxManager.ViewModels
             else if (e.PropertyName == nameof(AppSettings.Theme))
             {
                 this.RaisePropertyChanged(nameof(ApplicationTheme));
+            }
+            else if (e.PropertyName == nameof(AppSettings.Has86ToolbarBtn))
+            {
+                this.RaisePropertyChanged(nameof(Toolbar86Btn));
+            }
+            else if (e.PropertyName == nameof(AppSettings.HasPSToolbarBtn))
+            {
+                this.RaisePropertyChanged(nameof(ToolbarPSBtn));
             }
         }
 

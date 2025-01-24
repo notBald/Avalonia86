@@ -450,6 +450,18 @@ namespace _86BoxManager.Views
             await this.RunDialog(new dlgSettings());
         }
 
+
+        private async void btnExe_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new dlgSettings();
+            if (dlg.DataContext is dlgSettingsModel m)
+            {
+                m.SelectedTabIdx = 2;
+                m.RaisePropertyChanged(nameof(dlgSettingsModel.SelectedTabIdx));
+            }
+            await this.RunDialog(dlg);
+        }
+
         /// <summary>
         /// Updates the state used by the UI to enable / disable buttons and menues.
         /// </summary>
