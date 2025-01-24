@@ -25,15 +25,15 @@ namespace _86BoxManager.Core
 {
     internal static class VMCenter
     {
-        private readonly static Dictionary<string, VMWatch> _watch = new();
+        private readonly static Dictionary<long, VMWatch> _watch = new();
         private static AppSettings Sett => AppSettings.Settings;
 
         public static bool IsWatching => _watch.Count > 0;
 
-        public static void DisposeMe(VMWatch w, string name)
+        public static void DisposeMe(VMWatch w, long uid)
         {
             w.Dispose();
-            _watch.Remove(name);
+            _watch.Remove(uid);
         }
 
         public async static Task<bool> CloseAllWindows(frmMain ui)
@@ -298,10 +298,10 @@ namespace _86BoxManager.Core
             {
                 try
                 {
-                    if (_watch.TryGetValue(vm.Name, out VMWatch w))
+                    if (_watch.TryGetValue(vm.UID, out VMWatch w))
                     {
                         w.Dispose();
-                        _watch.Remove(vm.Name);
+                        _watch.Remove(vm.UID);
                     }
 
                     vis.CommitUptime(DateTime.Now);
@@ -341,7 +341,7 @@ namespace _86BoxManager.Core
                 Platforms.Manager.GetSender().DoVmForceStop(vm);
 
                 w.Dispose();
-                _watch.Remove(vm.Name);
+                _watch.Remove(vm.UID);
 
                 clean_stop = 1;
             }
@@ -809,7 +809,7 @@ namespace _86BoxManager.Core
                         WorkerSupportsCancellation = false
                     };
                     var watch = new VMWatch(bgw, vis);
-                    _watch.Add(vis.Name, watch);
+                    _watch.Add(vis.Tag.UID, watch);
                     bgw.RunWorkerAsync(vis);
 
                     ui.UpdateState();
@@ -911,7 +911,7 @@ namespace _86BoxManager.Core
                         WorkerSupportsCancellation = false
                     };
                     var watch = new VMWatch(bgw, vis);
-                    _watch.Add(vis.Name, watch);
+                    _watch.Add(vis.Tag.UID, watch);
                     bgw.RunWorkerAsync(vis);
 
                     ui.UpdateState();

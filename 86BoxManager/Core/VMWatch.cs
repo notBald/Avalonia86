@@ -93,7 +93,7 @@ namespace _86BoxManager.Core
             }
 
             VMCenter.CountRefresh();
-            VMCenter.DisposeMe(this, vm.Name);
+            VMCenter.DisposeMe(this, vm.Tag.UID);
         }
 
         public static bool TryWaitForInputIdle(Process process, int forceDelay)
