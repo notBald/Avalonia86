@@ -219,7 +219,7 @@
 								<ComboBox ItemsSource="{Binding OSs}" SelectedItem="{Binding SelectedOS}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" />
 								<CheckBox IsChecked="{Binding PrefNDR}" Content="Prefer New Dynamic Recompiler" Grid.Row="2" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
 								<CheckBox IsChecked="{Binding UpdateROMs}" Content="Also update ROMs / Firmware" Grid.Row="3" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
-								<TextBlock Grid.Row="4" Grid.ColumnSpan="3" FontStyle="Italic" TextWrapping="WrapWithOverflow">
+								<TextBlock Grid.Row="4" Grid.ColumnSpan="3" FontStyle="Italic" TextWrapping="Wrap" TextTrimming="CharacterEllipsis">
 									If update roms is set, Avalonia86 will check the box if the stored ROMs are older than the last Github commit on the ROMs repository. 
 								</TextBlock>
 							</Grid>
