@@ -68,9 +68,6 @@ namespace _86BoxManager
 
         private void Desktop_Exit(object sender, ControlledApplicationLifetimeExitEventArgs e)
         {
-            Core.DBStore.CloseDatabase();
-            Tools.HWDB.CloseDatabase();
-
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is frmMain main)
             {
                 main.Exit();

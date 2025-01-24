@@ -31,11 +31,13 @@ namespace _86BoxManager.Unix
             Dispose();
         }
 
+        private string GetName(IVm vm) => vm.Title.Replace('/', '_');
+
         public override ProcessStartInfo BuildStartInfo(IExecVars args)
         {
+            var name = GetName(args.Vm);
             var info = base.BuildStartInfo(args);
 
-            var name = args.Vm.Title;
             var socketName = name + Environment.ProcessId;
 
             var server = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
@@ -71,7 +73,7 @@ namespace _86BoxManager.Unix
 
         private void OnVmExit(IVm vm)
         {
-            var name = vm.Title;
+            var name = GetName(vm);
             if (!_runningVm.TryGetValue(name, out var info))
                 return;
             info.Dispose();

@@ -76,8 +76,14 @@ namespace _86BoxManager
                 Console.WriteLine(ex.Message);
 
                 NativeMSG.Msg(ex.Message, "App init failed");
+                //NativeMSG.Msg(ex.StackTrace, "Stacktrace");
 
                 return -1;
+            }
+            finally
+            {
+                Core.DBStore.CloseDatabase();
+                Tools.HWDB.CloseDatabase();
             }
         }
 

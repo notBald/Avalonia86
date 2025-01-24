@@ -20,7 +20,7 @@ namespace _86BoxManager.Core
         const string BOX_SCREENSHOTS = "screenshots";
         const string BOX_PRINTER = "printer";
 
-        private readonly BackgroundExecutor _worker = new();
+        private BackgroundExecutor _worker = new();
 
         /// <summary>
         /// One annoying aspect of FileSystemWatcher is that it does not generate notifications
@@ -336,7 +336,8 @@ namespace _86BoxManager.Core
                 _pendingFolderCheck |= check_folders;
                 _pendingConfigCheck |= parse_config;
 
-                _worker.Post(work);
+                if (_worker != null)
+                    _worker.Post(work);
             });
         }
 
@@ -462,7 +463,7 @@ namespace _86BoxManager.Core
 
             _current.CalcTime();
 
-            if (!string.IsNullOrEmpty(mi.VMPath))
+            if (!string.IsNullOrEmpty(mi.VMPath) && _worker != null)
                 _worker.Post(work);
         }
 
@@ -628,6 +629,11 @@ namespace _86BoxManager.Core
         {
             _fsw.Dispose();
             _worker.Stop();
+
+            //Set worker to null to signal already posted work to stop. This works
+            //because those jobs always executes on the UI thread.
+            _worker = null;
+            
             lock (_throttle_timer)
             {
                 if (_fld_size_timer != null)
