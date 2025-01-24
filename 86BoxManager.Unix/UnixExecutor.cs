@@ -94,7 +94,7 @@ namespace _86BoxManager.Unix
 
         internal Socket GetClient(string name)
         {
-            return _runningVm.TryGetValue(name, out var info) ? info.Client : null;
+            return _runningVm.TryGetValue(name.Replace('/', '_'), out var info) ? info.Client : null;
         }
     }
 }
