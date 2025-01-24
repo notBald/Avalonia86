@@ -7,6 +7,7 @@ CREATE TABLE FileInfo (
 ) WITHOUT ROWID;
 --§
 CREATE TABLE Window (
+    ID        TEXT NOT NULL PRIMARY KEY,
     "Top"     REAL NOT NULL,
     "Left"    REAL NOT NULL,
     Height    REAL NOT NULL,
@@ -109,3 +110,21 @@ CREATE TABLE Executables (
     Comment Text,
     Arch Text
 );
+--§Version
+--§v1.2
+CREATE TABLE Window_new (
+    ID        TEXT NOT NULL PRIMARY KEY,
+    "Top"     REAL NOT NULL,
+    "Left"    REAL NOT NULL,
+    Height    REAL NOT NULL,
+    Width     REAL NOT NULL,
+    Maximized BOOLEAN NOT NULL
+);
+--§
+INSERT INTO Window_new (ID, "Top", "Left", Height, Width, Maximized)
+SELECT 'main', "Top", "Left", Height, Width, Maximized FROM "Window";
+--§
+DROP TABLE "Window";
+--§
+ALTER TABLE Window_new RENAME TO "Windows";
+--§Main

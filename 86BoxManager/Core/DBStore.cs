@@ -22,7 +22,8 @@ namespace _86BoxManager.Core
     /// </summary>
     internal sealed class DBStore
     {
-        const int CUR_MINOR_DB_VER = 1;
+        const int CUR_MINOR_DB_VER = 2;
+        const int CUR_MAJOR_DB_VER = 3;
 
         #region Static fields
 
@@ -156,16 +157,18 @@ namespace _86BoxManager.Core
                         if (sub_script.Length != 2)
                             throw new Exception("Failed to find main script");
 
-                        bool do_upgrade = current_minor != -1 && minor_version == (current_minor + 1);
 
-                        for (int i = do_upgrade ? 0 : 1; i < sub_script.Length; i++)
+                        for (int i = 0; i < sub_script.Length; i++)
                         {
                             var commands = sub_script[i].TrimStart().Split(SCRIPT_DIV);
 
                             foreach (var command in commands)
                             {
-                                using var cmd = NewCommand(command, db);
-                                cmd.ExecuteNonQuery();
+                                if (!string.IsNullOrEmpty(command))
+                                {
+                                    using var cmd = NewCommand(command, db);
+                                    cmd.ExecuteNonQuery();
+                                }
                             }
                         }
                     }
@@ -175,12 +178,12 @@ namespace _86BoxManager.Core
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
                 if (current_minor != -1)
                 {
-                    using var cmd = NewCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}', Version = 2.0", db);
+                    using var cmd = NewCommand($"UPDATE FileInfo SET Updater = '{AppName} {version.Major}.{version.Minor}.{version.Build}', Version = 3.0", db);
                     cmd.ExecuteNonQuery();
                 }
                 else
                 {
-                    using var cmd = NewCommand($"INSERT INTO FileInfo(Creator, Version) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 2.0)", db);
+                    using var cmd = NewCommand($"INSERT INTO FileInfo(Creator, Version) VALUES('{AppName} {version.Major}.{version.Minor}.{version.Build}', 3.0)", db);
                     cmd.ExecuteNonQuery();
                 }
 
@@ -291,7 +294,7 @@ namespace _86BoxManager.Core
                                         return false;
                                     major = r.GetFloat("Version");
 
-                                    if (major >= 3)
+                                    if (major > CUR_MAJOR_DB_VER)
                                         return false;
                                 }
 
@@ -300,23 +303,27 @@ namespace _86BoxManager.Core
                                 {
                                     //We got to upgrade.
 #if MSDB
-                                    using var t = db.BeginTransaction();
-                                    _current_transaction = t;
-                                    if (!InitDB(db, GetDBVersion(db)))
+                                    using (var t = db.BeginTransaction())
                                     {
-                                        t.Rollback();
-                                        throw new Exception("DB create failed.");
+                                        _current_transaction = t;
+                                        if (!InitDB(db, GetDBVersion(db)))
+                                        {
+                                            t.Rollback();
+                                            throw new Exception("DB create failed.");
+                                        }
+                                        t.Commit();
                                     }
-                                    t.Commit();
                                     _current_transaction = null;
 #else
-                                    using var t = db.BeginTransaction();
-                                    if (!InitDB(db, GetDBVersion(db)))
+                                    using (var t = db.BeginTransaction())
                                     {
-                                        t.Rollback();
-                                        throw new Exception("DB create failed.");
+                                        if (!InitDB(db, GetDBVersion(db)))
+                                        {
+                                            t.Rollback();
+                                            throw new Exception("DB create failed.");
+                                        }
+                                        t.Commit();
                                     }
-                                    t.Commit();
 #endif
                                 }
                             }
@@ -336,7 +343,7 @@ namespace _86BoxManager.Core
             return false;
         }
 
-        internal static void UpdateWindow(double top, double left, double height, double width, bool maximized)
+        internal static void UpdateWindow(string id, double top, double left, double height, double width, bool maximized)
         {
 #if MSDB
             var update = new SQLiteCommand(null, _db, _current_transaction)
@@ -345,11 +352,12 @@ namespace _86BoxManager.Core
 #endif
             {
                 CommandText =
-                    @"UPDATE Window SET Top = @t, ""Left"" = @l, Height = @h, Width = @w, Maximized = @m"
+                    @"UPDATE Windows SET Top = @t, ""Left"" = @l, Height = @h, Width = @w, Maximized = @m WHERE ID = @id"
             };
 
             try
             {
+                update.Parameters.AddWithValue("@id", id);
                 update.Parameters.AddWithValue("@t", top);
                 update.Parameters.AddWithValue("@l", left);
                 update.Parameters.AddWithValue("@h", height);
@@ -358,7 +366,7 @@ namespace _86BoxManager.Core
 
                 if (update.ExecuteNonQuery() != 1)
                 {
-                    update.CommandText = @"Insert into Window (Top, ""Left"", Height, Width, Maximized) values (@t, @l, @h, @w, @m)";
+                    update.CommandText = @"Insert into Windows (ID, Top, ""Left"", Height, Width, Maximized) values (@id, @t, @l, @h, @w, @m)";
 
                     update.ExecuteNonQuery();
                 }
@@ -367,7 +375,7 @@ namespace _86BoxManager.Core
             finally { update.Dispose(); }
         }
 
-        internal static SizeWindow FetchWindowSize()
+        internal static SizeWindow FetchWindowSize(string id)
         {
 #if MSDB
             var fetch = new SQLiteCommand(null, _db, _current_transaction)
@@ -376,7 +384,7 @@ namespace _86BoxManager.Core
 #endif
             {
                 CommandText =
-                    @"select Top, ""Left"", Height, Width, Maximized from Window"
+                    @$"select Top, ""Left"", Height, Width, Maximized from Windows where ID = '{id}'"
             };
 
             try

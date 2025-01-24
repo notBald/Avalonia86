@@ -57,7 +57,8 @@ namespace _86BoxManager.Tools
         [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
         public static async Task RunDialog(this Window parent, Window dialog, DialogResult func = null)
         {
-            dialog.WindowStartupLocation = StartLoc.CenterOwner;
+            if (!(dialog is Views.BaseWindow))
+                dialog.WindowStartupLocation = StartLoc.CenterOwner;
             dialog.Icon = parent.Icon;
 
             var raw = dialog.ShowDialog<object>(parent);

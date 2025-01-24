@@ -177,7 +177,7 @@ namespace _86BoxManager.Views
 
             int was_imported = 0;
             int got_imported = 0;
-            var s = Program.Root.Settings;
+            var s = AppSettings.Settings;
 
             foreach (var vm in to_import)
             {

@@ -20,17 +20,18 @@ using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 
 namespace _86BoxManager.Views;
 
-public partial class dlgUpdater : Window
+public partial class dlgUpdater : BaseWindow
 {
     private readonly dlgUpdaterModel _m;
     private readonly Download86Manager _dm = new();
 
-    public dlgUpdater()
+    public dlgUpdater() : base("update")
     {
         _m = new dlgUpdaterModel(AppSettings.Settings, _dm);
         DataContext = _m;
 
         InitializeComponent();
+        BaseInit();
 
         if (!Design.IsDesignMode)
             Loaded += DlgUpdater_Loaded;
@@ -298,6 +299,9 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
     {
         get
         {
+            if (_me == null)
+                return false;
+
             return !ReferenceEquals(_me.SelectedArch, SelectedArch) ||
                    !ReferenceEquals(_me.SelectedOS, SelectedOS) ||
                    _me.PrefNDR != PrefNDR ||
@@ -445,21 +449,25 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             bool has_ndr = false;
 
             //We adjust the selection to the prefered artifact
-            foreach (var art in Artifacts)
+            if (Artifacts != null)
             {
-                if (art.FileName.Contains(SelectedOS.ID, StringComparison.InvariantCultureIgnoreCase) 
-                    && art.FileName.Contains(SelectedArch.ID, StringComparison.InvariantCultureIgnoreCase))
+                foreach (var art in Artifacts)
                 {
-                    if (candidate == null || has_ndr != PrefNDR)
+                    if (art.FileName.Contains(SelectedOS.ID, StringComparison.InvariantCultureIgnoreCase)
+                        && art.FileName.Contains(SelectedArch.ID, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        candidate = art;
-                        has_ndr = art.FileName.Contains("-NDR-");
+                        if (candidate == null || has_ndr != PrefNDR)
+                        {
+                            candidate = art;
+                            has_ndr = art.FileName.Contains("-NDR-");
+                        }
                     }
                 }
+
+                if (candidate == null && Artifacts.Count > 0)
+                    candidate = Artifacts[0];
+                SelectedArtifact = candidate;
             }
-            if (candidate == null && Artifacts.Count > 0)
-                candidate = Artifacts[0];
-            SelectedArtifact = candidate;
 
             if (UpdateROMs && (_dm.LatestRomCommit == null || RomsLastUpdated == null || _dm.LatestRomCommit.Value > RomsLastUpdated.Value))
             {

@@ -52,7 +52,7 @@ namespace _86BoxManager.Views
             var r = Program.Root;
             if (r != null)
             {
-                _s = r.Settings;
+                _s = AppSettings.Settings;
 
                 _m.OrgName = _s.PathToName(oldPath);
                 _uid = _s.PathToId(oldPath);

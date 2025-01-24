@@ -26,7 +26,7 @@ namespace _86BoxManager.Core
     internal static class VMCenter
     {
         private readonly static Dictionary<string, VMWatch> _watch = new();
-        private static AppSettings Sett => Program.Root.Settings;
+        private static AppSettings Sett => AppSettings.Settings;
 
         public static bool IsWatching => _watch.Count > 0;
 
@@ -653,7 +653,7 @@ namespace _86BoxManager.Core
                 Build = paths.Build,
                 Arch = paths.Arch,
                 Vm = vm.Tag,
-                LogFile = ui.Settings.EnableLogging ? ui.Settings.LogPath : null,
+                LogFile = AppSettings.Settings.EnableLogging ? AppSettings.Settings.LogPath : null,
                 Handle = idString != null ? (idString, hWndHex) : null
             };
             return vars;
@@ -776,7 +776,7 @@ namespace _86BoxManager.Core
                 {
                     var exec = Platforms.Manager.GetExecutor();
                     var info = exec.BuildStartInfo(GetExecArgs(ui, vis, idString));
-                    if (!ui.Settings.ShowConsole)
+                    if (!AppSettings.Settings.ShowConsole)
                     {
                         info.RedirectStandardOutput = true;
                         info.UseShellExecute = false;
@@ -795,7 +795,7 @@ namespace _86BoxManager.Core
                     vis.RefreshStatus();
 
                     // Minimize the main window if the user wants this
-                    if (ui.Settings.MinimizeOnVMStart)
+                    if (AppSettings.Settings.MinimizeOnVMStart)
                     {
                         ui.Iconify();
                     }
@@ -885,7 +885,7 @@ namespace _86BoxManager.Core
                 {
                     var exec = Platforms.Manager.GetExecutor();
                     var info = exec.BuildConfigInfo(GetExecArgs(ui, vis, null));
-                    if (!ui.Settings.ShowConsole)
+                    if (!AppSettings.Settings.ShowConsole)
                     {
                         info.RedirectStandardOutput = true;
                         info.UseShellExecute = false;

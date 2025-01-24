@@ -26,7 +26,7 @@ namespace _86BoxManager.Views
         public dlgEditVM()
         {
             InitializeComponent();
-            _m = new dlgEditModel(Program.Root != null ? Program.Root.Settings : null);
+            _m = new dlgEditModel(Program.Root != null ? AppSettings.Settings : null);
             DataContext = _m;
 
             Loaded += DlgEditVM_Loaded;

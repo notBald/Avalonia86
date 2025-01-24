@@ -15,17 +15,26 @@ using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
 using MessageType = MsBox.Avalonia.Enums.Icon;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 using Avalonia.Styling;
+using Avalonia;
 
 namespace _86BoxManager.Views
 {
-    public partial class dlgSettings : Window
+    public partial class dlgSettings : BaseWindow
     {
         private readonly dlgSettingsModel _m;
         private bool _cancel_or_ok;
 
-        public dlgSettings()
+        #region Private fields
+
+        private Size RestoreSize;
+        private PixelPoint OldPos, NewPos;
+
+        #endregion
+
+        public dlgSettings() : base("settings")
         {
             InitializeComponent();
+            BaseInit();
             Closing += dlgSettings_FormClosing;
             Closed += dlgSettings_Closed;
 
@@ -33,9 +42,6 @@ namespace _86BoxManager.Views
             DataContext = _m;
 
             _m.PropertyChanged += _m_PropertyChanged;
-
-            //Windows 10 workarround
-            NativeMSG.SetDarkMode(this);
         }
 
 
@@ -310,7 +316,7 @@ namespace _86BoxManager.Views
             try
             {
                 //Store the new values, close the key, changes are saved
-                var s = Program.Root.Settings;
+                var s = AppSettings.Settings;
                 using (var t = s.BeginTransaction())
                 {
                     string dir = _m.ExeDir;
@@ -394,7 +400,7 @@ namespace _86BoxManager.Views
         /// </summary>
         private void LoadSettings()
         {
-            var s = Program.Root.Settings;
+            var s = AppSettings.Settings;
 
             _m.ExeDir = s.EXEdir;
             _m.CFGDir = s.CFGdir;

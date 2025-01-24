@@ -138,12 +138,12 @@ namespace _86BoxManager.Core
             var ui = Program.Root;
             var lstVMs = ui.lstVMs;
 
-            var ids = ui.Settings.NameToIds(vmName);
+            var ids = AppSettings.Settings.NameToIds(vmName);
 
             // This check is necessary in case the specified VM was already removed but the shortcut remains
             if (ids != null && ids.Length > 0)
             {
-                var vis = ui.Settings.RefreshVisual(ids[0]);
+                var vis = AppSettings.Settings.RefreshVisual(ids[0]);
 
                 // If the VM is already running, display a message, otherwise, start it
                 if (vis.Status != MachineStatus.STOPPED)

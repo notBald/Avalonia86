@@ -242,6 +242,9 @@
 				<TextBlock Foreground="Green"
 						   HorizontalAlignment="Center"
 						   Text="Please set 86Box path in program settings" />
+				<TextBlock Foreground="Green" FontSize="10"
+						   HorizontalAlignment="Center"
+						   Text="(You can then download 86Box from here)" />
 			</StackPanel>
 		</DockPanel>
 		<v:ctrlGrip />

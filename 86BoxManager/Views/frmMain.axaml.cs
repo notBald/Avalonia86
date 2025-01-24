@@ -36,7 +36,7 @@ using System.Runtime.InteropServices;
 
 namespace _86BoxManager.Views
 {
-    public partial class frmMain : Window
+    public partial class frmMain : BaseWindow
     {
         #region Menu Commands
 
@@ -93,16 +93,9 @@ namespace _86BoxManager.Views
 
         #endregion
 
-        #region Private fields
-
-        private Size RestoreSize;
-        private PixelPoint OldPos, NewPos;
-
-        #endregion
-
         internal MainModel Model => (MainModel)DataContext;
 
-        internal AppSettings Settings { get; private set; }
+        private AppSettings Settings { get => AppSettings.Settings; }
 
         public static string WindowTitle
         {
@@ -120,20 +113,16 @@ namespace _86BoxManager.Views
             }
         }
 
-        public frmMain()
+        public frmMain() : base("main")
         {
             //Version number and debug string is applied to the window title, so we set it in code behind.
             Title = WindowTitle;
-
-            //Restore size is a feature missing in Avalonia, so we do it ourselves. The basic problem is that
-            //we need to know the size of the window before it was maximized when saving the window size.
-            RestoreSize = new Size(Width, Height);
-            OldPos = NewPos = Position;
 
             //Presumably this will never actually change, but just in case
             DataContextChanged += FrmMain_DataContextChanged;
 
             InitializeComponent();
+            BaseInit();
             DataContext = new MainModel();
 
             //This binding must be done after DataContext is set. I don't want to set DataContext before InitializeComponent,
@@ -156,13 +145,6 @@ namespace _86BoxManager.Views
                         mts.CompactMachine = dc.CompactList;
                 };
             }
-
-            //This is where the window size is restored
-            try
-            {
-                if (!Design.IsDesignMode)
-                    SetWindowSize();
-            } catch { }
 
             //We need to catch changes in window state.
             PropertyChanged += FrmMain_PropertyChanged;
@@ -191,96 +173,16 @@ namespace _86BoxManager.Views
                 Converter = BoolConverters.And
             };
             btnStart.BindClass("resume", mb, null);
-
-
-            //Workaround for missing RestoreSize property in Avalonia
-            // https://github.com/AvaloniaUI/Avalonia/issues/5285#issuecomment-1764175742
-            //In addition to this, we also need the old window position. We take advantage of the fact that the
-            //window will not move once maximized, so we add a handler that always saves away an "oldpos".
-            //
-            //One problem with this implementation is that we don't handle events where the screen layout
-            //changes, such as when a screen is removed. There aren't really any good ways of handling
-            //this in Avalonia.
-            this.GetPropertyChangedObservable(ClientSizeProperty).AddClassHandler<Visual>((t, args) =>
-            {
-                if (WindowState == WindowState.Normal && args.OldValue is Size rs)
-                {
-                    //Note that we store the "old value". This way we get the position before the
-                    //window was maximized, as this event will fire with the Max size in NewValue
-                    //and "WindowState == WindowState.Normal", annoyingly enough.
-                    RestoreSize = rs;
-                }
-            });
-            PositionChanged += (s, e) =>
-            {
-                OldPos = NewPos;
-                NewPos = e.Point;
-            };
-
-            NativeMSG.SetDarkMode(this);
-            if (App.Current != null)
-                App.Current.PropertyChanged += Current_PropertyChanged;
         }
 
-        private void Current_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        protected override void SetWindowParams()
         {
-            if (e.Property.Name == nameof(App.RequestedThemeVariant))
-            {
-                NativeMSG.SetDarkMode(this);
-            }
-        }
-
-        /// <summary>
-        /// Sets the window size, but makes sure not to set the window in a bad location.
-        /// </summary>
-        private void SetWindowSize()
-        {
-            var size = Core.DBStore.FetchWindowSize();
-
-            //If size for some reason fails to load, we do nothing. The window will the open with
-            //default size.
-            if (size != null && size.Width > 50 && size.Height > 50)
-            {
-                var left_pos = new PixelPoint((int)size.Left, (int)size.Top);
-                var right_pos = new PixelPoint((int)(size.Left + size.Width), (int)size.Top);
-                var windowRect = new PixelRect(left_pos, new PixelSize((int)size.Width, (int)size.Height));
-                double windowArea = windowRect.Width * windowRect.Height * 0.5;
-                double totalIntersectionArea = 0;
-                bool isPositionValid = false;
-
-                //What we want is to furfill two conditions.
-                // 1. That the top/left position on the window is visible on at least one screen.
-                //    The goal here is to avoid situations where the top of the window is above
-                //    the screen.
-                // 2. At least 50% of the window is visible on all screens combinded. Maybe we can
-                //    reduse this number, as what we want is a decent chunk of the app visible.
-                foreach (var screen in Screens.All)
-                {
-                    var intersection = screen.Bounds.Intersect(windowRect);
-                    totalIntersectionArea += intersection.Width * intersection.Height;
-
-                    if (screen.Bounds.Contains(left_pos) || screen.Bounds.Contains(right_pos))
-                        isPositionValid = true;
-                }
-
-                //Note that "windowArea" referes to the size of the app's window, and we've halved it
-                //so that we'll pass the check with half the window intersecting with all screens.
-                if (totalIntersectionArea >= windowArea && isPositionValid)
-                {
-                    Position = left_pos;
-                    Width = size.Width;
-                    Height = size.Height;
-                    if (size.Maximized)
-                        WindowState = WindowState.Maximized;
-
-                    var iw = Settings.ListWidth;
-                    if (iw.HasValue)
-                        gridSplitListMain.ColumnDefinitions[0].Width = new GridLength(iw.Value);
-                    iw = Settings.InfoWidth;
-                    if (iw.HasValue)
-                        gridSplitInfoStats.ColumnDefinitions[2].Width = new GridLength(iw.Value);
-                }
-            }
+            var iw = Settings.ListWidth;
+            if (iw.HasValue)
+                gridSplitListMain.ColumnDefinitions[0].Width = new GridLength(iw.Value);
+            iw = Settings.InfoWidth;
+            if (iw.HasValue)
+                gridSplitInfoStats.ColumnDefinitions[2].Width = new GridLength(iw.Value);
         }
 
         /// <summary>
@@ -292,7 +194,6 @@ namespace _86BoxManager.Views
             if (dc != null)
             {
                 dc.UI = this;
-                Settings = dc.Settings;
                 UpdateState();
 
                 dc.PropertyChanged += Dc_PropertyChanged;
@@ -564,23 +465,12 @@ namespace _86BoxManager.Views
                     return;
                 }
             }
+        }
 
-            using (var t = Settings.BeginTransaction())
-            {
-                if (WindowState == WindowState.Maximized)
-                    DBStore.UpdateWindow(OldPos.Y, OldPos.X, RestoreSize.Height, RestoreSize.Width, true);
-                else
-                    DBStore.UpdateWindow(Position.Y, Position.X, Height, Width, false);
-
-                try
-                {
-                    Settings.ListWidth = gridSplitListMain.ColumnDefinitions[0].Width.Value;
-                    Settings.InfoWidth = gridSplitInfoStats.ColumnDefinitions[2].Width.Value;
-                }
-                catch { }
-
-                t.Commit();
-            }
+        protected override void SaveWindowParams()
+        {
+            Settings.ListWidth = gridSplitListMain.ColumnDefinitions[0].Width.Value;
+            Settings.InfoWidth = gridSplitInfoStats.ColumnDefinitions[2].Width.Value;
         }
 
         /// <summary>
