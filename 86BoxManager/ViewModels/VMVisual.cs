@@ -2,6 +2,7 @@
 using _86BoxManager.Models;
 using _86BoxManager.Tools;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -407,6 +408,9 @@ namespace _86BoxManager.ViewModels
             this.RaisePropertyChanged(nameof(Tag));
             this.RaisePropertyChanged(nameof(IsRunning));
 
+            Uptime = TimeDifferenceFormatter.FormatTimeDifferenceAccurate(TM.Uptime ?? TimeSpan.Zero, "None", "");
+            Dispatcher.UIThread.Post(() => this.RaisePropertyChanged(nameof(Uptime)));
+
             if (Status == MachineStatus.WAITING)
                 _has_waited = true;
         }
@@ -493,14 +497,6 @@ namespace _86BoxManager.ViewModels
                     //the uptime clock.
                     if (TM.WillCommitUptime)
                         Uptime = TimeDifferenceFormatter.FormatTimeDifference(total_duration, "Just started", "");
-                }
-            }
-            else
-            {
-                if (_total_duration < _duration)
-                {
-                    Uptime = TimeDifferenceFormatter.FormatTimeDifference(_duration, "Just started", "");
-                    _total_duration = _duration;
                 }
             }
         }

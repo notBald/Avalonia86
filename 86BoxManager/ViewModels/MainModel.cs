@@ -35,6 +35,10 @@ namespace _86BoxManager.ViewModels
             //The correct code:
             set => this.RaiseAndSetIfChanged(ref _vm_is_sel, value);
         }
+
+        /// <summary>
+        /// True, even when the machine is paused or waiting.
+        /// </summary>
         public bool SelVmRunning { get => _sel_vm_run;
             //set => Dispatcher.UIThread.Post(() => this.RaiseAndSetIfChanged(ref _sel_vm_run, value));
             set => this.RaiseAndSetIfChanged(ref _sel_vm_run, value); 
