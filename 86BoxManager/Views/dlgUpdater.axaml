@@ -8,6 +8,7 @@
 		xmlns:conv="clr-namespace:_86BoxManager.Converters"
 		mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
 		Width="600" Height="450"
+		MinWidth="300" MinHeight="250"
         x:Class="_86BoxManager.Views.dlgUpdater"
 		x:DataType="v:dlgUpdaterModel"
         Title="86Box Updater"

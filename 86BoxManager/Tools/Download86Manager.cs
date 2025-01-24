@@ -29,8 +29,6 @@ public class Download86Manager : ReactiveObject
     private const string ROMS_COMMITS_URL = $"{ROMS_URL}commits";
     private const string ROMS_ZIP_URL = $"https://github.com/86Box/roms/archive/refs/heads/master.zip";
 
-    //public event Action<string> Log;
-    //public event Action<string> ErrorLog;
     private static class Operation
     {
         public const int Download86Box = 0;
@@ -185,8 +183,6 @@ public class Download86Manager : ReactiveObject
         return h;
     }
 
-    public delegate bool HandleFiles(string name, List<ExtractedFile> files, ProgressCalculator calc);
-
     /// <summary>
     /// Downloads new 86Box
     /// </summary>
@@ -300,7 +296,6 @@ public class Download86Manager : ReactiveObject
                     }
                 }
 
-                //This is a quick opperation, so I won't bother with having a progress bar or doing it on antoher thread, etc.
                 if (job.Build.FileName.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase))
                 {
                     job.AddLog($"Finished downloading 86Box artifact - Verifying");
@@ -317,9 +312,6 @@ public class Download86Manager : ReactiveObject
                     try
                     {
                         zip_data.Position = 0;
-
-                        //var test = Platforms.RequestManager(System.Runtime.InteropServices.OSPlatform.Linux);
-                        //var vii = test.Get86BoxInfo(zip_data);
 
                         var vi = Platforms.Manager.Get86BoxInfo(zip_data);
                         if (vi == null)

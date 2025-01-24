@@ -423,7 +423,7 @@ namespace _86BoxManager.Views
 
             foreach(var r in s.ListExecutables())
             {
-                var exe = new dlgSettingsModel.ExeEntery(false)
+                var exe = new dlgSettingsModel.ExeEntery((bool)r["IsDef"], false)
                 {
                     ID = (long) r["ID"],
                     Name = r["Name"] as string,
@@ -433,16 +433,18 @@ namespace _86BoxManager.Views
                     Comment = r["Comment"] as string,
                     Arch = r["Arch"] as string,
                     Build = r["Build"] as string,
-                    IsDefault = (bool) r["IsDef"]
                 };
 
                 if (exe.IsDefault)
                     is_def = false;
 
+                exe.PropertyChanged += (o, e) => _m.IsExeListChanged = true;
+
                 _m.Executables.AddOrUpdate(exe);
             }
 
             _m.IsDefChecked = is_def;
+            _m.IsExeListChanged = false;
 
             _m.Commit();
         }
@@ -490,7 +492,7 @@ namespace _86BoxManager.Views
 
                                 var ver_str = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}";
 
-                                _m.Executables.AddOrUpdate(new dlgSettingsModel.ExeEntery()
+                                _m.Executables.AddOrUpdate(new dlgSettingsModel.ExeEntery(false)
                                 {
                                     ID = -1 - _m.Executables.Count,
                                     VMPath = exe,
@@ -499,6 +501,8 @@ namespace _86BoxManager.Views
                                     Arch = vi.Arch,
                                     Build = "" + vi.FilePrivatePart
                                 });
+
+                                _m.IsExeListChanged = true;
                             }
                         }
                     }
@@ -534,7 +538,7 @@ namespace _86BoxManager.Views
 
                     if (add)
                     {
-                        _m.Executables.AddOrUpdate(new dlgSettingsModel.ExeEntery()
+                        _m.Executables.AddOrUpdate(new dlgSettingsModel.ExeEntery(false)
                         {
                             ID = -1 - _m.Executables.Count,
                             VMPath = m.ExePath,
@@ -603,18 +607,6 @@ namespace _86BoxManager.Views
                 }
             });
         }
-
-        /// <summary>
-        /// Handles both checked and unchecked.
-        /// </summary>
-        private void RadioButton_Checked(object sender, Avalonia.Interactivity.RoutedEventArgs e)
-        {
-            _m.IsExeListChanged = true;
-            if (sender is RadioButton radio && radio.DataContext is dlgSettingsModel.ExeEntery exe)
-            {
-                exe.SetChanged();
-            }
-        }
     }
 
     internal class dlgSettingsModel : ReactiveObject, IDisposable
@@ -652,7 +644,14 @@ namespace _86BoxManager.Views
         public bool IsDefChecked
         {
             get => _is_default_selected;
-            set => this.RaiseAndSetIfChanged(ref _is_default_selected, value);
+            set
+            {
+                if (value != _is_default_selected)
+                {
+                    this.RaiseAndSetIfChanged(ref _is_default_selected, value);
+                    IsExeListChanged = true;
+                }
+            }
         }
 
         public bool HasSelectedExe => _sel_exe != null;
@@ -971,10 +970,12 @@ namespace _86BoxManager.Views
 
         public class ExeEntery : ReactiveObject
         {
+            private bool _is_default;
+
             public readonly bool IsNew;
             public bool IsChanged { get; private set; }
 
-            public ExeEntery(bool is_new = true) { IsNew = is_new; }
+            public ExeEntery(bool is_default, bool is_new = true) { IsNew = is_new; _is_default = is_default; }
 
             public long ID { get; set; }
             public string Name { get; set; }
@@ -987,7 +988,19 @@ namespace _86BoxManager.Views
 
             public bool IsDeleted { get; set; }
 
-            public bool IsDefault { get; set; }
+            public bool IsDefault 
+            { 
+                get => _is_default; 
+                set
+                {
+                    if (value != _is_default)
+                    {
+                        _is_default = value;
+                        IsChanged = true;
+                        this.RaisePropertyChanged(nameof(IsChanged));
+                    }
+                }
+            }
 
             public void SetChanged()
             {
