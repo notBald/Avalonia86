@@ -1,10 +1,10 @@
 ﻿using _86BoxManager.Core;
+using _86BoxManager.Tools;
 using _86BoxManager.Views;
 using _86BoxManager.Xplat;
 using Avalonia;
 using Avalonia.ReactiveUI;
 using System;
-using _86BoxManager.Tools;
 
 namespace _86BoxManager
 {

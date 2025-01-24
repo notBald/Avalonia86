@@ -24,13 +24,6 @@ namespace _86BoxManager.Views
         private readonly dlgSettingsModel _m;
         private bool _cancel_or_ok;
 
-        #region Private fields
-
-        private Size RestoreSize;
-        private PixelPoint OldPos, NewPos;
-
-        #endregion
-
         public dlgSettings() : base("settings")
         {
             InitializeComponent();
