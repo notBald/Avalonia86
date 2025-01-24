@@ -114,44 +114,6 @@ namespace _86BoxManager.Tools
         public string Full { get => first_part + and_part + post_part; }
         public string Short { get => first_part + post_part; }
 
-        /// <summary>
-        /// Quick fix for Uptime. 
-        /// </summary>
-        public string ShortAccurate
-        {
-            get
-            {
-                if (TimeDifference.TotalSeconds < 60)
-                {
-                    if (TimeDifference.Seconds == 0)
-                        return "None";
-                    if (TimeDifference.Seconds != 1)
-                        return $"{TimeDifference.Seconds} seconds";
-
-                    return "1 second";
-                }
-
-                return Short;
-            }
-        }
-
-        public string FullAccurate
-        {
-            get
-            {
-                if (TimeDifference.TotalSeconds < 60)
-                {
-                    if (TimeDifference.Seconds == 0)
-                        return "None";
-                    if (TimeDifference.Seconds != 1)
-                        return $"{TimeDifference.Seconds} seconds";
-                    return "1 second";
-                }
-
-                return Full;
-            }
-        }
-
         public TimeDifferenceResult(string first, string and, string post, TimeSpan td)
         {
             first_part = first;
