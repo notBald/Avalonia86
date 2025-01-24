@@ -27,6 +27,7 @@ target_include_directories(messagebox PRIVATE ${GTK3_INCLUDE_DIRS})
 // cmake ..
 // make
 
+// Function to handle the response from the dialog
 void on_response(GtkDialog *dialog, gint response_id, gpointer user_data) {
     gtk_widget_destroy(GTK_WIDGET(dialog));
     gtk_main_quit();
@@ -34,14 +35,18 @@ void on_response(GtkDialog *dialog, gint response_id, gpointer user_data) {
 
 void show_message_box(const char* message, const char* title) {
     GtkWidget *dialog;
+
+    // Initialize the GTK library
     gtk_init(0, NULL);
-//Use GTK_MESSAGE_INFO for "info"
+
     dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", message);
     gtk_window_set_title(GTK_WINDOW(dialog), title);
 
-    // Connect the "response" signal to the on_response function
+    // Connect the "response" signal of the dialog to the on_response function
     g_signal_connect(dialog, "response", G_CALLBACK(on_response), NULL);
 
     gtk_widget_show_all(dialog);
+
+    // Enter the GTK main loop
     gtk_main();
 }

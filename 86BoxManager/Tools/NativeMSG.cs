@@ -67,9 +67,9 @@ namespace _86BoxManager.Tools
 
         public static void Msg(string message, string title)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (IsWindows)
                 MessageBox(IntPtr.Zero, message, title, 0);
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            else if (IsLinux)
                 show_message_box(message, title);
         }
     }

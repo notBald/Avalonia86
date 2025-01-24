@@ -259,6 +259,7 @@ public class Download86Manager : ReactiveObject
             }
         }
 
+        var vm_exe = job.CurrentExe.VMExe;
         var calc = new ProgressCalculator(prog);
         ThreadPool.QueueUserWorkItem(async o =>
         {
@@ -336,7 +337,13 @@ public class Download86Manager : ReactiveObject
                         return;
                     }
 
-
+                    //Removes the old app image.
+                    if (!string.Equals(job.Build.FileName, Path.GetFileName(vm_exe)) &&
+                        File.Exists(vm_exe))
+                    {
+                        job.AddLog("Removing: " + Path.GetFileName(vm_exe));
+                        File.Delete(vm_exe);
+                    }
                 }
                 else 
                 {
