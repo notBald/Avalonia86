@@ -104,6 +104,28 @@ namespace _86BoxManager.Core
             VMCenter.CountRefresh();
         }
 
+        public void OnDialogOpened(long uid)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                var dc = (MainModel)Program.Root.DataContext;
+                var items = dc.AllMachines;
+                Console.WriteLine("I'm here");
+                foreach (var vis in items)
+                {
+                    Console.WriteLine(vis.Name);
+                    var vm = vis.Tag;
+                    if (vm.UID != uid || vis.Status == MachineStatus.WAITING)
+                        continue;
+
+                    vis.Status = MachineStatus.WAITING;
+                    vis.RefreshStatus();
+                    Program.Root.UpdateState();
+                }
+                VMCenter.CountRefresh();
+            });
+        }
+
         public void OnDialogClosed(IntPtr hWnd)
         {
             var dc = (MainModel)Program.Root.DataContext;
@@ -120,6 +142,27 @@ namespace _86BoxManager.Core
                 Program.Root.UpdateState();
             }
             VMCenter.CountRefresh();
+        }
+
+        public void OnDialogClosed(long uid)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                var dc = (MainModel)Program.Root.DataContext;
+                var items = dc.AllMachines;
+
+                foreach (var vis in items)
+                {
+                    var vm = vis.Tag;
+                    if (vm.UID != uid || vis.Status == MachineStatus.RUNNING)
+                        continue;
+
+                    vis.Status = vis.IsPaused ? MachineStatus.PAUSED : MachineStatus.RUNNING;
+                    vis.RefreshStatus();
+                    Program.Root.UpdateState();
+                }
+                VMCenter.CountRefresh();
+            });
         }
 
         public void OnManagerStartVm(string vmName)

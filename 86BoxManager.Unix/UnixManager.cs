@@ -16,6 +16,7 @@ namespace _86BoxManager.Unix
 
         public override IMessageLoop GetLoop(IMessageReceiver callback)
         {
+            _exec.CallBack = callback;
             var loop = new UnixLoop(callback, _exec);
             return loop;
         }

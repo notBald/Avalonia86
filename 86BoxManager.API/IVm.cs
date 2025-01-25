@@ -12,6 +12,11 @@ namespace _86BoxManager.API
         string Title { get; }
 
         /// <summary>
+        /// Unique identifier
+        /// </summary>
+        long UID { get; }
+
+        /// <summary>
         /// Window handle for the VM once it's started
         /// </summary>
         IntPtr hWnd { get; }

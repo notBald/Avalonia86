@@ -42,6 +42,11 @@ namespace _86BoxManager.Core
             foreach (var w in _watch.Values)
             {
                 var vm = w.Tag;
+
+                //Don't try to force stop waiting machines. It causes trouble more often than not.
+                if (w.Vis.Status == MachineStatus.WAITING)
+                    continue;
+
                 vmCount += await ForceStop(w, ui);
 
                 try

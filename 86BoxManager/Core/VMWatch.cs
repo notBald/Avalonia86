@@ -20,6 +20,7 @@ namespace _86BoxManager.Core
         private readonly VMVisual _vis;
 
         public VM Tag { get => _vis.Tag; }
+        internal VMVisual Vis { get => _vis; }
 
         internal VMWatch(BackgroundWorker bgw, VMVisual tag)
         {

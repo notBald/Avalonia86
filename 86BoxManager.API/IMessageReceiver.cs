@@ -11,7 +11,9 @@ namespace _86BoxManager.API
         void OnVmResumed(IntPtr hWnd);
 
         void OnDialogOpened(IntPtr hWnd);
+        void OnDialogOpened(long uid);
         void OnDialogClosed(IntPtr hWnd);
+        void OnDialogClosed(long uid);
 
         void OnManagerStartVm(string vmName);
     }
