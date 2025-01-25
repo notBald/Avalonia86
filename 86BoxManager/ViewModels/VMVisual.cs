@@ -442,6 +442,9 @@ namespace _86BoxManager.ViewModels
             _duration = TM.Uptime.HasValue ? TM.Uptime.Value : TimeSpan.Zero;
 
             UpdateClocks(DateTime.Now);
+            //Uptime is only set when running
+            if (!IsRunning)
+                Uptime = TimeDifferenceFormatter.FormatTimeDifferenceAccurate(TM.Uptime ?? TimeSpan.Zero, "None", "");
         }
 
         public void SetLastRun(DateTime lastRun)
