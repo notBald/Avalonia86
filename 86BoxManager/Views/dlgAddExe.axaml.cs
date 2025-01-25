@@ -78,7 +78,7 @@ public partial class dlgAddExe : Window
 
         string path = string.IsNullOrWhiteSpace(DefExePath) ? "" : DefExePath;
 
-        var exe = NativeMSG.IsWindows ? ".exe" : null;
+        var exe = CurrentApp.IsWindows ? ".exe" : null;
         var file_name = await Dialogs.OpenFile(text, path, "", this, exe);
 
         if (file_name != null)

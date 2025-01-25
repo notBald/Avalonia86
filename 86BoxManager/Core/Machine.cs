@@ -1,5 +1,6 @@
 ﻿using _86BoxManager.Tools;
 using _86BoxManager.ViewModels;
+using _86BoxManager.Xplat;
 using Avalonia.Threading;
 using ReactiveUI;
 using System;
@@ -103,7 +104,7 @@ namespace _86BoxManager.Core
             _minutte_clock.Start();
 
             //Linux does not get the waiting/paused events from 86Box.
-            if (!Program.IsLinux)
+            if (!CurrentApp.IsLinux)
             {
                 _throttle_timer.Interval = 250;
             }
@@ -192,7 +193,7 @@ namespace _86BoxManager.Core
                 //This is quite dependent on quirks of 86Box, making it fragile. A more robust
                 //solution is probably to set the throttle_timer to a much higher value.
                 parse_config = (!_current.IsRunning || _current.Status == MachineStatus.RUNNING && _current.ClearWaiting()) 
-                    || Program.IsLinux || _current.IsConfig;
+                    || CurrentApp.IsLinux || _current.IsConfig;
                 check_size = parse_config;
             }
             else if (string.Equals(e.FullPath, _86box_prt_path, StringComparison.InvariantCultureIgnoreCase) ||

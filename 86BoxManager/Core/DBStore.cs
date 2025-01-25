@@ -93,7 +93,7 @@ namespace _86BoxManager.Core
             string db_name = AppName + ".sqlite";
 
             //First, we look for a database in the local folder or appdata folder.
-            string local_path = Path.Combine(CurrentApp.StartupPath, db_name);
+            string local_path = Path.Combine(CurrentApp.TrueStartupPath, db_name);
             string app_folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SettingsFolder);
             string app_path = Path.Combine(app_folder, db_name);
             SQLiteConnection con;

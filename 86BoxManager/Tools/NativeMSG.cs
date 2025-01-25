@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Styling;
+using _86BoxManager.Xplat;
 
 namespace _86BoxManager.Tools
 {
@@ -14,13 +15,10 @@ namespace _86BoxManager.Tools
     /// </summary>
     internal static class NativeMSG
     {
-        public static bool IsLinux { get => RuntimeInformation.IsOSPlatform(OSPlatform.Linux); }
-        public static bool IsWindows { get => RuntimeInformation.IsOSPlatform(OSPlatform.Windows); }
-        private static bool IsWindows10 { get => Environment.OSVersion.Version.Major == 10; }
-
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
 
+        private static bool IsWindows10 { get => Environment.OSVersion.Version.Major == 10; }
 
         [DllImport("libmessagebox.so", CallingConvention = CallingConvention.Cdecl)]
         private static extern void show_message_box(string message, string title);
@@ -39,7 +37,7 @@ namespace _86BoxManager.Tools
             if (Design.IsDesignMode)
                 return;
 
-            if (IsWindows && IsWindows10 && App.Current != null)
+            if (CurrentApp.IsWindows && IsWindows10 && App.Current != null)
             {
                 var build = Environment.OSVersion.Version.Build;
                 var attrib = (build > 18985) ? DWMWA_USE_IMMERSIVE_DARK_MODE : DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1;
@@ -67,9 +65,9 @@ namespace _86BoxManager.Tools
 
         public static void Msg(string message, string title)
         {
-            if (IsWindows)
+            if (CurrentApp.IsWindows)
                 MessageBox(IntPtr.Zero, message, title, 0);
-            else if (IsLinux)
+            else if (CurrentApp.IsLinux)
                 show_message_box(message, title);
         }
     }

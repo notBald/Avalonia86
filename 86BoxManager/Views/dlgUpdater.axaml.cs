@@ -1,5 +1,6 @@
 using _86BoxManager.Core;
 using _86BoxManager.Tools;
+using _86BoxManager.Xplat;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -371,9 +372,9 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             }
             if (SelectedOS == null)
             {
-                if (NativeMSG.IsLinux)
+                if (CurrentApp.IsLinux)
                     SelectedOS = OSs[0];
-                else if (NativeMSG.IsWindows)
+                else if (CurrentApp.IsWindows)
                     SelectedOS = OSs[2];
                 else
                     SelectedOS = OSs[1];

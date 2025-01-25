@@ -36,7 +36,7 @@ namespace _86BoxManager.Unix
         private void SendCommand(IVm vm, string message)
         {
             var vmName = vm.Title;
-            var client = _executor.GetClient(vmName);
+            var client = _executor.GetClient(vm);
             if (client == null)
                 return;
             var text = message + "\n";

@@ -34,7 +34,7 @@ namespace _86BoxManager.Unix
             Dispose();
         }
 
-        private string GetName(IVm vm) => vm.Title.Replace('/', '_');
+        private string GetName(IVm vm) => vm.Title.Replace('/', '_')+vm.UID;
 
         public override ProcessStartInfo BuildStartInfo(IExecVars args)
         {
@@ -178,9 +178,9 @@ namespace _86BoxManager.Unix
             }
         }
 
-        internal Socket GetClient(string name)
+        internal Socket GetClient(IVm vm)
         {
-            return _runningVm.TryGetValue(name.Replace('/', '_'), out var info) ? info.Client : null;
+            return _runningVm.TryGetValue(GetName(vm), out var info) ? info.Client : null;
         }
     }
 }

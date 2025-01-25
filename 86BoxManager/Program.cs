@@ -5,6 +5,8 @@ using _86BoxManager.Xplat;
 using Avalonia;
 using Avalonia.ReactiveUI;
 using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace _86BoxManager
 {
@@ -18,22 +20,16 @@ namespace _86BoxManager
 
         internal static frmMain Root;
 
-        internal static bool IsLinux;
-
         [STAThread]
         private static int Main(string[] args)
         {
-            if (NativeMSG.IsLinux)
+            //Causes current app to determine startup path
+            if (CurrentApp.IsLinux)
             {
-                IsLinux = true;
 #if DEBUG
                 // Set the process name on Linux
                 NativeMSG.prctl(NativeMSG.PR_SET_NAME, "Avalonia86", IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
 #endif
-            }
-            else
-            {
-                IsLinux = false;
             }
 
             try
@@ -76,7 +72,7 @@ namespace _86BoxManager
                 Console.WriteLine(ex.Message);
 
                 NativeMSG.Msg(ex.Message, "App init failed");
-                NativeMSG.Msg(ex.StackTrace, "Stacktrace");
+                //NativeMSG.Msg(ex.StackTrace, "Stacktrace");
 
                 return -1;
             }
