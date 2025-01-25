@@ -72,7 +72,7 @@ namespace _86BoxManager
                 Console.WriteLine(ex.Message);
 
                 NativeMSG.Msg(ex.Message, "App init failed");
-                //NativeMSG.Msg(ex.StackTrace, "Stacktrace");
+                NativeMSG.Msg(ex.StackTrace, "Stacktrace");
 
                 return -1;
             }
