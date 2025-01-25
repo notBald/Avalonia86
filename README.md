@@ -33,7 +33,9 @@ You may have to install .net 9.0. In that case, you will get a message like the 
 
 ## Using on Linux
 
-See the [Linux Guide](Linux.md).
+For older builds, see the [Linux Guide](Linux.md).
+
+Newer builds are AppImages, same as 86Box.
 
 ## How to build
 
