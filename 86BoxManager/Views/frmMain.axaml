@@ -346,7 +346,7 @@
 				<Button Click="btnExe_Click" IsVisible="{Binding ToolbarPSBtn}">
 					<StackPanel Classes="start">
 						<Image Height="32" Width="32" Source="/Assets/Actions/29 - gears2 32x32.png" />
-						<TextBlock Text="Executable" />
+						<TextBlock Text="Exe Manager" />
 					</StackPanel>
 				</Button>
 				<Rectangle Fill="#8a8a8a" Width="1" Margin="1,2,0,2"/>
