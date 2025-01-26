@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\86BoxManager.Common\86BoxManager.Common.csproj" />
+    <ProjectReference Include="..\86BoxManager.Common\Avalonia86.Common.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\86BoxManager.API\86BoxManager.API.csproj" />
+    <ProjectReference Include="..\86BoxManager.API\Avalonia86.API.csproj" />
   </ItemGroup>
 
 </Project>

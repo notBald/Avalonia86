@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "86BoxManager.API", "86BoxManager.API\86BoxManager.API.csproj", "{CFFBD1C4-08B0-4367-ACAC-9FFEB0E8C498}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avalonia86.API", "86BoxManager.API\Avalonia86.API.csproj", "{CFFBD1C4-08B0-4367-ACAC-9FFEB0E8C498}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "86BoxManager.Common", "86BoxManager.Common\86BoxManager.Common.csproj", "{88B71811-8D21-4AD2-BB89-6B2E8913CB43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avalonia86.Common", "86BoxManager.Common\Avalonia86.Common.csproj", "{88B71811-8D21-4AD2-BB89-6B2E8913CB43}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "86BoxManager.Linux", "86BoxManager.Linux\86BoxManager.Linux.csproj", "{2EEC0C04-8C2E-42B1-A7B1-195F1A6C52D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avalonia86.Linux", "86BoxManager.Linux\Avalonia86.Linux.csproj", "{2EEC0C04-8C2E-42B1-A7B1-195F1A6C52D4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "86BoxManager.Mac", "86BoxManager.Mac\86BoxManager.Mac.csproj", "{9DE359DC-835A-4E13-A3A4-4D668F6DB641}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avalonia86.Mac", "86BoxManager.Mac\Avalonia86.Mac.csproj", "{9DE359DC-835A-4E13-A3A4-4D668F6DB641}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "86BoxManager.Unix", "86BoxManager.Unix\86BoxManager.Unix.csproj", "{3C8FE45D-8700-4C63-B737-E922E8AF5A66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avalonia86.Unix", "86BoxManager.Unix\Avalonia86.Unix.csproj", "{3C8FE45D-8700-4C63-B737-E922E8AF5A66}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "86BoxManager.Windows", "86BoxManager.Windows\86BoxManager.Windows.csproj", "{DB4AD9FA-D9D5-497A-B5DB-8BC75898F4EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avalonia86.Windows", "86BoxManager.Windows\Avalonia86.Windows.csproj", "{DB4AD9FA-D9D5-497A-B5DB-8BC75898F4EE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{FB9C017E-A47B-457A-B860-A22E607F7BDA}"
 EndProject
@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{11633D7A-1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cross", "Cross", "{FE40DF74-77EB-454F-9CFC-1474A694C634}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "86BoxManager.Core", "86BoxManager.Core\86BoxManager.Core.csproj", "{64F8FA04-E8AF-4787-9C70-68EF6A289D5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avalonia86.Core", "86BoxManager.Core\Avalonia86.Core.csproj", "{64F8FA04-E8AF-4787-9C70-68EF6A289D5A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Avalonia86", "86BoxManager\Avalonia86.csproj", "{AC773A3C-59A7-449E-8196-55D078C3E0DB}"
 EndProject

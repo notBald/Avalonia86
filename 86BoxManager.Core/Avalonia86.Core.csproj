@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\86BoxManager.Linux\86BoxManager.Linux.csproj" />
-    <ProjectReference Include="..\86BoxManager.Mac\86BoxManager.Mac.csproj" />
-    <ProjectReference Include="..\86BoxManager.Windows\86BoxManager.Windows.csproj" />
+    <ProjectReference Include="..\86BoxManager.Linux\Avalonia86.Linux.csproj" />
+    <ProjectReference Include="..\86BoxManager.Mac\Avalonia86.Mac.csproj" />
+    <ProjectReference Include="..\86BoxManager.Windows\Avalonia86.Windows.csproj" />
   </ItemGroup>
 
 </Project>
