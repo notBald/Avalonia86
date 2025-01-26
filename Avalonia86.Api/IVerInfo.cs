@@ -1,15 +1,14 @@
-﻿namespace _86BoxManager.API
+﻿namespace Avalonia86.API;
+
+public interface IVerInfo
 {
-    public interface IVerInfo
-    {
-        int FilePrivatePart { get; }
+    int FilePrivatePart { get; }
 
-        int FileMajorPart { get; }
+    int FileMajorPart { get; }
 
-        int FileMinorPart { get; }
+    int FileMinorPart { get; }
 
-        int FileBuildPart { get; }
+    int FileBuildPart { get; }
 
-        string Arch {  get; }
-    }
+    string Arch {  get; }
 }

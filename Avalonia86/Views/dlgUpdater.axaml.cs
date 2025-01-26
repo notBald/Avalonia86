@@ -1,6 +1,6 @@
-using _86BoxManager.Core;
-using _86BoxManager.Tools;
-using _86BoxManager.Xplat;
+using Avalonia86.Core;
+using Avalonia86.Tools;
+using Avalonia86.Xplat;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -14,12 +14,12 @@ using System.Globalization;
 using System.IO;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using static _86BoxManager.Tools.JenkinsBase;
-using static _86BoxManager.Views.dlgUpdaterModel;
+using static Avalonia86.Tools.JenkinsBase;
+using static Avalonia86.Views.dlgUpdaterModel;
 using IOPath = System.IO.Path;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 
-namespace _86BoxManager.Views;
+namespace Avalonia86.Views;
 
 public partial class dlgUpdater : BaseWindow
 {

@@ -2,7 +2,7 @@
 using System.IO;
 
 
-namespace _86BoxManager.Tools
+namespace Avalonia86.Tools
 {
     public class FolderSizeCalculator
     {

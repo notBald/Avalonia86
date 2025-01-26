@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace _86BoxManager.Tools;
+namespace Avalonia86.Tools;
 
 public abstract class JenkinsBase
 {

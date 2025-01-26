@@ -3,11 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Metadata;
 using System;
 using System.Collections.Generic;
-using _86BoxManager.ViewModels;
+using Avalonia86.ViewModels;
 using Avalonia.Media;
 using Avalonia;
 
-namespace _86BoxManager.Converters
+namespace Avalonia86.Converters
 {
     public class MachineTemplateSelector : AvaloniaObject, IDataTemplate
     {

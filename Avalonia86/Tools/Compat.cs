@@ -5,36 +5,35 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace _86BoxManager.Tools
+namespace Avalonia86.Tools;
+
+public static class Compat
 {
-    public static class Compat
+    public static bool IsActive(this ToggleButton toggle)
+        => toggle.IsChecked == true;
+
+    public static bool IsEditable(this TextBox box, bool value)
     {
-        public static bool IsActive(this ToggleButton toggle)
-            => toggle.IsChecked == true;
+        box.IsReadOnly = !value;
+        return value;
+    }
 
-        public static bool IsEditable(this TextBox box, bool value)
-        {
-            box.IsReadOnly = !value;
-            return value;
-        }
+    public static void Iconify(this Window window)
+    {
+        window.WindowState = WindowState.Minimized;
+    }
 
-        public static void Iconify(this Window window)
-        {
-            window.WindowState = WindowState.Minimized;
-        }
+    public static void SetColorTxt(this ContentControl label, ISolidColorBrush color,
+        FontWeight weight, string text)
+    {
+        label.Foreground = color;
+        label.FontWeight = weight;
+        label.Content = text;
+    }
 
-        public static void SetColorTxt(this ContentControl label, ISolidColorBrush color,
-            FontWeight weight, string text)
-        {
-            label.Foreground = color;
-            label.FontWeight = weight;
-            label.Content = text;
-        }
-
-        public static void OnTextChanged(this TextBox txtBox, Action<object, TextInputEventArgs> handler)
-        {
-            var observable = txtBox.GetObservable(TextBox.TextProperty);
-            observable.Subscribe(text => handler(txtBox, new TextInputEventArgs { Text = text }));
-        }
+    public static void OnTextChanged(this TextBox txtBox, Action<object, TextInputEventArgs> handler)
+    {
+        var observable = txtBox.GetObservable(TextBox.TextProperty);
+        observable.Subscribe(text => handler(txtBox, new TextInputEventArgs { Text = text }));
     }
 }

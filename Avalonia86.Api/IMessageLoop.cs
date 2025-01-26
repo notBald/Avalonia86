@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace _86BoxManager.API
+namespace Avalonia86.API;
+
+public interface IMessageLoop
 {
-    public interface IMessageLoop
-    {
-        IntPtr GetHandle();
-    }
+    IntPtr GetHandle();
 }

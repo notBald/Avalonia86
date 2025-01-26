@@ -1,4 +1,4 @@
-using _86BoxManager.Core;
+using Avalonia86.Core;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -6,7 +6,7 @@ using ReactiveUI;
 using System.Collections.Generic;
 using System.IO;
 
-namespace _86BoxManager.Views;
+namespace Avalonia86.Views;
 
 public partial class ctrlSetExecutable : UserControl
 {

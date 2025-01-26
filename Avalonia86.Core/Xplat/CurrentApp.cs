@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace _86BoxManager.Xplat;
+namespace Avalonia86.Xplat;
 
 public static class CurrentApp
 {

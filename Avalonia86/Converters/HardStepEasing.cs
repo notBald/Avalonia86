@@ -1,7 +1,7 @@
 ﻿using Avalonia.Animation.Easings;
 using System;
 
-namespace _86BoxManager.Converters;
+namespace Avalonia86.Converters;
 
 public class HardStepEasing : Easing
 {

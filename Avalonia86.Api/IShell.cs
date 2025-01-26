@@ -1,21 +1,20 @@
 ﻿using System;
 
-namespace _86BoxManager.API
+namespace Avalonia86.API;
+
+public interface IShell
 {
-    public interface IShell
-    {
-        void CreateShortcut(string address, string name, string desc, string startup);
+    void CreateShortcut(string address, string name, string desc, string startup);
 
-        void PushToForeground(IntPtr window);
+    void PushToForeground(IntPtr window);
 
-        void PrepareAppId(string appId);
+    void PrepareAppId(string appId);
 
-        void OpenFolder(string folder);
+    void OpenFolder(string folder);
 
-        void EditFile(string file);
+    void EditFile(string file);
 
-        string DetermineExeName(string exePath, string[] exeNames);
+    string DetermineExeName(string exePath, string[] exeNames);
 
-        bool SetExecutable(string filePath);
-    }
+    bool SetExecutable(string filePath);
 }

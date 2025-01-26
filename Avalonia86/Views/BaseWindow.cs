@@ -1,5 +1,5 @@
-﻿using _86BoxManager.Core;
-using _86BoxManager.Tools;
+﻿using Avalonia86.Core;
+using Avalonia86.Tools;
 using Avalonia;
 using Avalonia.Controls;
 using System;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _86BoxManager.Views;
+namespace Avalonia86.Views;
 
 public abstract class BaseWindow : Window
 {

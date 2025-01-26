@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="_86BoxManager.Views.ctrlGrip">
+             x:Class="Avalonia86.Views.ctrlGrip">
 	<!-- Instead of using a PNG or SVG, we paint the dots directly. Note, we have not implemented any rezise logic. I was planning to use <actipro:WindowResizeGrip /> but it does not work. -->
 	<Canvas>
 		<Rectangle Height="2" Width="2" Fill="#bfbfbf" Canvas.Right="2" Canvas.Bottom="2"/>

@@ -1,22 +1,21 @@
 using System.Diagnostics;
-using _86BoxManager.API;
-using _86BoxManager.Common;
+using Avalonia86.API;
+using Avalonia86.Common;
 
-namespace _86BoxManager.Windows.Internal
+namespace Avalonia86.Windows.Internal;
+
+internal sealed class WinExecutor : CommonExecutor
 {
-    internal sealed class WinExecutor : CommonExecutor
+    public override ProcessStartInfo BuildStartInfo(IExecVars args)
     {
-        public override ProcessStartInfo BuildStartInfo(IExecVars args)
+        var info = base.BuildStartInfo(args);
+        var ops = info.ArgumentList;
+        if (args.Handle != null)
         {
-            var info = base.BuildStartInfo(args);
-            var ops = info.ArgumentList;
-            if (args.Handle != null)
-            {
-                ops.Add("--hwnd");
-                var (idString, hWndHex) = args.Handle.Value;
-                ops.Add($"{idString},{hWndHex}");
-            }
-            return info;
+            ops.Add("--hwnd");
+            var (idString, hWndHex) = args.Handle.Value;
+            ops.Add($"{idString},{hWndHex}");
         }
+        return info;
     }
 }

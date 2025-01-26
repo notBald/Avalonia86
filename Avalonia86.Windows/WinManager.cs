@@ -3,101 +3,100 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection.PortableExecutable;
 using System.Threading;
-using _86BoxManager.API;
-using _86BoxManager.Common;
-using _86BoxManager.Windows.Internal;
-using static _86BoxManager.Windows.Internal.Win32Imports;
+using Avalonia86.API;
+using Avalonia86.Common;
+using Avalonia86.Windows.Internal;
+using static Avalonia86.Windows.Internal.Win32Imports;
 
-namespace _86BoxManager.Windows
+namespace Avalonia86.Windows;
+
+public sealed class WinManager : CommonManager, IManager
 {
-    public sealed class WinManager : CommonManager, IManager
+    private static Mutex mutex = null;
+
+    public override bool IsFirstInstance(string name)
     {
-        private static Mutex mutex = null;
+        //Use a mutex to check if this is the first instance of Manager
+        mutex = new Mutex(true, name, out var firstInstance);
+        return firstInstance;
+    }
 
-        public override bool IsFirstInstance(string name)
-        {
-            //Use a mutex to check if this is the first instance of Manager
-            mutex = new Mutex(true, name, out var firstInstance);
-            return firstInstance;
-        }
+    public override IntPtr RestoreAndFocus(string windowTitle, string handleTitle)
+    {
+        //Finds the existing window, unhides it, restores it and sets focus to it
+        var hWnd = FindWindow(null, windowTitle);
+        ShowWindow(hWnd, ShowWindowEnum.Show);
+        ShowWindow(hWnd, ShowWindowEnum.Restore);
+        SetForegroundWindow(hWnd);
 
-        public override IntPtr RestoreAndFocus(string windowTitle, string handleTitle)
-        {
-            //Finds the existing window, unhides it, restores it and sets focus to it
-            var hWnd = FindWindow(null, windowTitle);
-            ShowWindow(hWnd, ShowWindowEnum.Show);
-            ShowWindow(hWnd, ShowWindowEnum.Restore);
-            SetForegroundWindow(hWnd);
+        hWnd = FindWindow(null, handleTitle);
+        return hWnd;
+    }
 
-            hWnd = FindWindow(null, handleTitle);
-            return hWnd;
-        }
-
-        protected override bool IsExecutable(FileInfo fileInfo)
-        {
-            if (fileInfo == null)
-                return false;
-
-            string[] executableExtensions = { ".exe", ".bat", ".cmd", ".com" };
-            string fileExtension = fileInfo.Extension.ToLower();
-
-            foreach (string extension in executableExtensions)
-            {
-                if (fileExtension == extension)
-                    return true;
-            }
-
+    protected override bool IsExecutable(FileInfo fileInfo)
+    {
+        if (fileInfo == null)
             return false;
+
+        string[] executableExtensions = { ".exe", ".bat", ".cmd", ".com" };
+        string fileExtension = fileInfo.Extension.ToLower();
+
+        foreach (string extension in executableExtensions)
+        {
+            if (fileExtension == extension)
+                return true;
         }
 
-        public override IVerInfo Get86BoxInfo(string path)
+        return false;
+    }
+
+    public override IVerInfo Get86BoxInfo(string path)
+    {
+        if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
         {
-            if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            var vi = new WinVerInfo(FileVersionInfo.GetVersionInfo(path));
+
+            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
-                var vi = new WinVerInfo(FileVersionInfo.GetVersionInfo(path));
-
-                using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+                using (var reader = new PEReader(stream))
                 {
-                    using (var reader = new PEReader(stream))
-                    {
-                        var headers = reader.PEHeaders;
-                        vi.Arch = headers.CoffHeader.Machine.ToString();
-                    }
+                    var headers = reader.PEHeaders;
+                    vi.Arch = headers.CoffHeader.Machine.ToString();
                 }
-
-                return vi;
             }
+
+            return vi;
+        }
+        return null;
+    }
+
+    public override IVerInfo GetBoxVersion(string exeDir)
+    {
+        var exePath = Path.Combine(exeDir, "86Box.exe");
+        if (!File.Exists(exePath))
+        {
+            // Not found!
             return null;
         }
+        var vi = FileVersionInfo.GetVersionInfo(exePath);
+        return new WinVerInfo(vi);
+    }
 
-        public override IVerInfo GetBoxVersion(string exeDir)
-        {
-            var exePath = Path.Combine(exeDir, "86Box.exe");
-            if (!File.Exists(exePath))
-            {
-                // Not found!
-                return null;
-            }
-            var vi = FileVersionInfo.GetVersionInfo(exePath);
-            return new WinVerInfo(vi);
-        }
+    public override IMessageLoop GetLoop(IMessageReceiver callback)
+    {
+        var loop = new WinLoop(callback);
+        return loop;
+    }
 
-        public override IMessageLoop GetLoop(IMessageReceiver callback)
-        {
-            var loop = new WinLoop(callback);
-            return loop;
-        }
+    public override IMessageSender GetSender()
+    {
+        var loop = new WinLoop(null);
+        return loop;
+    }
 
-        public override IMessageSender GetSender()
-        {
-            var loop = new WinLoop(null);
-            return loop;
-        }
-
-        public override IExecutor GetExecutor()
-        {
-            var exec = new WinExecutor();
-            return exec;
-        }
+    public override IExecutor GetExecutor()
+    {
+        var exec = new WinExecutor();
+        return exec;
     }
 }

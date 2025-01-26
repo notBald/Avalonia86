@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace _86BoxManager.Tools;
+namespace Avalonia86.Tools;
 
 public class ProgressCalculator
 {

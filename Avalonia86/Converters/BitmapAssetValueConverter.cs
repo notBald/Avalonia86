@@ -5,7 +5,7 @@ using System;
 using System.Globalization;
 using System.Reflection;
 
-namespace _86BoxManager.Converters
+namespace Avalonia86.Converters
 {
     /// <summary>
     /// <para>

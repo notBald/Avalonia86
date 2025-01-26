@@ -1,64 +1,63 @@
 ﻿using System;
 using System.IO;
 
-namespace _86BoxManager.Linux
+namespace Avalonia86.Linux;
+
+internal class OffsetStream : Stream
 {
-    internal class OffsetStream : Stream
+    private readonly Stream baseStream;
+    private readonly long offset;
+
+    public OffsetStream(Stream baseStream, long offset)
     {
-        private readonly Stream baseStream;
-        private readonly long offset;
+        this.baseStream = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
+        this.offset = offset;
 
-        public OffsetStream(Stream baseStream, long offset)
+        if (!baseStream.CanRead)
         {
-            this.baseStream = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
-            this.offset = offset;
-
-            if (!baseStream.CanRead)
-            {
-                throw new ArgumentException("Base stream must be readable.", nameof(baseStream));
-            }
-
-            baseStream.Seek(offset, SeekOrigin.Begin);
+            throw new ArgumentException("Base stream must be readable.", nameof(baseStream));
         }
 
-        public override bool CanRead => baseStream.CanRead;
-        public override bool CanSeek => baseStream.CanSeek;
-        public override bool CanWrite => false;
-        public override long Length => baseStream.Length - offset;
+        baseStream.Seek(offset, SeekOrigin.Begin);
+    }
 
-        public override long Position
+    public override bool CanRead => baseStream.CanRead;
+    public override bool CanSeek => baseStream.CanSeek;
+    public override bool CanWrite => false;
+    public override long Length => baseStream.Length - offset;
+
+    public override long Position
+    {
+        get => baseStream.Position - offset;
+        set => baseStream.Position = value + offset;
+    }
+
+    public override void Flush() => baseStream.Flush();
+
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        return baseStream.Read(buffer, offset, count);
+    }
+
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        if (origin == SeekOrigin.Begin)
         {
-            get => baseStream.Position - offset;
-            set => baseStream.Position = value + offset;
+            return baseStream.Seek(offset + this.offset, SeekOrigin.Begin) - this.offset;
         }
-
-        public override void Flush() => baseStream.Flush();
-
-        public override int Read(byte[] buffer, int offset, int count)
+        else
         {
-            return baseStream.Read(buffer, offset, count);
+            return baseStream.Seek(offset, origin) - this.offset;
         }
+    }
 
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            if (origin == SeekOrigin.Begin)
-            {
-                return baseStream.Seek(offset + this.offset, SeekOrigin.Begin) - this.offset;
-            }
-            else
-            {
-                return baseStream.Seek(offset, origin) - this.offset;
-            }
-        }
+    public override void SetLength(long value)
+    {
+        throw new NotSupportedException("OffsetStream does not support setting length.");
+    }
 
-        public override void SetLength(long value)
-        {
-            throw new NotSupportedException("OffsetStream does not support setting length.");
-        }
-
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            throw new NotSupportedException("OffsetStream is read-only.");
-        }
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        throw new NotSupportedException("OffsetStream is read-only.");
     }
 }

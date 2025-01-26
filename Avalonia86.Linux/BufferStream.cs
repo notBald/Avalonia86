@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace _86BoxManager.Linux;
+namespace Avalonia86.Linux;
 
 public class BufferStream : Stream
 {

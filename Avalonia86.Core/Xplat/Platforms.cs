@@ -1,53 +1,52 @@
 using System;
 using System.Runtime.InteropServices;
-using _86BoxManager.API;
-using _86BoxManager.Windows;
-using _86BoxManager.Linux;
-using _86BoxManager.Mac;
+using Avalonia86.API;
+using Avalonia86.Windows;
+using Avalonia86.Linux;
+using Avalonia86.Mac;
 
-namespace _86BoxManager.Xplat
+namespace Avalonia86.Xplat;
+
+public static class Platforms
 {
-    public static class Platforms
+    public static readonly IShell Shell;
+    public static readonly IManager Manager;
+    public static readonly IEnv Env;
+
+    static Platforms()
     {
-        public static readonly IShell Shell;
-        public static readonly IManager Manager;
-        public static readonly IEnv Env;
-
-        static Platforms()
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                Shell = new LinuxShell();
-                Manager = new LinuxManager();
-                Env = new LinuxEnv();
-                return;
-            }
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                Shell = new MacShell();
-                Manager = new MacManager();
-                Env = new MacEnv();
-                return;
-            }
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                Shell = new WinShell();
-                Manager = new WinManager();
-                Env = new WinEnv();
-                return;
-            }
-
-            throw new InvalidOperationException("Not supported OS! Sorry!");
+            Shell = new LinuxShell();
+            Manager = new LinuxManager();
+            Env = new LinuxEnv();
+            return;
         }
 
-        public static IManager RequestManager(OSPlatform os)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            if (OSPlatform.Linux == os)
-                return new LinuxManager();
-
-            return null;
+            Shell = new MacShell();
+            Manager = new MacManager();
+            Env = new MacEnv();
+            return;
         }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            Shell = new WinShell();
+            Manager = new WinManager();
+            Env = new WinEnv();
+            return;
+        }
+
+        throw new InvalidOperationException("Not supported OS! Sorry!");
+    }
+
+    public static IManager RequestManager(OSPlatform os)
+    {
+        if (OSPlatform.Linux == os)
+            return new LinuxManager();
+
+        return null;
     }
 }

@@ -3,10 +3,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:gb="using:GroupBox.Avalonia.Controls"
-		xmlns:v="clr-namespace:_86BoxManager.Views"
+		xmlns:v="clr-namespace:Avalonia86.Views"
         mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
 		Width="500" Height="600"
-        x:Class="_86BoxManager.Views.dlgAddExe"
+        x:Class="Avalonia86.Views.dlgAddExe"
 		x:DataType="v:dlgAddExeModel"
         Title="Add 86Box Executable"
 		Background="{DynamicResource TabDlgBackground}">

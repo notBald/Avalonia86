@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ReactiveUI;
 
-namespace _86BoxManager.Views;
+namespace Avalonia86.Views;
 public class ExeModel : ReactiveObject
 {
     public long? ID { get; set; }

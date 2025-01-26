@@ -1,40 +1,39 @@
 ﻿using System;
 using System.IO;
-using _86BoxManager.Common;
+using Avalonia86.Common;
 using IWshRuntimeLibrary;
-using static _86BoxManager.Windows.Internal.Win32Imports;
+using static Avalonia86.Windows.Internal.Win32Imports;
 
-namespace _86BoxManager.Windows
+namespace Avalonia86.Windows;
+
+public sealed class WinShell : CommonShell
 {
-    public sealed class WinShell : CommonShell
+    public override void CreateShortcut(string address, string name, string desc, string startup)
     {
-        public override void CreateShortcut(string address, string name, string desc, string startup)
-        {
-            dynamic shell = new WshShell();
-            dynamic shortcut = (IWshShortcut)shell.CreateShortcut(address);
-            shortcut.Description = desc;
-            shortcut.IconLocation = $"{Path.Combine(startup, "86manager.exe")},0";
-            shortcut.TargetPath = Path.Combine(startup, "86manager.exe");
-            shortcut.Arguments = $@"-S ""{name}""";
-            shortcut.Save();
-        }
+        dynamic shell = new WshShell();
+        dynamic shortcut = (IWshShortcut)shell.CreateShortcut(address);
+        shortcut.Description = desc;
+        shortcut.IconLocation = $"{Path.Combine(startup, "86manager.exe")},0";
+        shortcut.TargetPath = Path.Combine(startup, "86manager.exe");
+        shortcut.Arguments = $@"-S ""{name}""";
+        shortcut.Save();
+    }
 
-        public override void PushToForeground(IntPtr hWnd)
-        {
-            SetForegroundWindow(hWnd);
-        }
+    public override void PushToForeground(IntPtr hWnd)
+    {
+        SetForegroundWindow(hWnd);
+    }
 
-        public override void PrepareAppId(string appId)
-        {
-            if (Environment.OSVersion.Version.Major >= 6)
-                SetProcessDPIAware();
+    public override void PrepareAppId(string appId)
+    {
+        if (Environment.OSVersion.Version.Major >= 6)
+            SetProcessDPIAware();
 
-            SetCurrentProcessExplicitAppUserModelID(appId);
-        }
+        SetCurrentProcessExplicitAppUserModelID(appId);
+    }
 
-        public override bool SetExecutable(string filePath)
-        {
-            return true;
-        }
+    public override bool SetExecutable(string filePath)
+    {
+        return true;
     }
 }

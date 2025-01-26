@@ -1,11 +1,10 @@
 using System.Diagnostics;
 
-namespace _86BoxManager.API
-{
-    public interface IExecutor
-    {
-        ProcessStartInfo BuildStartInfo(IExecVars args);
+namespace Avalonia86.API;
 
-        ProcessStartInfo BuildConfigInfo(IExecVars args);
-    }
+public interface IExecutor
+{
+    ProcessStartInfo BuildStartInfo(IExecVars args);
+
+    ProcessStartInfo BuildConfigInfo(IExecVars args);
 }

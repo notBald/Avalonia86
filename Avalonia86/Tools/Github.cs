@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace _86BoxManager.Tools;
+namespace Avalonia86.Tools;
 
 public class GithubCommit
 {

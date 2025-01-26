@@ -2,10 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:v="clr-namespace:_86BoxManager.Views"
+			 xmlns:v="clr-namespace:Avalonia86.Views"
 			 xmlns:gb="using:GroupBox.Avalonia.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="_86BoxManager.Views.ctrlSetExecutable"
+             x:Class="Avalonia86.Views.ctrlSetExecutable"
 			 x:DataType="v:ctrlSetExecutableModel">
 	<Design.DataContext>
 		<v:ctrlSetExecutableModel/>

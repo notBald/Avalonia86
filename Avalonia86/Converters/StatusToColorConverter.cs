@@ -1,4 +1,4 @@
-﻿using _86BoxManager.ViewModels;
+﻿using Avalonia86.ViewModels;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -7,7 +7,7 @@ using System;
 using System.Globalization;
 using System.Reflection;
 
-namespace _86BoxManager.Converters
+namespace Avalonia86.Converters
 {
     /// <summary>
     /// Converts a status into a color

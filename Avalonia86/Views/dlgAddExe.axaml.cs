@@ -3,11 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 using ReactiveUI;
-using _86BoxManager.Tools;
-using _86BoxManager.Xplat;
+using Avalonia86.Tools;
+using Avalonia86.Xplat;
 using System.ComponentModel;
 
-namespace _86BoxManager.Views;
+namespace Avalonia86.Views;
 
 public partial class dlgAddExe : Window
 {

@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:avalonia="clr-namespace:HyperText.Avalonia;assembly=HyperText.Avalonia"
 			 xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
-             x:Class="_86BoxManager.App">	
+             x:Class="Avalonia86.App">	
     <Application.Styles>
         <!--<FluentTheme />-->
 		<!-- ^To use Fluent theme, remove SimpleTheme and comment out "FluidThemeBits" from resources below -->

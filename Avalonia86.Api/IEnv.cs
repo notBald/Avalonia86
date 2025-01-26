@@ -1,17 +1,16 @@
-﻿namespace _86BoxManager.API
+﻿namespace Avalonia86.API;
+
+public interface IEnv
 {
-    public interface IEnv
-    {
-        string MyComputer { get; }
+    string MyComputer { get; }
 
-        string UserProfile { get; }
+    string UserProfile { get; }
 
-        string[] ExeNames { get; }
+    string[] ExeNames { get; }
 
-        string MyDocuments { get; }
+    string MyDocuments { get; }
 
-        string Desktop { get; }
+    string Desktop { get; }
 
-        string[] GetProgramFiles(string appName);
-    }
+    string[] GetProgramFiles(string appName);
 }

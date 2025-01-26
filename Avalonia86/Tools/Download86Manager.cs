@@ -1,6 +1,6 @@
-﻿using _86BoxManager.Core;
-using _86BoxManager.Views;
-using _86BoxManager.Xplat;
+﻿using Avalonia86.Core;
+using Avalonia86.Views;
+using Avalonia86.Xplat;
 using Avalonia.Threading;
 using DynamicData;
 using ReactiveUI;
@@ -14,7 +14,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace _86BoxManager.Tools;
+namespace Avalonia86.Tools;
 
 public class Download86Manager : ReactiveObject
 {

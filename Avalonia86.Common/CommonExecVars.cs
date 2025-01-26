@@ -1,23 +1,22 @@
-using _86BoxManager.API;
+using Avalonia86.API;
 
-namespace _86BoxManager.Common
+namespace Avalonia86.Common;
+
+public sealed class CommonExecVars : IExecVars
 {
-    public sealed class CommonExecVars : IExecVars
-    {
-        public string FileName { get; set; }
+    public string FileName { get; set; }
 
-        public string RomPath { get; set; }
+    public string RomPath { get; set; }
 
-        public string LogFile { get; set; }
+    public string LogFile { get; set; }
 
-        public string VmPath { get; set; }
+    public string VmPath { get; set; }
 
-        public long? Build {  get; set; }
+    public long? Build {  get; set; }
 
-        public string Arch {  get; set; }
+    public string Arch {  get; set; }
 
-        public IVm Vm { get; set; }
+    public IVm Vm { get; set; }
 
-        public (string id, string hWnd)? Handle { get; set; }
-    }
+    public (string id, string hWnd)? Handle { get; set; }
 }

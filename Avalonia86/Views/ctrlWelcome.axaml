@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
-             x:Class="_86BoxManager.Views.ctrlWelcome" MaxWidth="800"
+             x:Class="Avalonia86.Views.ctrlWelcome" MaxWidth="800"
 			 HorizontalAlignment="Left">
 	<ScrollViewer>
 		<DockPanel Margin="20, 20, 20, 0">
