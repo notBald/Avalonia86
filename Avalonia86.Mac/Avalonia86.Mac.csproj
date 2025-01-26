@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>_86BoxManager.Mac</RootNamespace>
+    <RootNamespace>Avalonia86.Mac</RootNamespace>
     <Configurations>Debug;Release;Release-MSDB;Debug-MSDB</Configurations>
   </PropertyGroup>
 

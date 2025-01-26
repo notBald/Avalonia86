@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>_86BoxManager.Common</RootNamespace>
+    <RootNamespace>Avalonia86.Common</RootNamespace>
     <Configurations>Debug;Release;Release-MSDB;Debug-MSDB</Configurations>
   </PropertyGroup>
 

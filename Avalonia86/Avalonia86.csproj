@@ -7,9 +7,9 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <RootNamespace>_86BoxManager</RootNamespace>
+    <RootNamespace>Avalonia86</RootNamespace>
     <AssemblyName>Avalonia86</AssemblyName>
-    <StartupObject>_86BoxManager.Program</StartupObject>
+    <StartupObject>Avalonia86.Program</StartupObject>
     <ApplicationIcon>86Box-gray.ico</ApplicationIcon>
     <Configurations>Debug;Release;Release-MSDB;Debug-MSDB</Configurations>
   </PropertyGroup>
