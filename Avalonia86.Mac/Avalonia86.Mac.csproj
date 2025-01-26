@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\86BoxManager.Unix\Avalonia86.Unix.csproj" />
+    <ProjectReference Include="..\Avalonia86.Unix\Avalonia86.Unix.csproj" />
   </ItemGroup>
 
 </Project>

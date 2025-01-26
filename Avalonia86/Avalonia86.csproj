@@ -90,7 +90,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\86BoxManager.Core\Avalonia86.Core.csproj" />
+    <ProjectReference Include="..\Avalonia86.Core\Avalonia86.Core.csproj" />
     <ProjectReference Include="..\GroupBox.Avalonia\GroupBox.Avalonia.csproj" />
   </ItemGroup>
 
