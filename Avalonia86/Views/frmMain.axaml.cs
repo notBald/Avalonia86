@@ -33,6 +33,7 @@ using Avalonia86.Converters;
 using System.Reactive.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
+using Avalonia86.DialogBox;
 
 namespace Avalonia86.Views;
 
@@ -500,6 +501,14 @@ public partial class frmMain : BaseWindow
     private void btnCtrlAltDel_Click(object sender, RoutedEventArgs e)
     {
         VMCenter.CtrlAltDel(Model.Machine, this);
+    }
+
+    private async void btnTest_Click(object sender, RoutedEventArgs e)
+    {
+        if (await this.ShowMsg("Hello world") == DialogResult.Ok)
+        {
+            //NativeMSG.Msg("Was OK", "OK");
+        }
     }
 
     private void btnReset_Click(object sender, RoutedEventArgs e)

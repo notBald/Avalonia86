@@ -1,15 +1,20 @@
 ﻿using Avalonia.Styling;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Avalonia.Controls;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia86.Tools;
 
 namespace Avalonia86.DialogBox;
 
 public class DialogBoxBuilder
 {
-    private DialogBoxSettings _settings = new();
+    private readonly DialogBoxSettings _settings = new();
+    private readonly Window _parent;
+
+    public DialogBoxBuilder(Window w) {  _parent = w; }
+
     public DialogBoxBuilder WithMessage(string message)
     {
         _settings.Message = message;
@@ -22,11 +27,18 @@ public class DialogBoxBuilder
 
     public async Task<DialogResult> ShowDialog()
     {
-        throw new NotImplementedException();
-        //// 1. Create DialogBoxView
-        //var view = new DialogBoxView(_settings);
+        var dlg = new DialogWindow() { DataContext = _settings };
 
-        //// 2. Show as modal dialog
-        //return await view.ShowDialog<DialogResult>();
+        if (_parent == null)
+        {
+            dlg.Show();
+        }
+        else
+        {
+            dlg.Icon = _parent.Icon;
+            await dlg.ShowDialog(_parent);
+        }
+        
+        return DialogResult.Ok;
     }
 }

@@ -210,6 +210,9 @@
 									<TextBox Text="{Binding ArchivePath}" />
 								</DockPanel>
 								<CheckBox IsChecked="{Binding PreserveROMs}" IsEnabled="{Binding UpdateROMs}" Content="Also preserve ROMs / Firmware" />
+								<TextBlock FontStyle="Italic" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Margin="0, -5, 0, 0">
+									Note, Avalonia86 will only preserve ROMs when you're both archiving 86Box and downloading new ROMs.
+								</TextBlock>
 							</StackPanel>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Selection of new build" Theme="{StaticResource GroupBoxClassic}" Grid.Row="1" Margin="0, 0, 0, 10">

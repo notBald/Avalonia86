@@ -57,14 +57,22 @@ internal static class Dialogs
     [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
     public static async Task RunDialog(this Window parent, Window dialog, DialogResult func = null)
     {
-        if (!(dialog is Views.BaseWindow))
-            dialog.WindowStartupLocation = StartLoc.CenterOwner;
-        dialog.Icon = parent.Icon;
+        try
+        {
+            if (!(dialog is Views.BaseWindow))
+                dialog.WindowStartupLocation = StartLoc.CenterOwner;
 
-        var raw = dialog.ShowDialog<object>(parent);
-        await raw;
-        func?.Invoke(raw.Result as ResponseType?);
-        (dialog as IDisposable)?.Dispose();
+            var raw = dialog.ShowDialog<object>(parent);
+
+            dialog.Icon = parent.Icon;
+            await raw;
+            func?.Invoke(raw.Result as ResponseType?);
+        }
+        finally
+        {
+            (dialog as IDisposable)?.Dispose();
+        }
+
     }
 
     public static async Task<string> SelectFolder(string dir, string title, Window parent)
