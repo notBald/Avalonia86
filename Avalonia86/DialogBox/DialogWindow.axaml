@@ -8,13 +8,6 @@
         x:Class="Avalonia86.DialogBox.DialogWindow"
 		x:DataType="db:DialogBoxSettings"
         Title="DialogWindow" SizeToContent="WidthAndHeight"
-		
-		TransparencyLevelHint="AcrylicBlur"
-        ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="PreferSystemChrome"
-        ExtendClientAreaTitleBarHeightHint="-1"
-        SystemDecorations="Full"
-		x:Name="DLG"
 		>
 	<Design.DataContext>
 		<db:DialogBoxSettings/>
@@ -23,82 +16,48 @@
 		<ResourceDictionary>
 			<ResourceDictionary.ThemeDictionaries>
 				<ResourceDictionary x:Key="Default">
-					<Color x:Key="TintColor">#CCCCCC</Color>
-					<x:Double x:Key="TintOpacity">.3</x:Double>
-					<x:Double x:Key="MaterialOpacity">.1</x:Double>
-					
-					<SolidColorBrush x:Key="OuterContentBorder" Color="#DDDFE1" />
-					<SolidColorBrush x:Key="InnerContentBorder" Color="#414851" />
+					<SolidColorBrush x:Key="BannerForground" Color="Black" />
+					<!--<SolidColorBrush x:Key="BannerBackground" Color="WhiteSmoke" />-->
+					<SolidColorBrush x:Key="BannerBorder" Color="White" />
+					<SolidColorBrush Color="#d9d9d9" x:Key="main_BorderBrush" />
 
+					<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="BannerBackground">
+						<GradientStop Color="#FFFFFF" Offset="0.0"/>
+						<GradientStop Color="#D6D6D6" Offset="1.0"/>
+					</LinearGradientBrush>
+				</ResourceDictionary>
+				<ResourceDictionary x:Key="Dark">
 					<SolidColorBrush x:Key="BannerForground" Color="Black" />
 					<SolidColorBrush x:Key="BannerBackground" Color="White" />
 					<SolidColorBrush x:Key="BannerBorder" Color="#D3D3D3" />
+					<SolidColorBrush Color="#828790" x:Key="main_BorderBrush" />
 				</ResourceDictionary>
-				</ResourceDictionary.ThemeDictionaries>
+			</ResourceDictionary.ThemeDictionaries>
 		</ResourceDictionary>
 
 
 	</Window.Resources>
 	<DockPanel>
-		<ExperimentalAcrylicBorder Name="AcrylicBorder"
-									IsHitTestVisible="False"
-									IsVisible="True"
-								   DockPanel.Dock="Top">
-			<ExperimentalAcrylicBorder.Material>
-				<ExperimentalAcrylicMaterial BackgroundSource="Digger"
-											 FallbackColor="{DynamicResource TintColor}"
-											 TintColor="{DynamicResource TintColor}"
-											 TintOpacity="{DynamicResource TintOpacity}"
-											 MaterialOpacity="{DynamicResource MaterialOpacity}"
-												/> 
-			</ExperimentalAcrylicBorder.Material>
-			<StackPanel Orientation="Horizontal" Height="30" VerticalAlignment="Top">
-				<Image Source="avares://Avalonia86/Assets/86Box-gray.png" Width="16" Height="16" Margin="14, 7, 7, 7"
-					   IsHitTestVisible="False" />
-				<TextBlock
-				 VerticalAlignment="Center"
-                 FontWeight="DemiBold"
-                 Foreground="#F1F1F1"
-                 Text="I'm in ur title bar"
-                 IsHitTestVisible="False" />
-			</StackPanel>
-		</ExperimentalAcrylicBorder>
-		<ExperimentalAcrylicBorder >
-			<ExperimentalAcrylicBorder.Material>
-				<ExperimentalAcrylicMaterial BackgroundSource="Digger"
-											 FallbackColor="{DynamicResource TintColor}"
-											 TintColor="{DynamicResource TintColor}"
-											 TintOpacity="{DynamicResource TintOpacity}"
-											 MaterialOpacity="{DynamicResource MaterialOpacity}"
-												/>
-			</ExperimentalAcrylicBorder.Material>
-			<Border BorderThickness="1" BorderBrush="{DynamicResource OuterContentBorder}" Margin="14, 0, 14, 14">
-				<Border BorderThickness="1" BorderBrush="{DynamicResource InnerContentBorder}">
-					<DockPanel>
-						<Border DockPanel.Dock="Top"
-								Background="{DynamicResource BannerBackground}"
-								Height="57"
-								BorderThickness="0, 0, 0, 1"
-								BorderBrush="{DynamicResource BannerBorder}">
-							<DockPanel Margin="9, 0, 0, 0">
-								<Image Source="avares://Avalonia86/Assets/86Box-gray.png"
-									   Margin="0, 2, 12, 2" DockPanel.Dock="Right"
-									IsHitTestVisible="False" />
-								<StackPanel>
-									<TextBlock FontSize="18.6" Foreground="{DynamicResource BannerForground}" FontWeight="Bold" Margin="0, 5, 0, 0" TextTrimming="CharacterEllipsis">Main header</TextBlock>
-									<TextBlock FontSize="14.6" Foreground="{DynamicResource BannerForground}" TextTrimming="CharacterEllipsis">Sub header</TextBlock>
-								</StackPanel>
-							</DockPanel>
-						</Border>
-						<Border BorderThickness="0, 1, 0, 0" BorderBrush="{DynamicResource BannerBorder}">
-							<StackPanel Margin="{Binding #DLG.WindowDecorationMargin}">
-								<TextBlock
-										   Text="hello world" />
-							</StackPanel>
-						</Border>
-					</DockPanel>
-				</Border>
-			</Border>
-		</ExperimentalAcrylicBorder>
+		<Border DockPanel.Dock="Top"
+				Background="{DynamicResource BannerBackground}"
+				Height="58">
+			<DockPanel Margin="9, 0, 0, 0">
+				<Image Source="avares://Avalonia86/Assets/86Box-gray.png"
+						Margin="0, 2, 12, 2" DockPanel.Dock="Right"
+					IsHitTestVisible="False" />
+				<StackPanel>
+					<TextBlock FontSize="18.6" Foreground="{DynamicResource BannerForground}" FontWeight="Bold" Margin="0, 5, 0, 0" TextTrimming="CharacterEllipsis">Main header</TextBlock>
+					<TextBlock FontSize="14.6" Foreground="{DynamicResource BannerForground}" TextTrimming="CharacterEllipsis">Sub header</TextBlock>
+				</StackPanel>
+			</DockPanel>
+		</Border>
+		<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="10">
+			<Button>OK</Button>
+			<Button>Cancel</Button>
+		</StackPanel>
+		<Border BorderThickness="0, 1" BorderBrush="{DynamicResource main_BorderBrush}" Margin="0, 1">
+			<TextBlock Margin="7"
+						Text="Hello world, here is a sentence of text!" />
+		</Border>
 	</DockPanel>
 </Window>
