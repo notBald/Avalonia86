@@ -462,8 +462,16 @@
 										<Image Source="/Assets/Actions/6 - delete.png" />
 									</MenuItem.Icon>
 								</MenuItem>
-								<MenuItem Header="Open folder in Explorer" Click="openFolderToolStripMenuItem_Click" IsEnabled="True" />
-								<MenuItem Header="Open config file" Click="openConfigFileToolStripMenuItem_Click" IsEnabled="True" />
+								<MenuItem Header="Open folder in Explorer" Click="openFolderToolStripMenuItem_Click" IsEnabled="True">
+									<MenuItem.Icon>
+										<Image Source="/Assets/Mix/file.png" />
+									</MenuItem.Icon>
+								</MenuItem>	
+								<MenuItem Header="Open config file" Click="openConfigFileToolStripMenuItem_Click" IsEnabled="True">
+									<MenuItem.Icon>
+										<Image Source="/Assets/Mix/conf.png" />
+									</MenuItem.Icon>
+								</MenuItem>
 								<MenuItem Header="Create a desktop shortcut" Click="createADesktopShortcutToolStripMenuItem_Click" IsEnabled="True" IsVisible="False" />
 							</ContextMenu>
 						</ListBox.Resources>

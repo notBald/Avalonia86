@@ -7,7 +7,7 @@
 		MinWidth="250" MinHeight="50"
         x:Class="Avalonia86.DialogBox.DialogWindow"
 		x:DataType="db:DialogBoxSettings"
-        Title="DialogWindow" SizeToContent="WidthAndHeight"
+        Title="{Binding Title, TargetNullValue='Information'}" SizeToContent="WidthAndHeight"
 		>
 	<Design.DataContext>
 		<db:DialogBoxSettings/>
@@ -23,7 +23,7 @@
 
 					<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="BannerBackground">
 						<GradientStop Color="#FFFFFF" Offset="0.0"/>
-						<GradientStop Color="#D6D6D6" Offset="1.0"/>
+						<GradientStop Color="#FAFAFA" Offset="1.0"/>
 					</LinearGradientBrush>
 				</ResourceDictionary>
 				<ResourceDictionary x:Key="Dark">
@@ -35,29 +35,44 @@
 			</ResourceDictionary.ThemeDictionaries>
 		</ResourceDictionary>
 
-
+		<db:DialogIconConverter x:Key="IconConv" />
 	</Window.Resources>
 	<DockPanel>
-		<Border DockPanel.Dock="Top"
+		<Border DockPanel.Dock="Top" IsVisible="{Binding Banner}"
 				Background="{DynamicResource BannerBackground}"
 				Height="58">
 			<DockPanel Margin="9, 0, 0, 0">
-				<Image Source="avares://Avalonia86/Assets/86Box-gray.png"
-						Margin="0, 2, 12, 2" DockPanel.Dock="Right"
-					IsHitTestVisible="False" />
+				<Image Source="{Binding Icon, Converter={StaticResource IconConv}}"
+					   Margin="0, 2, 12, 2" DockPanel.Dock="Right"
+					   RenderOptions.BitmapInterpolationMode="HighQuality"
+					   IsHitTestVisible="False" />
 				<StackPanel>
-					<TextBlock FontSize="18.6" Foreground="{DynamicResource BannerForground}" FontWeight="Bold" Margin="0, 5, 0, 0" TextTrimming="CharacterEllipsis">Main header</TextBlock>
-					<TextBlock FontSize="14.6" Foreground="{DynamicResource BannerForground}" TextTrimming="CharacterEllipsis">Sub header</TextBlock>
+					<TextBlock FontSize="18.6" Foreground="{DynamicResource BannerForground}" 
+							   FontWeight="Bold" Margin="0, 5, 0, 0" TextTrimming="CharacterEllipsis"
+							   Text="{Binding Header, TargetNullValue='Main header'}" />
+					<TextBlock FontSize="14.6" Foreground="{DynamicResource BannerForground}" 
+							   TextTrimming="CharacterEllipsis" 
+							   Text="{Binding Subheader, TargetNullValue=''}"/>
 				</StackPanel>
 			</DockPanel>
 		</Border>
-		<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="10">
-			<Button>OK</Button>
-			<Button>Cancel</Button>
-		</StackPanel>
-		<Border BorderThickness="0, 1" BorderBrush="{DynamicResource main_BorderBrush}" Margin="0, 1">
-			<TextBlock Margin="7"
-						Text="Hello world, here is a sentence of text!" />
+		<Grid DockPanel.Dock="Bottom" Margin="10" ColumnDefinitions="Auto, *, Auto">
+			<CheckBox Grid.Column="0" IsChecked="{Binding IsChecked}" Content="{Binding Checkbox}"
+					  IsVisible="{Binding Checkbox, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+			<StackPanel Grid.Column="2"
+				Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+				<Button Width="60" Content="{Binding Btn1, TargetNullValue='OK'}" IsDefault="True" 
+						Click="btn1_Click" />
+				<Button Width="60" Content="{Binding Btn2, TargetNullValue='Cancel'}" IsVisible="{Binding ShowBtn2}" IsCancel="True" 
+						Click="btn2_Click"/>
+			</StackPanel>
+		</Grid>
+		<Border BorderThickness="{Binding Border}" BorderBrush="{DynamicResource main_BorderBrush}" Margin="0, 1">
+			<DockPanel Margin="7">
+				<TextBlock Margin="25" Text="{Binding Message}" 
+						   TextWrapping="Wrap" TextTrimming="CharacterEllipsis" 
+						   VerticalAlignment="Center" TextAlignment="Center" />
+			</DockPanel>
 		</Border>
 	</DockPanel>
 </Window>

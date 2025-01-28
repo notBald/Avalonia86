@@ -19,6 +19,7 @@ using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
 using IOPath = System.IO.Path;
 using MessageType = MsBox.Avalonia.Enums.Icon;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
+using Avalonia86.DialogBox;
 
 // ReSharper disable InconsistentNaming
 namespace Avalonia86.Core;
@@ -498,18 +499,21 @@ internal static class VMCenter
     // Removes the selected VM. Confirmations for maximum safety
     public static async void Remove(VMVisual vm, frmMain ui)
     {
-        var result1 = await Dialogs.ShowMessageBox((string)($@"Are you sure you want to remove the" +
-                                                @$" virtual machine ""{vm.Name}""?"),
-            MessageType.Warning, ui, ButtonsType.YesNo, "Remove virtual machine");
+        var r = await new DialogBoxBuilder(ui)
+            .WithButtons(DialogButtons.YesNo)
+            .WithCheckbox($"Also delete {vm.Name}'s files.", !vm.IsLinked)
+            .WithIcon(DialogIcon.Question)
+            .WithHeader("Remove virtual machine", $"{vm.Name} will be deleted")
+            .WithMessage("Are you sure you want to remove the"+
+                       @$" virtual machine ""{vm.Name}""?")
+            .ShowDialog();
 
-        if (result1 == ResponseType.Yes)
+        if (r == DialogResult.Yes || r == DialogResult.YesChecked)
         {
             if (vm.Status != MachineStatus.STOPPED)
             {
-                await Dialogs.ShowMessageBox((string)($@"Virtual machine ""{vm.Name}"" is currently " +
-                                        "running and cannot be removed. Please stop virtual machines" +
-                                        " before attempting to remove them."),
-                    MessageType.Error, ui, ButtonsType.Ok, "Error");
+                await ui.ShowError($@"Virtual machine ""{vm.Name}"" is currently " +
+                               "running and cannot be removed.", $"{vm.Name} is still running");
                 return;
             }
 
@@ -550,17 +554,12 @@ internal static class VMCenter
             }
             catch (Exception ex) // Catches "regkey doesn't exist" exceptions and such
             {
-                await Dialogs.ShowMessageBox((string)(@$"Virtual machine ""{vm_name}"" could not be removed due to " +
-                                        $"the following error:\n\n{ex.Message}"),
-                    MessageType.Error, ui, ButtonsType.Ok, "Error");
+                await ui.ShowError(@$"Virtual machine ""{vm_name}"" could not be removed due to " +
+                                    $"the following error:\n\n{ex.Message}");
                 return;
             }
 
-            var result2 = await Dialogs.ShowMessageBox((string)($@"Virtual machine ""{vm_name}"" was " +
-                                                    "successfully removed. Would you like to delete" +
-                                                    " its files as well?"),
-                MessageType.Question, ui, ButtonsType.YesNo, "Virtual machine removed");
-            if (result2 == ResponseType.Yes)
+            if (r == DialogResult.YesChecked)
             {
                 try
                 {
@@ -568,38 +567,32 @@ internal static class VMCenter
                 }
                 catch (UnauthorizedAccessException) //Files are read-only or protected by privileges
                 {
-                    await Dialogs.ShowMessageBox("86Box Manager was unable to delete the files of this " +
-                                            "virtual machine because they are read-only or you don't " +
-                                            "have sufficient privileges to delete them.\n\nMake sure " +
-                                            "the files are free for deletion, then remove them manually.",
-                        MessageType.Error, ui, ButtonsType.Ok, "Error");
+                    await ui.ShowError("86Box Manager was unable to delete the files of this " +
+                                       "virtual machine because they are read-only or you don't " +
+                                       "have sufficient privileges to delete them.\n\nMake sure " +
+                                       "the files are free for deletion, then remove them manually.");
                     return;
                 }
                 catch (DirectoryNotFoundException) //Directory not found
                 {
-                    await Dialogs.ShowMessageBox("86Box Manager was unable to delete the files of this " +
-                                            "virtual machine because they no longer exist.",
-                        MessageType.Error, ui, ButtonsType.Ok, "Error");
+                    await ui.ShowError("86Box Manager was unable to delete the files of this " +
+                                            "virtual machine because they no longer exist.");
                     return;
                 }
                 catch (IOException) //Files are in use by another process
                 {
-                    await Dialogs.ShowMessageBox("86Box Manager was unable to delete some files of this " +
+                    await ui.ShowError("86Box Manager was unable to delete some files of this " +
                                             "virtual machine because they are currently in use by " +
                                             "another process.\n\nMake sure the files are free for " +
-                                            "deletion, then remove them manually.",
-                        MessageType.Error, ui, ButtonsType.Ok, "Error");
+                                            "deletion, then remove them manually.");
                     return;
                 }
                 catch (Exception ex) //Other exceptions
                 {
-                    await Dialogs.ShowMessageBox($"The following error occurred while trying to remove" +
-                                            $" the files of this virtual machine:\n\n{ex.Message}",
-                        MessageType.Error, ui, ButtonsType.Ok, "Error");
+                    await ui.ShowError($"The following error occurred while trying to remove" +
+                                            $" the files of this virtual machine:\n\n{ex.Message}");
                     return;
                 }
-                await Dialogs.ShowMessageBox($@"Files of virtual machine ""{vm_name}"" were successfully deleted.",
-                    MessageType.Info, ui, ButtonsType.Ok, "Virtual machine files removed");
             }
         }
 

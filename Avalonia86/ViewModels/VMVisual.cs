@@ -53,7 +53,7 @@ internal sealed class VMVisual : ReactiveObject
     /// <summary>
     /// Linked VMs are not owned by Avalonia86 and has to be treated a little differently here and there.
     /// </summary>
-    private bool IsLinked
+    internal bool IsLinked
     {
         get => _s.GetIsLinked(Tag.UID);
     }

@@ -1,9 +1,7 @@
 using System;
-using Avalonia86.Models;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using Avalonia86.API;
 using Avalonia86.Core;
@@ -14,25 +12,15 @@ using IOPath = System.IO.Path;
 using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
 using MessageType = MsBox.Avalonia.Enums.Icon;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
-using System.Threading;
 using Avalonia;
 using Avalonia.Input;
-using Avalonia.VisualTree;
-using System.Windows.Input;
-using Avalonia.Styling;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
-using System.Threading.Channels;
 using System.Threading.Tasks;
-using MsBox.Avalonia.Dto;
 using System.IO;
 using ReactiveUI;
-using Avalonia.Controls.Documents;
-using System.Collections.Generic;
 using Avalonia86.Converters;
 using System.Reactive.Linq;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
 using Avalonia86.DialogBox;
 
 namespace Avalonia86.Views;
@@ -505,9 +493,20 @@ public partial class frmMain : BaseWindow
 
     private async void btnTest_Click(object sender, RoutedEventArgs e)
     {
-        if (await this.ShowMsg("Hello world") == DialogResult.Ok)
+        //var r = await this.ShowQuestion("Delete VM XXX", "Remove virtual machine", "Delete XXX");
+        var r = await new DialogBoxBuilder(this).WithButtons(DialogButtons.YesNo)
+            .WithCheckbox("Also delete files")
+            .WithIcon(DialogIcon.Question)
+            .WithHeader("Remove virtual machine", "Delete XXX")
+            .WithMessage("Here's my message")
+            .ShowDialog();
+        if (r == DialogResult.Yes)
         {
-            //NativeMSG.Msg("Was OK", "OK");
+            NativeMSG.Msg("Was YES", "OK");
+        }
+        if (r == DialogResult.YesChecked)
+        {
+            await this.ShowMsg("Was Checked", "OK");
         }
     }
 

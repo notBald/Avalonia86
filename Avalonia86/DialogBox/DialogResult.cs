@@ -3,9 +3,10 @@
 public enum DialogResult
 {
     None,
-    Ok,
     Cancel,
-    Yes,
+    Ok,
+    OkChecked,
     No,
-    Custom
+    Yes,
+    YesChecked,
 }

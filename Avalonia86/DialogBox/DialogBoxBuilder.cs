@@ -21,12 +21,48 @@ public class DialogBoxBuilder
         return this;  // Returns self for method chaining
     }
     public DialogBoxBuilder WithTitle(string title) { _settings.Title = title; return this; }
+    public DialogBoxBuilder WithHeader(string header, string sub = null) { _settings.Header = header; _settings.Subheader = sub; return this; }
     public DialogBoxBuilder WithButtons(DialogButtons buttons) { _settings.Buttons = buttons; return this; }
     public DialogBoxBuilder WithIcon(DialogIcon icon) { _settings.Icon = icon; return this; }
     public DialogBoxBuilder WithDefaultButton(DialogResult defaultButton) { _settings.DefaultButton = defaultButton; return this; }
+    public DialogBoxBuilder WithCheckbox(string text, bool def_state = false) { _settings.Checkbox = text; _settings.IsChecked = def_state; return this; }
 
     public async Task<DialogResult> ShowDialog()
     {
+        if (_settings.Icon == DialogIcon.None)
+            _settings.Icon = DialogIcon.Information;
+        if (_settings.Title == null)
+        {
+            switch(_settings.Icon)
+            {
+                case DialogIcon.Error:
+                    _settings.Title = "Error";
+                    break;
+
+                case DialogIcon.Warning:
+                    _settings.Title = "Warning";
+                    break;
+
+                case DialogIcon.Question:
+                    _settings.Title = "Question";
+                    break;
+
+                default:
+                    _settings.Title = "Information";
+                    break;
+            }
+        }
+        if (_settings.Header == null)
+            _settings.Header = _settings.Title;
+        else
+            _settings.Banner = true;
+        _settings.ShowBtn2 = _settings.Buttons != DialogButtons.Ok;
+        if (_settings.Buttons == DialogButtons.YesNo)
+        {
+            _settings.Btn1 = "Yes";
+            _settings.Btn2 = "No";
+        }
+
         var dlg = new DialogWindow() { DataContext = _settings };
 
         if (_parent == null)
@@ -36,7 +72,7 @@ public class DialogBoxBuilder
         else
         {
             dlg.Icon = _parent.Icon;
-            await dlg.ShowDialog(_parent);
+            return await dlg.ShowDialog<DialogResult>(_parent);
         }
         
         return DialogResult.Ok;
