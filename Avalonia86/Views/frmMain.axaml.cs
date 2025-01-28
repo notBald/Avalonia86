@@ -438,11 +438,12 @@ public partial class frmMain : BaseWindow
             e.Cancel = true;
             var result = await this.ShowQuestion("Some virtual machines are still running. It's " +
                                                  "recommended you stop them first before closing " +
-                                                 "86Box Manager. Do you want to stop them now?",
-                                                 "Virtual machines are still running");
-            if (result == DialogResult.Yes)
+                                                 "86Box Manager.\n\nDo you want to stop them now?",
+                                                 "Virtual machines are still running", "Do you want to stop them now?");
+            if (result != DialogResult.None)
             {
-                await VMCenter.CloseAllWindows(this);
+                if (result == DialogResult.Yes)
+                    await VMCenter.CloseAllWindows(this);
 
                 //With all VMs hopefully closed, we do a proper close. This will result in this method being called again.
                 do_close = true;

@@ -71,7 +71,7 @@
 			<DockPanel Margin="7">
 				<TextBlock Margin="25" Text="{Binding Message}" 
 						   TextWrapping="Wrap" TextTrimming="CharacterEllipsis" 
-						   VerticalAlignment="Center" TextAlignment="Center" />
+						   VerticalAlignment="Center" TextAlignment="Left" HorizontalAlignment="Center" />
 			</DockPanel>
 		</Border>
 	</DockPanel>
