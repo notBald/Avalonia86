@@ -424,7 +424,11 @@ public partial class dlgSettings : BaseWindow
 
         foreach(var r in s.ListExecutables())
         {
+#if MSDB
+            var exe = new dlgSettingsModel.ExeEntery(((long)r["IsDef"]) == 1, false)
+#else
             var exe = new dlgSettingsModel.ExeEntery((bool)r["IsDef"], false)
+#endif
             {
                 ID = (long) r["ID"],
                 Name = r["Name"] as string,

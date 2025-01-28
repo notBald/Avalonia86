@@ -141,7 +141,7 @@ public partial class dlgAddVM : Window
         }
         catch (Exception ex)
         {
-            await this.ShowError($@"An error occured: "+ex.Message, "Failure");
+            await DialogBox.DialogBox.ShowError(Owner as Window, $@"An error occured: "+ex.Message, "Failure");
         }
     }
 
@@ -202,7 +202,7 @@ public partial class dlgAddVM : Window
         if (was_imported > 0)
             was_imp = (was_imported == 0) ? "" : $@" , {was_imported} machine" + (was_imported == 1 ? " was" : "s were") + " already importet.";
 
-        await this.ShowMsg(got_imp + was_imp, "Success");
+        await DialogBox.DialogBox.ShowMsg(w, got_imp + was_imp, "Success");
 
         Close(DialogResult.Ok);
 

@@ -619,7 +619,11 @@ internal class AppSettings
     {
         foreach (var name in _store.Query("select linked from VMs where id = @id", new SQLParam("id", id)))
         {
+#if MSDB
+            return ((long)name[0]) == 1;
+#else
             return (bool) name[0];
+#endif
         }
 
         return false;
