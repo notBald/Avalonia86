@@ -20,6 +20,8 @@ using IOPath = System.IO.Path;
 using MessageType = MsBox.Avalonia.Enums.Icon;
 using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 using Avalonia86.DialogBox;
+using Avalonia.Threading;
+using static Avalonia86.Tools.GithubCommit;
 
 // ReSharper disable InconsistentNaming
 namespace Avalonia86.Core;
@@ -101,7 +103,7 @@ internal static class VMCenter
         }
     }
 
-    public static void OpenConfig(VMVisual vm, Window parent)
+    public static void OpenConfig(VMVisual vm, Window ui)
     {
         try
         {
@@ -110,15 +112,17 @@ internal static class VMCenter
         }
         catch
         {
-            Dialogs.DispatchMSGBox($@"The config file for the virtual machine ""{vm.Name}"" could" +
-                                    " not be opened. Make sure it still exists and that you have " +
-                                    "sufficient privileges to access it.",
-                MessageType.Error, parent, ButtonsType.Ok, "Error");
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await ui.ShowError($@"The config file for the virtual machine ""{vm.Name}"" could" +
+                                     " not be opened. Make sure it still exists and that you have " +
+                                     "sufficient privileges to access it.");
+            });
         }
     }
 
     // Opens the folder containing the selected VM
-    public static void OpenFolder(VMVisual vm, Window parent)
+    public static void OpenFolder(VMVisual vm, Window ui)
     {
         try
         {
@@ -126,15 +130,17 @@ internal static class VMCenter
         }
         catch
         {
-            Dialogs.DispatchMSGBox($@"The folder for the virtual machine ""{vm.Name}"" could" +
-                                    " not be opened. Make sure it still exists and that you have " +
-                                    "sufficient privileges to access it.",
-                MessageType.Error, parent, ButtonsType.Ok, "Error");
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await ui.ShowError($@"The folder for the virtual machine ""{vm.Name}"" could" +
+                                     " not be opened. Make sure it still exists and that you have " +
+                                     "sufficient privileges to access it.");
+            });
         }
     }
 
     // Opens the folder containing the selected VM
-    public static void OpenScreenshotsFolder(VMVisual vm, Window parent)
+    public static void OpenScreenshotsFolder(VMVisual vm, Window ui)
     {
         try
         {
@@ -146,15 +152,17 @@ internal static class VMCenter
         }
         catch
         {
-            Dialogs.DispatchMSGBox($@"The screenshots folder for the virtual machine ""{vm.Name}"" could" +
-                                    " not be opened. Make sure you have " +
-                                    "sufficient privileges to access it.",
-                MessageType.Error, parent, ButtonsType.Ok, "Error");
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await ui.ShowError($@"The screenshots folder for the virtual machine ""{vm.Name}"" could" +
+                                     " not be opened. Make sure you have " +
+                                     "sufficient privileges to access it.");
+            });
         }
     }
 
     // Opens the folder containing the selected VM
-    public static void OpenTrayFolder(VMVisual vm, Window parent)
+    public static void OpenTrayFolder(VMVisual vm, Window ui)
     {
         try
         {
@@ -166,10 +174,12 @@ internal static class VMCenter
         }
         catch
         {
-            Dialogs.DispatchMSGBox($@"The screenshots folder for the virtual machine ""{vm.Name}"" could" +
-                                    " not be opened. Make sure you have " +
-                                    "sufficient privileges to access it.",
-                MessageType.Error, parent, ButtonsType.Ok, "Error");
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await ui.ShowError($@"The screenshots folder for the virtual machine ""{vm.Name}"" could" +
+                                     " not be opened. Make sure you have " +
+                                     "sufficient privileges to access it.");
+            });
         }
     }
 
@@ -823,21 +833,27 @@ internal static class VMCenter
         }
         catch (InvalidOperationException)
         {
-            Dialogs.DispatchMSGBox("The process failed to initialize or its window " +
-                                   "handle could not be obtained.",
-                MessageType.Error, parent, ButtonsType.Ok, "Error");
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await parent.ShowError("The process failed to initialize or its window " +
+                                       "handle could not be obtained.");
+            });
         }
         catch (Win32Exception)
         {
-            Dialogs.DispatchMSGBox("Cannot find 86Box executable. Make sure your settings " +
-                                   $"are correct and try again. ({start_file})",
-                MessageType.Error, parent, ButtonsType.Ok, "Error");
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await parent.ShowError("Cannot find 86Box executable. Make sure your settings " +
+                                      $"are correct and try again. ({start_file})");
+            });
         }
         catch (Exception ex)
         {
-            Dialogs.DispatchMSGBox("An error has occurred. Please provide the following " +
-                                   $"information to the developer:\n{ex.Message}\n{ex.StackTrace}",
-                MessageType.Error, parent, ButtonsType.Ok, "Error");
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await parent.ShowError("An error has occurred. Please provide the following " +
+                                      $"information to the developer:\n{ex.Message}\n{ex.StackTrace}");
+            });
         }
 
         CountRefresh();
@@ -856,8 +872,10 @@ internal static class VMCenter
         }
         catch (Exception)
         {
-            Dialogs.DispatchMSGBox("An error occurred trying to stop the selected virtual machine.",
-                MessageType.Error, ui, ButtonsType.Ok, "Error");
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await ui.ShowError("An error occurred trying to stop the selected virtual machine.");
+            });
         }
 
         CountRefresh();
@@ -916,9 +934,11 @@ internal static class VMCenter
             }
             catch (Win32Exception)
             {
-                Dialogs.DispatchMSGBox("Cannot find 86Box executable. Make sure your " +
-                                       "settings are correct and try again.",
-                    MessageType.Error, ui, ButtonsType.Ok, "Error");
+                Dispatcher.UIThread.Post(async () =>
+                {
+                    await ui.ShowError("Cannot find 86Box executable. Make sure your " +
+                                       "settings are correct and try again.");
+                });
             }
             catch (Exception ex)
             {
@@ -926,10 +946,12 @@ internal static class VMCenter
                 vis.Status = MachineStatus.STOPPED;
                 vis.Tag.hWnd = IntPtr.Zero;
                 vis.Tag.Pid = -1;
-                Dialogs.DispatchMSGBox("This virtual machine could not be configured. Please " +
+                Dispatcher.UIThread.Post(async () =>
+                {
+                    await ui.ShowError("This virtual machine could not be configured. Please " +
                                        "provide the following information to the developer:\n" +
-                                       $"{ex.Message}\n{ex.StackTrace}",
-                    MessageType.Error, ui, ButtonsType.Ok, "Error");
+                                       $"{ex.Message}\n{ex.StackTrace}");
+                });
             }
         }
 

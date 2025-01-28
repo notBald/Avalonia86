@@ -72,6 +72,7 @@ public class DialogBoxBuilder
         else
         {
             dlg.Icon = _parent.Icon;
+            dlg.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             return await dlg.ShowDialog<DialogResult>(_parent);
         }
         

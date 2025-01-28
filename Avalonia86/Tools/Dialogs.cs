@@ -20,13 +20,6 @@ internal static class Dialogs
 {
     public delegate void DialogResult(ResponseType? result);
 
-    public static void DispatchMSGBox(string msg, Icon icon, Window parent,
-        ButtonEnum buttons = ButtonEnum.Ok, string title = "Attention")
-    {
-        var aw = ShowMessageBox(msg, icon, parent, buttons, title);
-        Dispatcher.UIThread.Post(async () => await aw);
-    }
-
     public static async Task<ButtonResult> ShowMessageBox(string msg, Icon icon, Window parent,
         ButtonEnum buttons = ButtonEnum.Ok, string title = "Attention")
     {
