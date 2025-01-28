@@ -40,7 +40,6 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.3" />
     <PackageReference Include="Avalonia.Themes.Simple" Version="11.2.3" />
     <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.2.0.7" />
-    <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Debug-MSDB'">

@@ -1,27 +1,21 @@
-﻿using Avalonia86.API;
+﻿using Avalonia.Controls;
+using Avalonia.Threading;
+using Avalonia86.API;
 using Avalonia86.Common;
-using Avalonia86.Models;
+using Avalonia86.DialogBox;
 using Avalonia86.Tools;
 using Avalonia86.ViewModels;
 using Avalonia86.Views;
 using Avalonia86.Xplat;
-using Avalonia.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
-using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
 using IOPath = System.IO.Path;
-using MessageType = MsBox.Avalonia.Enums.Icon;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
-using Avalonia86.DialogBox;
-using Avalonia.Threading;
-using static Avalonia86.Tools.GithubCommit;
 
 // ReSharper disable InconsistentNaming
 namespace Avalonia86.Core;
@@ -95,10 +89,9 @@ internal static class VMCenter
         }
         catch
         {
-            await Dialogs.ShowMessageBox("Could not load the virtual machine information from the " +
+            await parent.ShowError("Could not load the virtual machine information from the " +
                                    "registry. Make sure you have the required permissions " +
-                                   "and try again.",
-                MessageType.Error, parent, ButtonsType.Ok, "Error");
+                                   "and try again.");
             return null;
         }
     }
@@ -262,20 +255,17 @@ internal static class VMCenter
     // Deletes the config and nvr of selected VM
     public static async Task<bool> Wipe(VMVisual vm, Window parent)
     {
-        var result = await Dialogs.ShowMessageBox(
+        var result = await parent.ShowQuestion(
             "Wiping a virtual machine deletes its configuration" +
             " and nvr files. You'll have to reconfigure the virtual " +
             "machine (and the BIOS if applicable).\n\n Are you sure " +
-            @$"you wish to wipe the virtual machine ""{vm.Name}""?",
-            MessageType.Warning, Program.Root, ButtonsType.YesNo, "Warning");
-        if (result == ResponseType.Yes)
+            @$"you wish to wipe the virtual machine ""{vm.Name}""?", $"Wipe {vm.Name}", "Delete configuration and BIOS");
+        if (result == DialogResult.Yes)
         {
             if (vm.Status != MachineStatus.STOPPED)
             {
-                await Dialogs.ShowMessageBox($@"The virtual machine ""{vm.Name}"" is currently " +
-                                        "running and cannot be wiped. Please stop virtual machines " +
-                                        "before attempting to wipe them.",
-                    MessageType.Error, parent, ButtonsType.Ok, "Success");
+                await parent.ShowError($@"The virtual machine ""{vm.Name}"" is currently " +
+                                         "running and cannot be wiped.", $"{vm.Name} is running");
                 return false;
             }
             try
@@ -286,13 +276,11 @@ internal static class VMCenter
                 p = Path.Combine(vm.Path, "nvr");
                 if (Directory.Exists(p))
                     Directory.Delete(p, true);
-                await Dialogs.ShowMessageBox($@"The virtual machine ""{vm.Name}"" was successfully wiped.",
-                    MessageType.Info, parent, ButtonsType.Ok, "Success");
+                await parent.ShowMsg($@"The virtual machine ""{vm.Name}"" was successfully wiped.");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await Dialogs.ShowMessageBox($@"An error occurred trying to wipe the virtual machine ""{vm.Name}"".",
-                    MessageType.Error, parent, ButtonsType.Ok, ex.GetType().Name);
+                await parent.ShowError($@"An error occurred trying to wipe the virtual machine ""{vm.Name}"".");
             }
         }
 
@@ -305,12 +293,11 @@ internal static class VMCenter
         var vm = vis.Tag;
 
         //Ask the user to confirm
-        var result = await Dialogs.ShowMessageBox(
+        var result = await ui.ShowQuestion(
             $@"Killing a virtual machine can cause data loss. " +
             "Only do this if 86Box executable process gets stuck. Do you " +
-            @$"really wish to kill the virtual machine ""{vm.Name}""?",
-            MessageType.Warning, ui, ButtonsType.YesNo, "Warning");
-        if (result == ResponseType.Yes)
+            @$"really wish to kill the virtual machine ""{vm.Name}""?", $"Halt {vm.Name}", "Force the machine to stop");
+        if (result == DialogResult.Yes)
         {
             try
             {
@@ -327,10 +314,9 @@ internal static class VMCenter
             }
             catch
             {
-                await Dialogs.ShowMessageBox($@"Could not kill 86Box.exe process for virtual " +
-                                        @"machine ""{vm.Name}"". The process may have already " +
-                                        "ended on its own or access was denied.",
-                    MessageType.Error, ui, ButtonsType.Ok, "Could not kill process");
+                await ui.ShowError($@"Could not kill 86Box.exe process for virtual " +
+                                    @"machine ""{vm.Name}"". The process may have already " +
+                                     "ended on its own or access was denied.", "Could not kill process");
             }
 
             // We need to cleanup afterwards to make sure the VM is put back into a valid state
@@ -363,8 +349,7 @@ internal static class VMCenter
         }
         catch (Exception)
         {
-            await Dialogs.ShowMessageBox("An error occurred trying to stop the selected virtual machine.",
-                MessageType.Error, ui, ButtonsType.Ok, "Error");
+            await ui.ShowError("An error occurred trying to stop the selected virtual machine.");
         }
 
         w.CommitUptime(DateTime.Now);

@@ -9,9 +9,6 @@ using Avalonia86.Tools;
 using Avalonia86.ViewModels;
 using Avalonia86.Xplat;
 using IOPath = System.IO.Path;
-using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
-using MessageType = MsBox.Avalonia.Enums.Icon;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 using Avalonia;
 using Avalonia.Input;
 using Avalonia.Data;
@@ -246,7 +243,7 @@ public partial class frmMain : BaseWindow
         {
             if (DBStore.InMemDB)
             {
-                await Dialogs.ShowMessageBox("VMs and Settings will not be saved.", MessageType.Warning, this, ButtonsType.Ok, "Failed to create DataBase for settings.");
+                await this.ShowError("VMs and Settings will not be saved.", "Failed to create DataBase for settings.");
             }
         }
 
@@ -285,9 +282,9 @@ public partial class frmMain : BaseWindow
                 }
             }
 
-            await Dialogs.ShowMessageBox($@"The virtual machine ""{invVmName}"" could not be found. " +
+            await this.ShowError($@"The virtual machine ""{invVmName}"" could not be found. " +
                                    "It may have been removed or the specified name is incorrect.",
-                MessageType.Error, this, ButtonsType.Ok, "Virtual machine not found");
+                                   "Virtual machine not found");
         }
 
         return true;
@@ -439,11 +436,11 @@ public partial class frmMain : BaseWindow
         {
             //It's important that the event is canceld before we call await, otherwise the close will proceed.
             e.Cancel = true;
-            var result = await Dialogs.ShowMessageBox("Some virtual machines are still running. It's " +
-                                                "recommended you stop them first before closing " +
-                                                "86Box Manager. Do you want to stop them now?",
-                MessageType.Warning, this, ButtonsType.YesNo, "Virtual machines are still running");
-            if (result == ResponseType.Yes)
+            var result = await this.ShowQuestion("Some virtual machines are still running. It's " +
+                                                 "recommended you stop them first before closing " +
+                                                 "86Box Manager. Do you want to stop them now?",
+                                                 "Virtual machines are still running");
+            if (result == DialogResult.Yes)
             {
                 await VMCenter.CloseAllWindows(this);
 
@@ -545,7 +542,7 @@ public partial class frmMain : BaseWindow
             var name = Model.Settings.PathToName(fldName);
             if (name != null)
             {
-                await Dialogs.ShowMessageBox($"The folder you selected is already used by the VM \"{name}\"", MessageType.Error, this, ButtonsType.Ok, "Folder already in use");
+                await this.ShowError($"The folder you selected is already used by the VM \"{name}\"", "Folder already in use");
             }
             else
             {
@@ -653,15 +650,13 @@ public partial class frmMain : BaseWindow
 
             Platforms.Shell.CreateShortcut(shortcutAddress, vmName, shortcutDesc, startupPath);
 
-            await Dialogs.ShowMessageBox($@"A desktop shortcut for the virtual machine ""{vm.Name}"" " +
-                                    "was successfully created.",
-                MessageType.Info, this, ButtonsType.Ok, "Success");
+            await this.ShowMsg($@"A desktop shortcut for the virtual machine ""{vm.Name}"" " +
+                                    "was successfully created.");
         }
         catch
         {
-            await Dialogs.ShowMessageBox($@"A desktop shortcut for the virtual machine ""{vm.Name}"" could" +
-                                    " not be created.",
-                MessageType.Error, this, ButtonsType.Ok, "Error");
+            await this.ShowError($@"A desktop shortcut for the virtual machine ""{vm.Name}"" could" +
+                                   " not be created.");
         }
     }
 
@@ -686,16 +681,16 @@ public partial class frmMain : BaseWindow
         // If there are running VMs, display the warning and stop the VMs if user says so
         if (VMCenter.IsWatching)
         {
-            var result = await Dialogs.ShowMessageBox("Some virtual machines are still running. " +
-                                                "It's recommended you stop them first before " +
-                                                "closing 86Box Manager. Do you want to stop them now?",
-                MessageType.Warning, this, ButtonsType.YesNo, "Virtual machines are still running");
-            if (result == ResponseType.Yes)
+            var result = await this.ShowQuestion("Some virtual machines are still running. " +
+                                                 "It's recommended you stop them first before " +
+                                                 "closing 86Box Manager. Do you want to stop them now?",
+                                                 "Virtual machines are still running");
+            if (result == DialogResult.Yes)
             {
                 await VMCenter.CloseAllWindows(this);
 
             }
-            else if (result == ResponseType.Cancel)
+            else if (result == DialogResult.None)
             {
                 return;
             }

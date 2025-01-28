@@ -1,12 +1,8 @@
-﻿using System;
+﻿using Avalonia.Threading;
 using Avalonia86.API;
-using Avalonia86.Models;
-using Avalonia86.Tools;
+using Avalonia86.DialogBox;
 using Avalonia86.ViewModels;
-using Avalonia.Threading;
-using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
-using MessageType = MsBox.Avalonia.Enums.Icon;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
+using System;
 
 // ReSharper disable InconsistentNaming
 namespace Avalonia86.Core;
@@ -193,8 +189,8 @@ internal sealed class VMHandler : IMessageReceiver
             {
                 Dispatcher.UIThread.Post(async () =>
                 {
-                    await Dialogs.ShowMessageBox($@"The virtual machine ""{vmName}"" is already running.",
-                            MessageType.Info, null, ButtonsType.Ok, "Virtual machine already running");
+                    await ui.ShowError($@"The virtual machine ""{vmName}"" is already running.",
+                                         "Virtual machine already running");
                 });
             }
             else
@@ -208,9 +204,9 @@ internal sealed class VMHandler : IMessageReceiver
 
         Dispatcher.UIThread.Post(async () =>
         {
-            await Dialogs.ShowMessageBox($@"The virtual machine ""{vmName}"" could not be found. " +
-                   "It may have been removed or the specified name is incorrect.",
-                    MessageType.Error, null, ButtonsType.Ok, "Virtual machine not found");
+            await ui.ShowError($@"The virtual machine ""{vmName}"" could not be found. " +
+                   "It may have been removed or the specified name is incorrect.", 
+                   "Virtual machine not found");
         });
     }
 }

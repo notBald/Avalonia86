@@ -1,15 +1,14 @@
-using Avalonia86.Core;
-using Avalonia86.Tools;
-using Avalonia86.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia86.Core;
+using Avalonia86.DialogBox;
+using Avalonia86.Tools;
+using Avalonia86.ViewModels;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using MessageType = MsBox.Avalonia.Enums.Icon;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 
 namespace Avalonia86.Views;
 
@@ -87,18 +86,18 @@ public partial class dlgEditVM : Window
         }
         catch (Exception ex)
         {
-            await Dialogs.ShowMessageBox($@"Unable to save edit: "+ex.Message, MessageType.Error, this);
+            await this.ShowError($@"Unable to save edit: "+ex.Message);
         }
 
         //await Dialogs.ShowMessageBox($@"Virtual machine ""{name}"" was successfully modified.",
         //    MessageType.Info, parent, ButtonsType.Ok, "Success");
 
-        Close(ResponseType.Ok);
+        Close(DialogResult.Ok);
     }
 
     private void btnCancel_Click(object sender, RoutedEventArgs e)
     {
-        Close(ResponseType.Cancel);
+        Close(DialogResult.Cancel);
     }
 }
 

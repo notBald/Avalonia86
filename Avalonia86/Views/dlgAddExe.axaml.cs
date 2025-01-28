@@ -1,11 +1,11 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 using ReactiveUI;
 using Avalonia86.Tools;
 using Avalonia86.Xplat;
 using System.ComponentModel;
+using Avalonia86.DialogBox;
 
 namespace Avalonia86.Views;
 
@@ -39,7 +39,7 @@ public partial class dlgAddExe : Window
 
     private void btnCancel_Click(object sender, RoutedEventArgs e)
     {
-        Close(ResponseType.Cancel);
+        Close(DialogResult.Cancel);
     }
 
     private void btnOK_Click(object sender, RoutedEventArgs e)
@@ -69,7 +69,7 @@ public partial class dlgAddExe : Window
         if (string.IsNullOrWhiteSpace(_m.Build))
             _m.Arch = null;
 
-        Close(ResponseType.Ok);
+        Close(DialogResult.Ok);
     }
 
     private async void btnPathBrowse_click(object sender, RoutedEventArgs e)
@@ -86,10 +86,10 @@ public partial class dlgAddExe : Window
             if (!Platforms.Manager.IsExecutable(file_name))
             {
                 string name = string.IsNullOrWhiteSpace(file_name) ? "" : System.IO.Path.GetFileName(file_name);
-                var res = await Dialogs.ShowMessageBox("The file is not executable, do you wish to add it anyway?", MsBox.Avalonia.Enums.Icon.Question, this, 
-                    MsBox.Avalonia.Enums.ButtonEnum.YesNo, $"File {name} is not a program.");
+                var res = await this.ShowQuestion("The file is not executable, do you wish to add it anyway?", 
+                                                 $"File {name} is not a program.");
 
-                if (res == ResponseType.No)
+                if (res == DialogResult.No)
                     file_name = null;
             }
 

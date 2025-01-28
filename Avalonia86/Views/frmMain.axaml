@@ -331,12 +331,12 @@
 						<TextBlock Text="Soft Reset" />
 					</StackPanel>
 				</Button>-->
-				<Button Click="btnTest_Click">
+				<!--<Button Click="btnTest_Click">
 					<StackPanel Classes="start">
 						<Image Height="32" Width="32" Source="/Assets/Actions/2 - cad 32x32.png" />
 						<TextBlock Text="Test Dialog" />
 					</StackPanel>
-				</Button>
+				</Button>-->
 				<Button Click="btnConfigure_Click" IsVisible="{Binding Toolbar86Btn}">
 					<Button.IsEnabled>
 						<MultiBinding Converter="{x:Static BoolConverters.And}">

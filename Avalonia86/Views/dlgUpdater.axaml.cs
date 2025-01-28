@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 using static Avalonia86.Tools.JenkinsBase;
 using static Avalonia86.Views.dlgUpdaterModel;
 using IOPath = System.IO.Path;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
+using Avalonia86.DialogBox;
 
 namespace Avalonia86.Views;
 
@@ -109,7 +109,7 @@ public partial class dlgUpdater : BaseWindow
 
     private void btnCancel_Click(object sender, RoutedEventArgs e)
     {
-        Close(ResponseType.Cancel);
+        Close(DialogResult.Cancel);
     }
 
     private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -143,7 +143,10 @@ public partial class dlgUpdater : BaseWindow
 
             if (!FolderHelper.IsDirectoryWritable(fldName))
             {
-                await Dialogs.ShowMessageBox("The selected folder is not writable.", MsBox.Avalonia.Enums.Icon.Warning, this);
+                await new DialogBoxBuilder(this)
+                         .WithMessage("The selected folder is not writable.")
+                         .WithIcon(DialogIcon.Warning)
+                         .ShowDialog();
             }
         }
     }

@@ -1,24 +1,18 @@
-using System;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
+using Avalonia86.Core;
+using Avalonia86.DialogBox;
 using Avalonia86.Tools;
 using Avalonia86.Xplat;
-using Avalonia86.Core;
-using IOPath = System.IO.Path;
-using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
-using MessageType = MsBox.Avalonia.Enums.Icon;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
-using System.Threading.Tasks;
-using System.IO;
 using ReactiveUI;
-using System.Collections.Generic;
-using System.Xml.Linq;
+using System;
 using System.Collections.Concurrent;
-using Avalonia.Threading;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading;
-using MsBox.Avalonia.Enums;
+using System.Threading.Tasks;
 
 namespace Avalonia86.Views;
 
@@ -120,7 +114,7 @@ public partial class dlgAddVM : Window
 
                     if (_m.Imports.Count == 0)
                     {
-                        await Dialogs.ShowMessageBox("Sorry, didn't find any Virtual Machines.", MessageType.Info, this);
+                        await this.ShowMsg("Sorry, didn't find any Virtual Machines.");
                     }
                 });
             }, bag, empty_bag, cts.Token);
@@ -147,8 +141,7 @@ public partial class dlgAddVM : Window
         }
         catch (Exception ex)
         {
-            await Dialogs.ShowMessageBox($@"An error occured: "+ex.Message,
-                                MessageType.Error, this, ButtonsType.Ok, "Failure");
+            await this.ShowError($@"An error occured: "+ex.Message, "Failure");
         }
     }
 
@@ -156,7 +149,7 @@ public partial class dlgAddVM : Window
     {
         if (string.IsNullOrWhiteSpace(_s.CFGdir))
         {
-            await Dialogs.ShowMessageBox("Please select a folder for imported virtual machines in the program settings.", MessageType.Error, this);
+            await this.ShowError("Please select a folder for imported virtual machines in the program settings.");
 
             return false;
         }
@@ -170,7 +163,7 @@ public partial class dlgAddVM : Window
 
         if (to_import.Count == 0)
         {
-            await Dialogs.ShowMessageBox("You have not selected any virtual machines to import.", MessageType.Info, this);
+            await this.ShowMsg("You have not selected any virtual machines to import.");
             
             return false;
         }
@@ -209,10 +202,9 @@ public partial class dlgAddVM : Window
         if (was_imported > 0)
             was_imp = (was_imported == 0) ? "" : $@" , {was_imported} machine" + (was_imported == 1 ? " was" : "s were") + " already importet.";
 
-        await Dialogs.ShowMessageBox(got_imp + was_imp,
-                MessageType.Info, w, ButtonsType.Ok, "Success");
+        await this.ShowMsg(got_imp + was_imp, "Success");
 
-        Close(ResponseType.Ok);
+        Close(DialogResult.Ok);
 
         //Done for async
         return true;
@@ -222,8 +214,7 @@ public partial class dlgAddVM : Window
     {
         if (!_m.HasPath)
         {
-            await Dialogs.ShowMessageBox($@"You need to set a VM folder in settings or select a folder.",
-                MessageType.Error, this, ButtonsType.Ok, "No VM Folder");
+            await this.ShowError($@"You need to set a VM folder in settings or select a folder.", "No VM Folder");
             return false;
         }
 
@@ -233,7 +224,7 @@ public partial class dlgAddVM : Window
         string name = _s.PathToName(ip);
         if (name != null)
         {
-            await Dialogs.ShowMessageBox($"The folder you selected is already used by the VM \"{name}\"", MessageType.Error, this, ButtonsType.Ok, "Folder already in use");
+            await this.ShowError($"The folder you selected is already used by the VM \"{name}\"", "Folder already in use");
             return false;
         }
 
@@ -262,7 +253,7 @@ public partial class dlgAddVM : Window
         //await Dialogs.ShowMessageBox($@"Virtual machine ""{_m.VMName}"" was successfully created!",
         //        MessageType.Info, w, ButtonsType.Ok, "Success");
 
-        Close(ResponseType.Ok);
+        Close(DialogResult.Ok);
         return true;
 
         //Exists:
@@ -273,7 +264,7 @@ public partial class dlgAddVM : Window
 
     private void btnCancel_OnClick(object sender, RoutedEventArgs e)
     {
-        Close(ResponseType.Cancel);
+        Close(DialogResult.Cancel);
     }
 
     private async void btnSelFld_OnClick(object sender, RoutedEventArgs e)

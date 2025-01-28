@@ -1,51 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
-using MsBox.Avalonia.Dto;
-using System.Linq;
-using StartLoc = Avalonia.Controls.WindowStartupLocation;
 using Avalonia.Platform.Storage;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
-using Avalonia.Threading;
+using Avalonia86.DialogBox;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using StartLoc = Avalonia.Controls.WindowStartupLocation;
 
 namespace Avalonia86.Tools;
 
 internal static class Dialogs
 {
-    public delegate void DialogResult(ResponseType? result);
+    public delegate void DialogResult(DialogBox.DialogResult? result);
 
-    public static async Task<ButtonResult> ShowMessageBox(string msg, Icon icon, Window parent,
-        ButtonEnum buttons = ButtonEnum.Ok, string title = "Attention")
-    {
-        var loc = parent == null ? StartLoc.CenterScreen : StartLoc.CenterOwner;
-        var opts = new MessageBoxStandardParams
-        {
-            ButtonDefinitions = buttons,
-            ContentTitle = title,
-            ContentMessage = msg,
-            Icon = icon,
-            CanResize = false,
-            WindowStartupLocation = loc,
-            SizeToContent = SizeToContent.WidthAndHeight,
-        };
-
-        //This shouldn't be needed, but does not work anyway
-        //if (buttons == ButtonEnum.YesNo)
-        //{
-        //    opts.EnterDefaultButton = ClickEnum.Yes;
-        //    opts.EscDefaultButton = ClickEnum.No;
-        //}
-        var window = MessageBoxManager.GetMessageBoxStandard(opts);
-        var raw = parent != null ? window.ShowWindowDialogAsync(parent) : window.ShowAsync();
-
-        return await raw;
-    }
 
     [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
     public static async Task RunDialog(this Window parent, Window dialog, DialogResult func = null)
@@ -59,7 +25,7 @@ internal static class Dialogs
 
             dialog.Icon = parent.Icon;
             await raw;
-            func?.Invoke(raw.Result as ResponseType?);
+            func?.Invoke(raw.Result as DialogBox.DialogResult?);
         }
         finally
         {
@@ -76,7 +42,7 @@ internal static class Dialogs
             Uri.TryCreate("file://" + Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), UriKind.Absolute, out uri);
             if (uri == null)
             {
-                await Dialogs.ShowMessageBox("Failed to open file dialog.", Icon.Error, parent);
+                await parent.ShowError("Failed to open file dialog.");
                 //We let the exception happen further down
             }
         }

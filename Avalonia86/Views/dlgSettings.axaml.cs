@@ -11,11 +11,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
-using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
-using MessageType = MsBox.Avalonia.Enums.Icon;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
 using Avalonia.Styling;
 using Avalonia;
+using Avalonia86.DialogBox;
 
 namespace Avalonia86.Views;
 
@@ -71,8 +69,7 @@ public partial class dlgSettings : BaseWindow
         }
         catch
         {
-            await Dialogs.ShowMessageBox("Settings could not be loaded, sorry.",
-                     MessageType.Error, this, ButtonsType.Ok, "Failure");
+            await this.ShowError("Settings could not be loaded, sorry.", "Failure");
 
             Close();
         }
@@ -86,15 +83,15 @@ public partial class dlgSettings : BaseWindow
         e.Cancel = true;
 
         // Unsaved changes, ask the user to confirm
-        var result = await Dialogs.ShowMessageBox(
-            "Would you like to save the changes you've made to the settings?",
-            MessageType.Question, this, ButtonsType.YesNo, "Unsaved changes");
-        if (result == ResponseType.Yes)
+        var result = await this.ShowQuestion(
+            "Would you like to save the changes you've made to the settings?", 
+            "Unsaved changes");
+        if (result == DialogResult.Yes)
         {
             await SaveSettings();
         }
 
-        if (result != ResponseType.None)
+        if (result != DialogResult.None)
         {
             Closing -= dlgSettings_FormClosing;
             Close();
@@ -122,7 +119,7 @@ public partial class dlgSettings : BaseWindow
             await SaveSettings();
         }
         _cancel_or_ok = true;
-        Close(ResponseType.Ok);
+        Close(DialogResult.Ok);
     }
 
     private async void btnBrowse3_Click(object sender, RoutedEventArgs e)
@@ -138,7 +135,7 @@ public partial class dlgSettings : BaseWindow
         }
         catch
         {
-            await Dialogs.ShowMessageBox("Failed to open file dialog.", MessageType.Error, this);
+            await this.ShowError("Failed to open file dialog.");
         }
 
         if (!string.IsNullOrWhiteSpace(fileName))
@@ -149,10 +146,9 @@ public partial class dlgSettings : BaseWindow
 
     private async void btnDefaults_Click(object sender, RoutedEventArgs e)
     {
-        var result = await Dialogs.ShowMessageBox("All settings will be reset to their default values. " +
-                                            "Do you wish to continue?",
-            MessageType.Warning, this, ButtonsType.YesNo, "Settings will be reset");
-        if (result == ResponseType.Yes)
+        var result = await this.ShowQuestion("All settings will be reset to their default values. " +
+                                             "Do you wish to continue?", "Settings will be reset");
+        if (result == DialogResult.Yes)
         {
             ResetSettings();
         }
@@ -295,12 +291,11 @@ public partial class dlgSettings : BaseWindow
     {
         if (_m.EnableLogging && string.IsNullOrWhiteSpace(_m.LogPath))
         {
-            var result = await Dialogs.ShowMessageBox(
+            var result = await this.ShowQuestion(
                 "Using an empty or whitespace string for the log path will " +
                 "prevent 86Box from logging anything. Are you sure you want to use" +
-                " this path?",
-                MessageType.Warning, this, ButtonsType.YesNo, "Warning");
-            if (result == ResponseType.No)
+                " this path?");
+            if (result == DialogResult.No)
             {
                 return false;
             }
@@ -376,9 +371,8 @@ public partial class dlgSettings : BaseWindow
         }
         catch (Exception ex)
         {
-            await Dialogs.ShowMessageBox("An error has occurred. Please provide the following information" +
-                                   $" to the developer:\n{ex.Message}\n{ex.StackTrace}",
-                MessageType.Error, this, ButtonsType.Ok, "Error");
+            await this.ShowError("An error has occurred. Please provide the following information" +
+                                $" to the developer:\n{ex.Message}\n{ex.StackTrace}");
             return false;
         }
         finally
@@ -459,7 +453,7 @@ public partial class dlgSettings : BaseWindow
     private void btnCancel_Click(object sender, RoutedEventArgs e)
     {
         _cancel_or_ok = true;
-        Close(ResponseType.Cancel);
+        Close(DialogResult.Cancel);
     }
 
     /// <summary>
@@ -475,7 +469,9 @@ public partial class dlgSettings : BaseWindow
 
         if (folder_name != null)
         {
-            await Dialogs.ShowMessageBox("Warning: the UI will be unresponsive while importing.", MsBox.Avalonia.Enums.Icon.Warning, this);
+            await new DialogBoxBuilder(this).WithMessage("Warning: the UI will be unresponsive while importing.")
+                                            .WithIcon(DialogIcon.Warning)
+                                            .ShowDialog();
             try
             {
                 foreach (var exe in FolderHelper.GetExecutableFiles(folder_name, "86box", Platforms.Manager.IsExecutable))
@@ -527,7 +523,7 @@ public partial class dlgSettings : BaseWindow
         m.Commit();
         await Tools.Dialogs.RunDialog(this, win, async (dr) =>
         {
-            if (dr == ResponseType.Ok)
+            if (dr == DialogResult.Ok)
             {
                 bool add = true;
 
@@ -535,10 +531,9 @@ public partial class dlgSettings : BaseWindow
                 {
                     if (exe.VMPath == m.ExePath)
                     {
-                        var r = await Dialogs.ShowMessageBox(
-                            $"{m.Name} is already in the list under the name \"{exe.Name}\".\n\nDo you wish to add it anyway?", MessageType.Question, this,
-                            ButtonsType.YesNo, $"Is already in the list");
-                        add = r == ResponseType.Yes;
+                        var r = await this.ShowQuestion(
+                            $"{m.Name} is already in the list under the name \"{exe.Name}\".\n\nDo you wish to add it anyway?", $"{m.Name} is already in the list");
+                        add = r == DialogResult.Yes;
                         break;
                     }
                 }
@@ -599,7 +594,7 @@ public partial class dlgSettings : BaseWindow
         m.Commit();
         await Tools.Dialogs.RunDialog(this, win, (dr) =>
         {
-            if (dr == ResponseType.Ok)
+            if (dr == DialogResult.Ok)
             {
                 sel.Arch = m.Arch;
                 sel.Build = m.Build;

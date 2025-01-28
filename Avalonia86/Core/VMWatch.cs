@@ -1,14 +1,10 @@
-﻿using System;
+﻿using Avalonia.Threading;
+using Avalonia86.Models;
+using Avalonia86.ViewModels;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
-using Avalonia86.Tools;
-using Avalonia86.Models;
-using Avalonia86.ViewModels;
-using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
-using MessageType = MsBox.Avalonia.Enums.Icon;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
-using Avalonia.Threading;
 
 // ReSharper disable InconsistentNaming
 
@@ -55,9 +51,11 @@ public sealed class VMWatch
         {
             Dispatcher.UIThread.Post(async () =>
             {
-                await Dialogs.ShowMessageBox("An error has occurred. Please provide the following details" +
-                                       $" to the developer:\n{ex.Message}\n{ex.StackTrace}",
-                    MessageType.Error, null, ButtonsType.Ok, "Error");
+                await new DialogBox.DialogBoxBuilder(null)
+                                   .WithMessage("An error has occurred. Please provide the following details" +
+                                               $" to the developer:\n{ex.Message}\n{ex.StackTrace}")
+                                   .WithIcon(DialogBox.DialogIcon.Error)
+                                   .ShowDialog();
             });
         }
         e.Result = vm;

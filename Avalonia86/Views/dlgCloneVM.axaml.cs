@@ -1,19 +1,12 @@
-using System;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia86.Core;
-using Avalonia86.Tools;
-using IOPath = System.IO.Path;
-using ButtonsType = MsBox.Avalonia.Enums.ButtonEnum;
-using MessageType = MsBox.Avalonia.Enums.Icon;
-using ResponseType = MsBox.Avalonia.Enums.ButtonResult;
-using ReactiveUI;
-using System.Xml.Linq;
-using System.Threading;
 using Avalonia.Threading;
-using Mono.Unix.Native;
-using System.Security.Cryptography;
+using Avalonia86.Core;
+using Avalonia86.DialogBox;
+using Avalonia86.Tools;
+using ReactiveUI;
+using System;
+using System.Threading;
 
 namespace Avalonia86.Views;
 
@@ -66,9 +59,9 @@ public partial class dlgCloneVM : Window
         if (_m.IsWorking && !_stop_cloning)
         {
             e.Cancel = true;
-            var resp = await Dialogs.ShowMessageBox("Cloning is in progress, do you really want to cancel it?", MessageType.Question, this, ButtonsType.YesNo);
+            var resp = await this.ShowQuestion("Cloning is in progress, do you really want to cancel it?");
 
-            if (resp == ResponseType.Yes)
+            if (resp == DialogResult.Yes)
             {
                 _stop_cloning = true;
             }
@@ -83,7 +76,7 @@ public partial class dlgCloneVM : Window
         
         if (_m.OrgName == null)
         { 
-            await Dialogs.ShowMessageBox("Fatal error, failed to find machine that was to be cloned", MessageType.Error, this);
+            await this.ShowError("Fatal error, failed to find machine that was to be cloned");
             Close();
             return;
         }
@@ -94,8 +87,7 @@ public partial class dlgCloneVM : Window
         var cfgpath = _s.CFGdir;
         if (string.IsNullOrWhiteSpace(cfgpath))
         {
-            await Dialogs.ShowMessageBox($@"You need to set a VM folder in settings!",
-                MessageType.Error, this, ButtonsType.Ok, "No VM Folder");
+            await this.ShowError($@"You need to set a VM folder in settings!", "No VM Folder");
             return;
         }
 
@@ -111,8 +103,7 @@ public partial class dlgCloneVM : Window
 
         if (old_path == null)
         {
-            await Dialogs.ShowMessageBox($@"There was an error reading from the database, try again.",
-                MessageType.Error, this, ButtonsType.Ok, "Import failed");
+            await this.ShowError($@"There was an error reading from the database, try again.", "Import failed");
 
             return;
         }
@@ -153,8 +144,7 @@ public partial class dlgCloneVM : Window
 
             if (importFailed)
             {
-                await Dialogs.ShowMessageBox($@"Virtual machine could not be imported: {error}",
-                    MessageType.Error, this, ButtonsType.Ok, "Import failed");
+                await this.ShowError($@"Virtual machine could not be imported: {error}", "Import failed");
 
                 return;
             }
@@ -173,18 +163,16 @@ public partial class dlgCloneVM : Window
 
             if (importFailed)
             {
-                await Dialogs.ShowMessageBox($@"Virtual machine was copied but could not be registered: {error}",
-                    MessageType.Error, this, ButtonsType.Ok, "Import failed");
+                await this.ShowError($@"Virtual machine was copied but could not be registered: {error}", "Import failed");
 
                 return;
             }
 
-            await Dialogs.ShowMessageBox($@"Virtual machine ""{sp.Name}"" was successfully created, files " +
-                                "were imported. Remember to update any paths pointing to disk images in " +
-                                "your config!",
-            MessageType.Info, this, ButtonsType.Ok, "Success");
+            await this.ShowMsg($@"Virtual machine ""{sp.Name}"" was successfully created, files " +
+                                 "were imported. Remember to update any paths pointing to disk images in " +
+                                 "your config!", "Success");
 
-            Close(ResponseType.Ok);
+            Close(DialogResult.Ok);
         });
     }
 
@@ -204,7 +192,7 @@ public partial class dlgCloneVM : Window
 
     private void btnCancel_Click(object sender, RoutedEventArgs e)
     {
-        Close(ResponseType.Cancel);
+        Close(DialogResult.Cancel);
     }
 }
 
