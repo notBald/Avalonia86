@@ -176,7 +176,7 @@
 						</Style>
 					</TabItem.Styles>
 					<StackPanel>
-						<gb:GroupBox Header="About build that will be updated" Theme="{StaticResource GroupBoxClassic}">
+						<gb:GroupBox Header="Current build" Theme="{StaticResource GroupBoxClassic}">
 							<Grid Margin="20, 10" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto">
 								<TextBlock Text="Version:" Grid.Column="0" Grid.Row="0" />
 								<SelectableTextBlock Text="{Binding CurrentExe.Version}" Grid.Column="1" Grid.Row="0" />
@@ -188,7 +188,7 @@
 								<SelectableTextBlock Text="{Binding CurrentExe.VMExe}" Grid.Column="1" Grid.Row="3" />
 							</Grid>
 						</gb:GroupBox>
-						<gb:GroupBox Header="Firmware / ROMs that will be updated" Theme="{StaticResource GroupBoxClassic}">
+						<gb:GroupBox Header="Current Firmware / ROMs" Theme="{StaticResource GroupBoxClassic}">
 							<Grid Margin="20, 10" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
 								<TextBlock Text="Path:" Grid.Column="0" Grid.Row="0" />
 								<SelectableTextBlock Text="{Binding CurrentExe.VMRoms}" Grid.Column="1" Grid.Row="0" />
