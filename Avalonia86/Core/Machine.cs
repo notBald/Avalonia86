@@ -500,6 +500,12 @@ internal class Machine : IDisposable
                 }
             }
         }
+        else if (e.PropertyName == nameof(VMVisual.Path))
+        {
+            //If the path changes, then we need to ensure that we keep watching new path.
+            ClearCurrent();
+            Update((VMVisual)sender);
+        }
     }
 
     private void Update(MachineInfo mi)
