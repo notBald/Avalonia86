@@ -22,6 +22,7 @@ public class DialogBoxBuilder
     }
     public DialogBoxBuilder WithTitle(string title) { _settings.Title = title; return this; }
     public DialogBoxBuilder WithHeader(string header, string sub = null) { _settings.Header = header; _settings.Subheader = sub; return this; }
+    public DialogBoxBuilder WithException(Exception err) { _settings.Error = err; return this; }
     public DialogBoxBuilder WithButtons(DialogButtons buttons) { _settings.Buttons = buttons; return this; }
     public DialogBoxBuilder WithIcon(DialogIcon icon) { _settings.Icon = icon; return this; }
     public DialogBoxBuilder WithDefaultButton(DialogResult defaultButton) { _settings.DefaultButton = defaultButton; return this; }
@@ -56,6 +57,8 @@ public class DialogBoxBuilder
             _settings.Header = _settings.Title;
         else
             _settings.Banner = true;
+        if (_settings.Subheader == null && _settings.Error != null)
+            _settings.Subheader = _settings.Error.Message;
         _settings.ShowBtn2 = _settings.Buttons != DialogButtons.Ok;
         if (_settings.Buttons == DialogButtons.YesNo)
         {

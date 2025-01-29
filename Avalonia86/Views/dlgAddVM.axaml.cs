@@ -141,7 +141,7 @@ public partial class dlgAddVM : Window
         }
         catch (Exception ex)
         {
-            await DialogBox.DialogBox.ShowError(Owner as Window, $@"An error occured: "+ex.Message, "Failure");
+            await DialogBox.DialogBox.ShowError(Owner as Window, $@"An error occured: "+ex.Message, ex, "Failure");
         }
     }
 

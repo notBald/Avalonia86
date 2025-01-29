@@ -67,9 +67,9 @@ public partial class dlgSettings : BaseWindow
             LoadSettings();
             Get86BoxVersion();
         }
-        catch
+        catch (Exception ex)
         {
-            await this.ShowError("Settings could not be loaded, sorry.", "Failure");
+            await this.ShowError("Settings could not be loaded, sorry.", ex, "Failure");
 
             Close();
         }
@@ -133,9 +133,9 @@ public partial class dlgSettings : BaseWindow
         {
             fileName = await Dialogs.SaveFile(title, dir, filter, parent: this, ext: ".log");
         }
-        catch
+        catch (Exception ex)
         {
-            await this.ShowError("Failed to open file dialog.");
+            await this.ShowError("Failed to open file dialog.", ex);
         }
 
         if (!string.IsNullOrWhiteSpace(fileName))
@@ -372,7 +372,7 @@ public partial class dlgSettings : BaseWindow
         catch (Exception ex)
         {
             await this.ShowError("An error has occurred. Please provide the following information" +
-                                $" to the developer:\n{ex.Message}\n{ex.StackTrace}");
+                                $" to the developer:\n{ex.Message}\n{ex.StackTrace}", ex);
             return false;
         }
         finally

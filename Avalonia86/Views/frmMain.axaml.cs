@@ -2,7 +2,6 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System.ComponentModel;
-using System.Linq;
 using Avalonia86.API;
 using Avalonia86.Core;
 using Avalonia86.Tools;
@@ -17,7 +16,6 @@ using System.Threading.Tasks;
 using System.IO;
 using ReactiveUI;
 using Avalonia86.Converters;
-using System.Reactive.Linq;
 using Avalonia86.DialogBox;
 
 namespace Avalonia86.Views;
@@ -725,7 +723,8 @@ public partial class frmMain : BaseWindow
     private void PrepareUi()
     {
         var app = Application.Current;
-        trayIcon = app?.GetValue(TrayIcon.IconsProperty).FirstOrDefault();
+        var icons = app?.GetValue(TrayIcon.IconsProperty);
+        trayIcon = (icons == null || icons.Count == 0) ? null : icons[0];
         if (trayIcon is { Menu: { } })
         {
             cmsTrayIcon = trayIcon.Menu;

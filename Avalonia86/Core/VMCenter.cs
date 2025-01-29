@@ -87,11 +87,11 @@ internal static class VMCenter
         {
             return Sett.PathToName(path);
         }
-        catch
+        catch (Exception e)
         {
             await parent.ShowError("Could not load the virtual machine information from the " +
                                    "registry. Make sure you have the required permissions " +
-                                   "and try again.");
+                                   "and try again.", e);
             return null;
         }
     }
@@ -103,13 +103,13 @@ internal static class VMCenter
             var file = IOPath.Combine(vm.Path, "86box.cfg");
             Platforms.Shell.EditFile(file);
         }
-        catch
+        catch (Exception e)
         {
             Dispatcher.UIThread.Post(async () =>
             {
                 await ui.ShowError($@"The config file for the virtual machine ""{vm.Name}"" could" +
                                      " not be opened. Make sure it still exists and that you have " +
-                                     "sufficient privileges to access it.");
+                                     "sufficient privileges to access it.", e);
             });
         }
     }
@@ -121,13 +121,13 @@ internal static class VMCenter
         {
             Platforms.Shell.OpenFolder(vm.Path);
         }
-        catch
+        catch (Exception e)
         {
             Dispatcher.UIThread.Post(async () =>
             {
                 await ui.ShowError($@"The folder for the virtual machine ""{vm.Name}"" could" +
                                      " not be opened. Make sure it still exists and that you have " +
-                                     "sufficient privileges to access it.");
+                                     "sufficient privileges to access it.", e);
             });
         }
     }
@@ -143,13 +143,13 @@ internal static class VMCenter
 
             Platforms.Shell.OpenFolder(path);
         }
-        catch
+        catch (Exception e)
         {
             Dispatcher.UIThread.Post(async () =>
             {
                 await ui.ShowError($@"The screenshots folder for the virtual machine ""{vm.Name}"" could" +
                                      " not be opened. Make sure you have " +
-                                     "sufficient privileges to access it.");
+                                     "sufficient privileges to access it.", e);
             });
         }
     }
@@ -165,13 +165,13 @@ internal static class VMCenter
 
             Platforms.Shell.OpenFolder(path);
         }
-        catch
+        catch (Exception e)
         {
             Dispatcher.UIThread.Post(async () =>
             {
                 await ui.ShowError($@"The screenshots folder for the virtual machine ""{vm.Name}"" could" +
                                      " not be opened. Make sure you have " +
-                                     "sufficient privileges to access it.");
+                                     "sufficient privileges to access it.", e);
             });
         }
     }
@@ -278,9 +278,9 @@ internal static class VMCenter
                     Directory.Delete(p, true);
                 await parent.ShowMsg($@"The virtual machine ""{vm.Name}"" was successfully wiped.");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                await parent.ShowError($@"An error occurred trying to wipe the virtual machine ""{vm.Name}"".");
+                await parent.ShowError($@"An error occurred trying to wipe the virtual machine ""{vm.Name}"".", e);
             }
         }
 
@@ -312,11 +312,11 @@ internal static class VMCenter
                 var p = Process.GetProcessById(vm.Pid);
                 p.Kill();
             }
-            catch
+            catch (Exception e)
             {
                 await ui.ShowError($@"Could not kill 86Box.exe process for virtual " +
                                     @"machine ""{vm.Name}"". The process may have already " +
-                                     "ended on its own or access was denied.", "Could not kill process");
+                                     "ended on its own or access was denied.", e, "Could not kill process");
             }
 
             // We need to cleanup afterwards to make sure the VM is put back into a valid state
@@ -347,9 +347,9 @@ internal static class VMCenter
 
             clean_stop = 1;
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            await ui.ShowError("An error occurred trying to stop the selected virtual machine.");
+            await ui.ShowError("An error occurred trying to stop the selected virtual machine.", e);
         }
 
         w.CommitUptime(DateTime.Now);
@@ -550,7 +550,7 @@ internal static class VMCenter
             catch (Exception ex) // Catches "regkey doesn't exist" exceptions and such
             {
                 await ui.ShowError(@$"Virtual machine ""{vm_name}"" could not be removed due to " +
-                                    $"the following error:\n\n{ex.Message}");
+                                    $"the following error:\n\n{ex.Message}", ex);
                 return;
             }
 
@@ -560,32 +560,32 @@ internal static class VMCenter
                 {
                     Directory.Delete(vm_path, true);
                 }
-                catch (UnauthorizedAccessException) //Files are read-only or protected by privileges
+                catch (UnauthorizedAccessException e) //Files are read-only or protected by privileges
                 {
                     await ui.ShowError("86Box Manager was unable to delete the files of this " +
                                        "virtual machine because they are read-only or you don't " +
                                        "have sufficient privileges to delete them.\n\nMake sure " +
-                                       "the files are free for deletion, then remove them manually.");
+                                       "the files are free for deletion, then remove them manually.", e);
                     return;
                 }
-                catch (DirectoryNotFoundException) //Directory not found
+                catch (DirectoryNotFoundException e) //Directory not found
                 {
                     await ui.ShowError("86Box Manager was unable to delete the files of this " +
-                                            "virtual machine because they no longer exist.");
+                                            "virtual machine because they no longer exist.", e);
                     return;
                 }
-                catch (IOException) //Files are in use by another process
+                catch (IOException e) //Files are in use by another process
                 {
                     await ui.ShowError("86Box Manager was unable to delete some files of this " +
                                             "virtual machine because they are currently in use by " +
                                             "another process.\n\nMake sure the files are free for " +
-                                            "deletion, then remove them manually.");
+                                            "deletion, then remove them manually.", e);
                     return;
                 }
                 catch (Exception ex) //Other exceptions
                 {
                     await ui.ShowError($"The following error occurred while trying to remove" +
-                                            $" the files of this virtual machine:\n\n{ex.Message}");
+                                            $" the files of this virtual machine:\n\n{ex.Message}", ex);
                     return;
                 }
             }
@@ -816,20 +816,20 @@ internal static class VMCenter
                 }
             }
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException e)
         {
             Dispatcher.UIThread.Post(async () =>
             {
                 await parent.ShowError("The process failed to initialize or its window " +
-                                       "handle could not be obtained.");
+                                       "handle could not be obtained.", e);
             });
         }
-        catch (Win32Exception)
+        catch (Win32Exception e)
         {
             Dispatcher.UIThread.Post(async () =>
             {
                 await parent.ShowError("Cannot find 86Box executable. Make sure your settings " +
-                                      $"are correct and try again. ({start_file})");
+                                      $"are correct and try again. ({start_file})", e);
             });
         }
         catch (Exception ex)
@@ -837,7 +837,7 @@ internal static class VMCenter
             Dispatcher.UIThread.Post(async () =>
             {
                 await parent.ShowError("An error has occurred. Please provide the following " +
-                                      $"information to the developer:\n{ex.Message}\n{ex.StackTrace}");
+                                      $"information to the developer:\n{ex.Message}\n{ex.StackTrace}", ex);
             });
         }
 
@@ -855,11 +855,11 @@ internal static class VMCenter
                 Platforms.Shell.PushToForeground(vis.Tag.hWnd);
             }
         }
-        catch (Exception)
+        catch (Exception e)
         {
             Dispatcher.UIThread.Post(async () =>
             {
-                await ui.ShowError("An error occurred trying to stop the selected virtual machine.");
+                await ui.ShowError("An error occurred trying to stop the selected virtual machine.", e);
             });
         }
 
@@ -917,12 +917,12 @@ internal static class VMCenter
 
                 ui.UpdateState();
             }
-            catch (Win32Exception)
+            catch (Win32Exception e)
             {
                 Dispatcher.UIThread.Post(async () =>
                 {
                     await ui.ShowError("Cannot find 86Box executable. Make sure your " +
-                                       "settings are correct and try again.");
+                                       "settings are correct and try again.", e);
                 });
             }
             catch (Exception ex)
@@ -935,7 +935,7 @@ internal static class VMCenter
                 {
                     await ui.ShowError("This virtual machine could not be configured. Please " +
                                        "provide the following information to the developer:\n" +
-                                       $"{ex.Message}\n{ex.StackTrace}");
+                                       $"{ex.Message}\n{ex.StackTrace}", ex);
                 });
             }
         }

@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Controls;
 using System.Collections.Generic;
 
@@ -19,6 +20,7 @@ public class DialogBoxSettings
     public bool ShowBtn2 { get; set; }
     public bool IsChecked { get; set; }
     public string Checkbox { get; set; }
+    public Exception Error { get; set; }
     public Thickness Border
     {
         get

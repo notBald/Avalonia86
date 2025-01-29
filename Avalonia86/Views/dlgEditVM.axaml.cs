@@ -86,7 +86,7 @@ public partial class dlgEditVM : Window
         }
         catch (Exception ex)
         {
-            await this.ShowError($@"Unable to save edit: "+ex.Message);
+            await this.ShowError($@"Unable to save edit: "+ex.Message, ex);
         }
 
         //await Dialogs.ShowMessageBox($@"Virtual machine ""{name}"" was successfully modified.",
