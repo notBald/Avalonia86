@@ -267,9 +267,20 @@ internal class MainModel : ReactiveObject, IDisposable
     {
         if (e.PropertyName == nameof(MachineIndex) && _vm_idx >= 0) 
         {
-            Settings.RefreshVisual(Machine.Tag.UID);
-            Settings.RefreshTime(Machine);
-            _machine.Update(Machine);
+            try
+            {
+                Settings.RefreshVisual(Machine.Tag.UID);
+                Settings.RefreshTime(Machine);
+                _machine.Update(Machine);
+            }
+            catch (Exception ex)
+            {
+                //Instead of throwing a confusing error message to the user, we'll
+                //put this in the error log instead. This error simply means that
+                //the info pane will not be correct, and the most likely cause is
+                //having the vm database on a nettwork share.
+                Program.AddError("Failed to update machine", "MainModel_PropertyChanged", ex);
+            }
         }
         else if (_cat_idx >= 0 && e.PropertyName == nameof(CategoryIndex))
         {

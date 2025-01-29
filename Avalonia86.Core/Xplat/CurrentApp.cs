@@ -7,6 +7,7 @@ namespace Avalonia86.Xplat;
 
 public static class CurrentApp
 {
+    public static bool IsMac { get; private set; }
     public static bool IsLinux { get; private set; }
     public static bool IsWindows { get; private set; }
     public static bool IsAppImage { get; private set; }
@@ -31,6 +32,7 @@ public static class CurrentApp
     {
         IsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
         IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        IsMac = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
         try
         {

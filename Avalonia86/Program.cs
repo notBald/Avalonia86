@@ -5,6 +5,7 @@ using Avalonia86.Tools;
 using Avalonia86.Views;
 using Avalonia86.Xplat;
 using System;
+using System.Collections.Generic;
 
 namespace Avalonia86;
 
@@ -17,6 +18,30 @@ internal static class Program
     private static readonly string AppId = "Avalonia.86Box";
 
     internal static frmMain Root;
+
+    public readonly static List<ErrorMsg> ErrorLog = [];
+
+    public class ErrorMsg
+    {
+        public string Msg { get; private set; }
+        public string Method { get; private set; }
+        public Exception Ex { get; private set; }
+
+        public ErrorMsg(string msg, string met, Exception ex)
+        {
+            Msg = msg;
+            Method = met;
+            Ex = ex;
+        }
+    }
+
+    public static void AddError(string message, string method, Exception ex)
+    {
+        if (message == null || method == null || ex == null)
+            throw new ArgumentNullException();
+
+        ErrorLog.Add(new ErrorMsg(message, method, ex));
+    }
 
     [STAThread]
     private static int Main(string[] args)

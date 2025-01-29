@@ -30,6 +30,9 @@ public class DialogBoxBuilder
 
     public async Task<DialogResult> ShowDialog()
     {
+        if (_settings.Error != null)
+            Program.AddError(_settings.Message, "Unknown", _settings.Error);
+
         if (_settings.Icon == DialogIcon.None)
             _settings.Icon = DialogIcon.Information;
         if (_settings.Title == null)

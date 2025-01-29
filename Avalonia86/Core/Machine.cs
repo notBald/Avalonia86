@@ -42,6 +42,10 @@ internal class Machine : IDisposable
     /// 
     /// This delay is still so short it is basically instant, so an even longer
     /// delay might not be such a bad idea.
+    /// 
+    /// Note, _throttle_timer is used as a lock object for _fld_size_timer and
+    ///       _last_fld_chk. This has nothing to do with _throttle_timer, it's
+    ///       simply a convinient lock object.
     /// </remarks>
     private readonly Timer _throttle_timer = new Timer(75) { AutoReset = false };
 
@@ -103,8 +107,12 @@ internal class Machine : IDisposable
         _minutte_clock.Elapsed += _minutte_clock_Elapsed;
         _minutte_clock.Start();
 
-        //Linux does not get the waiting/paused events from 86Box.
-        if (!CurrentApp.IsLinux)
+        //Only on Windows can we be confident that the conf file has
+        //been updated within 75ms. By setting it to 250ms, we can be
+        //reasonably sure of this on Mac and Linux as well.
+        //(This because windows knows when the emu is actually running,
+        // this info is not avalible on other platforms)
+        if (!CurrentApp.IsWindows)
         {
             _throttle_timer.Interval = 250;
         }
@@ -193,7 +201,7 @@ internal class Machine : IDisposable
             //This is quite dependent on quirks of 86Box, making it fragile. A more robust
             //solution is probably to set the throttle_timer to a much higher value.
             parse_config = (!_current.IsRunning || _current.Status == MachineStatus.RUNNING && _current.ClearWaiting()) 
-                || CurrentApp.IsLinux || _current.IsConfig;
+                || CurrentApp.IsMac || _current.IsConfig;
             check_size = parse_config;
         }
         else if (string.Equals(e.FullPath, _86box_prt_path, StringComparison.InvariantCultureIgnoreCase) ||
@@ -221,9 +229,10 @@ internal class Machine : IDisposable
         //Debug.WriteLine($"Config: {parse_config}, Folders: {check_folders}, Size: {check_size}, Type: {e.ChangeType}");
 
         _event_queue.Enqueue(new UpdateEvent(parse_config, check_folders, check_size));
-        if (_throttle_timer.Enabled)
-            return;
 
+        //Note, it is not impossible for the _throttle_timer to fire between the method call above and
+        //      being enabled here. In that case, it will be fired again only to find an empty event 
+        //      queue. So no real harm.
         if (!_throttle_timer.Enabled)
             _throttle_timer.Start();
     }
@@ -257,9 +266,17 @@ internal class Machine : IDisposable
     {
         Dispatcher.UIThread.Post(() =>
         {
-            //On MT: This function will never execute after a machine has been
-            //switched, as the method that does the switch is on the UI thread
-            //and disables the timer (which is also the UI thread)
+            //On MT: It's theoretically possible that this method
+            //       executes right after "update" is called, if
+            //       the timer fires before it is disabled.
+            //
+            //       In that case, this method will not be called
+            //       until the updated method has cleared the
+            //       event queue. Meaning, it will do nothing.
+            //
+            //       And if an event somehow sneaks between the
+            //       update method and this, then the event will
+            //       simply be handled, so no real harm.
 
             bool parse_config = false;
             bool check_folders = false;
@@ -548,7 +565,7 @@ internal class Machine : IDisposable
             using (var sr = new StreamReader(f, Encoding.UTF8, true, 4096))
             {
                 //Sanity check. If the file is this big, it's probably not a config file
-                if (f.Length > 16384)
+                if (f.Length > 32768)
                     throw new IOException("File too big");
 
                 //This is an INI like format with section headers like this: [Header name]
