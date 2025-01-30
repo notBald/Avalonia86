@@ -81,6 +81,8 @@ internal sealed class VMVisual : ReactiveObject
         {
             var rp = RawPath;
 
+            //Note, if you debug you can alter the HasValidPath state by reading the "Path".
+            //      This is not ideal, but should only matter whan renaming folders. 
             if (!string.IsNullOrWhiteSpace(rp) && !Directory.Exists(rp))
             {
                 if (!IsLinked)

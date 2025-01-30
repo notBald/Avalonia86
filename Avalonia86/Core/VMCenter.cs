@@ -7,6 +7,7 @@ using Avalonia86.Tools;
 using Avalonia86.ViewModels;
 using Avalonia86.Views;
 using Avalonia86.Xplat;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -359,7 +360,9 @@ internal static class VMCenter
         return clean_stop;
     }
 
-    // Changes a VM's name and/or description
+    /// <summary>
+    /// Changes a VM's name and/or description
+    /// </summary>
     public static void Edit(long uid, string name, string new_folder, string desc, string category, string icon, string comment, long? exe_id, Window parent)
     {
         var m = Program.Root.Model;
@@ -384,11 +387,9 @@ internal static class VMCenter
                 try
                 {
                     Directory.Move(vm.Path, new_folder);
+                    vm.Path = new_folder;
                 }
                 catch { rename = false; }
-
-                if (rename)
-                    vm.Path = new_folder;
             }
 
             t.Commit();
@@ -407,6 +408,9 @@ internal static class VMCenter
             m.CategoryName = category;
             m.Machine = vm;
         }
+
+        if (rename)
+            vm.RaisePropertyChanged(nameof(VMVisual.Path));
     }
 
     public static (string, IVerInfo) GetPathExeInfo()
