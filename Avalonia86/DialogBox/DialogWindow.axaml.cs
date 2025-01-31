@@ -16,11 +16,12 @@ public partial class DialogWindow : Window
         //Windows 10 workarround
         NativeMSG.SetDarkMode(this);
 
-        this.Loaded += DialogWindow_Loaded;
+        Loaded += DialogWindow_Loaded;
     }
 
     private void DialogWindow_Loaded(object sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
+        Loaded -= DialogWindow_Loaded;
         btn1.Focus();
     }
 
