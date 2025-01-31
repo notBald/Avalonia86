@@ -56,3 +56,5 @@ You need a folder for a config file, and a subfolder for some additional files.
 
  There is also an option for supplying a ```--app-version 4.0.0``` command, which can
  be used innstead of manually editing the conf file.
+
+ Answer yes to any questions.
