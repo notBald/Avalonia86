@@ -62,9 +62,9 @@
 			<StackPanel Grid.Column="2"
 				Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
 				<Button Width="60" Content="{Binding Btn1, TargetNullValue='OK'}" IsDefault="True" 
-						Click="btn1_Click" />
+						Click="btn1_Click" Name="btn1" />
 				<Button Width="60" Content="{Binding Btn2, TargetNullValue='Cancel'}" IsVisible="{Binding ShowBtn2}" IsCancel="True" 
-						Click="btn2_Click"/>
+						Click="btn2_Click" />
 			</StackPanel>
 		</Grid>
 		<Border BorderThickness="{Binding Border}" BorderBrush="{DynamicResource main_BorderBrush}" Margin="0, 1">

@@ -374,7 +374,7 @@ internal static class FolderHelper
     public static bool IsDirectChild(string parent, string child)
     {
         if (!string.IsNullOrWhiteSpace(parent) && !string.IsNullOrWhiteSpace(child) &&
-            Directory.Exists(parent) && Directory.Exists(child))
+            Directory.Exists(parent))
         {
             parent = Path.GetFullPath(parent).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             string parentDir = GetParentFolderPath(child);
