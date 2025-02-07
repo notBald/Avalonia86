@@ -640,7 +640,7 @@ internal static class VMCenter
 
         var paths = DeterminePaths(vm);
         if (paths == null)
-            throw new Exception("No 86Box executable found.");
+            throw new FileNotFoundException("No 86Box executable found.");
 
         var vars = new CommonExecVars
         {
@@ -828,12 +828,11 @@ internal static class VMCenter
                                        "handle could not be obtained.", e);
             });
         }
-        catch (Win32Exception e)
+        catch (FileNotFoundException e)
         {
             Dispatcher.UIThread.Post(async () =>
             {
-                await parent.ShowError("Cannot find 86Box executable. Make sure your settings " +
-                                      $"are correct and try again. ({start_file})", e);
+                await parent.ShowError("You can download 86Box from the Tools -> Update 86Box menu.", e, "Could not locate a 86Box executable.", "86Box is needed to run a VM");
             });
         }
         catch (Exception ex)

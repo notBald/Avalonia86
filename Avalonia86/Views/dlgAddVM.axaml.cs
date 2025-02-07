@@ -60,7 +60,7 @@ public partial class dlgAddVM : Window
         if (!_m.HasPath)
         {
             //We know there is no base path, so we can safely assume that the user has not set a VM folder.
-            //But instead of showing an error, we check if we can createa a VM folder
+            //But instead of showing an error, we check if we can create a VM folder
 
             var dir = CurrentApp.StartupPath;
             if (Directory.Exists(dir))
