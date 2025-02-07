@@ -170,10 +170,13 @@
 									<Label Grid.Column="1" Content="Prefer default executable" Tapped="label_default_tapped" />
 								</Grid>
 								<DataGrid RowBackground="{DynamicResource GridRowBackground}" SelectedItem="{Binding SelectedExe}, Mode=OneWayToSource" BorderThickness="0"
-									GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}">
+									GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}" LoadingRow="DataGrid_LoadingRow">
 									<DataGrid.Styles>
 										<Style Selector="ScrollBar">
 											<Setter Property="AllowAutoHide" Value="False"/>
+										</Style>
+										<Style Selector="DataGridRow.missing">
+											<Setter Property="Background" Value="{DynamicResource ErrorRowBackground}" />
 										</Style>
 									</DataGrid.Styles>
 									<DataGrid.Columns>

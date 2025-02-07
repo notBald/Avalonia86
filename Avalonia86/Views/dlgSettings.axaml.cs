@@ -440,6 +440,9 @@ public partial class dlgSettings : BaseWindow
                 Build = r["Build"] as string,
             };
 
+            try { exe.ExeExists = File.Exists(exe.VMPath); }
+            catch { }
+
             if (exe.IsDefault)
                 is_def = false;
 
@@ -553,7 +556,8 @@ public partial class dlgSettings : BaseWindow
                         Version = m.Version,
                         Comment = m.Comment,
                         Arch = m.Arch,
-                        Build = m.Build
+                        Build = m.Build,
+                        ExeExists = true
                     });
 
                     _m.IsExeListChanged = true;
@@ -612,6 +616,17 @@ public partial class dlgSettings : BaseWindow
                 _m.IsExeListChanged = true;
             }
         });
+    }
+
+    private void DataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
+    {
+        if (e.Row.DataContext is dlgSettingsModel.ExeEntery exe)
+        {
+            if (exe.ExeExists)
+                e.Row.Classes.Remove("missing");
+            else
+                e.Row.Classes.Add("missing");
+        }
     }
 }
 
@@ -1026,7 +1041,7 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
         public string Comment { get; set; }
         public string Arch { get; set; }
         public string Build { get; set; }
-
+        public bool ExeExists { get; set; }
         public bool IsDeleted { get; set; }
 
         public bool IsDefault 

@@ -19,6 +19,7 @@
 
 			<!-- Colors used on data tables -->
 			<SolidColorBrush x:Key="GridRowBackground" Color="White"/>
+			<SolidColorBrush x:Key="ErrorRowBackground" Color="#F57782"/>
 		</ResourceDictionary>
 		<ResourceDictionary x:Key="Dark">
 			<SolidColorBrush x:Key="ArrowBrush" Color="White" />
@@ -38,6 +39,7 @@
 
 			<!-- Colors used on data tables -->
 			<SolidColorBrush x:Key="GridRowBackground" Color="Black"/>
+			<SolidColorBrush x:Key="ErrorRowBackground" Color="#F32732"/>
 		</ResourceDictionary>
 	</ResourceDictionary.ThemeDictionaries>
 
