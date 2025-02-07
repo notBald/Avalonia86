@@ -48,9 +48,53 @@ public partial class dlgAddVM : Window
         NativeMSG.SetDarkMode(this);
     }
 
-    private void DlgAddVM_Loaded(object sender, RoutedEventArgs e)
+    private async void DlgAddVM_Loaded(object sender, RoutedEventArgs e)
     {
+        if (Design.IsDesignMode)
+            return;
+
+        //Put focus into the name field
         tbName.Focus();
+
+        //Check if the VM folder exists
+        if (!_m.HasPath)
+        {
+            //We know there is no base path, so we can safely assume that the user has not set a VM folder.
+            //But instead of showing an error, we check if we can createa a VM folder
+
+            var dir = CurrentApp.StartupPath;
+            if (Directory.Exists(dir))
+            {
+                bool is_writable = false;
+
+                dir = Path.Combine(dir, "VMs");
+                if (!Directory.Exists(dir))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(dir);
+                        is_writable = true;
+                    }
+                    catch { }
+                }
+                else
+                {
+                    is_writable = FolderHelper.IsDirectoryWritable(dir);
+                }
+
+                if (!is_writable)
+                {
+                    await this.ShowError("You must select a default location for virtual machines, do it in settings.", "No VM folder");
+                    Close();
+                }
+                else
+                {
+                    _s.CFGdir = dir;
+                    _m.BasePath = dir;
+                    _m.RaisePropertyChanged(nameof(dlgAddVMModel.InstallPath));
+                }
+            }           
+        }
     }
 
     private void DlgAddVM_Closing(object sender, WindowClosingEventArgs e)
@@ -295,7 +339,6 @@ internal class dlgAddVMModel : ReactiveObject
 {
     private string _name, _install_path;
     private int _tab_idx = 0;
-    private readonly string _base_path;
     private readonly List<string> _img_list;
     private int _index = 0;
 
@@ -313,6 +356,8 @@ internal class dlgAddVMModel : ReactiveObject
             }
         }
     }
+
+    internal string BasePath { get; set; }
 
     public string VMName
     { 
@@ -349,7 +394,7 @@ internal class dlgAddVMModel : ReactiveObject
     public bool HasPath
     {
         get => !string.IsNullOrWhiteSpace(_install_path) || 
-            !string.IsNullOrWhiteSpace(_base_path);
+            !string.IsNullOrWhiteSpace(BasePath);
     }
 
     public string InstallPath
@@ -359,8 +404,8 @@ internal class dlgAddVMModel : ReactiveObject
             if (!string.IsNullOrWhiteSpace(_install_path))
                 return _install_path;
 
-            return string.IsNullOrWhiteSpace(_name) ? _base_path :
-                FolderHelper.EnsureUniqueFolderName(_base_path, _name);
+            return string.IsNullOrWhiteSpace(_name) ? BasePath :
+                FolderHelper.EnsureUniqueFolderName(BasePath, _name);
         }
         set
         {
@@ -448,7 +493,7 @@ internal class dlgAddVMModel : ReactiveObject
             Categories.Add("DOS machines");
             Categories.Add("OS/2 machines");
 
-            _base_path = "c:\\86Box\\VMs\\";
+            BasePath = "c:\\86Box\\VMs\\";
         }
         else
         {
@@ -458,7 +503,7 @@ internal class dlgAddVMModel : ReactiveObject
             Categories.Sort();
 
             DefaultCategory = s.DefaultCat.Name;
-            _base_path = s.CFGdir ?? "";
+            BasePath = s.CFGdir ?? "";
         }
     }
 
