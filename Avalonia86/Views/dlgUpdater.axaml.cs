@@ -54,6 +54,8 @@ public partial class dlgUpdater : BaseWindow
 
     private void DlgUpdater_Loaded(object sender, RoutedEventArgs e)
     {
+        Loaded -= DlgUpdater_Loaded;
+
         var fj = new Download86Manager.FetchJob(_m.CurrentBuild);
         fj.Log += AddToChangeLog;
         fj.ErrorLog += ErrorToChangeLog;
@@ -398,7 +400,41 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             Has86BoxFolder = !string.IsNullOrWhiteSpace(exe_fld) && Directory.Exists(exe_fld);
 
             if (!Has86BoxFolder)
-                return;
+            {
+                bool is_writable = false;
+                var dir = CurrentApp.StartupPath;
+                if (Directory.Exists(dir))
+                {
+                    dir = IOPath.Combine(dir, "86Box");
+                    if (!Directory.Exists(dir))
+                    {
+                        try
+                        {
+                            Directory.CreateDirectory(dir);
+                            is_writable = true;
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        is_writable = FolderHelper.IsDirectoryWritable(dir);
+                    }
+
+                    if (is_writable)
+                    {
+                        try 
+                        { 
+                            s.EXEdir = dir;
+                            exe_fld = dir;
+                            Has86BoxFolder = true;
+                        }
+                        catch { is_writable = false; }
+                    }
+                }
+
+                if (!is_writable)
+                    return;
+            }
 
             CurrentExe.Version = "N/A";
             CurrentExe.Arch = "N/A";

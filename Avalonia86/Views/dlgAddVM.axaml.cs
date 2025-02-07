@@ -42,7 +42,8 @@ public partial class dlgAddVM : Window
         _s = AppSettings.Settings;
 
         Closing += DlgAddVM_Closing;
-        Loaded += DlgAddVM_Loaded;
+        if (!Design.IsDesignMode)
+            Loaded += DlgAddVM_Loaded;
 
         //Windows 10 workarround
         NativeMSG.SetDarkMode(this);
@@ -50,8 +51,7 @@ public partial class dlgAddVM : Window
 
     private async void DlgAddVM_Loaded(object sender, RoutedEventArgs e)
     {
-        if (Design.IsDesignMode)
-            return;
+        Loaded -= DlgAddVM_Loaded;
 
         //Put focus into the name field
         tbName.Focus();
