@@ -746,7 +746,6 @@ internal static class VMCenter
                 foreach (var exe in exes)
                 {
                     var info = Platforms.Manager.Get86BoxInfo(exe);
-                    NativeMSG.Msg("Info is: "+info, "Debug");
                     if (info == null)
                         paths = new ExePaths(exe, AppSettings.Settings.ROMdir, "", "");
                     else
