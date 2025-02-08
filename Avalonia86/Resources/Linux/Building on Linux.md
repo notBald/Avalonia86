@@ -1,4 +1,16 @@
-# Building a AppImage for Linux
+# Creating AppImage
+
+Notes for my setup:
+ 1. Rightclick and select "Publish" on the Avalonia86 project.
+ 2. Select an "AppImage" project and run it.
+ 3. Fire up the Linux Mint VM
+ 4. Navigate to the ```sf_bin/Publish/Appimage``` folder
+ 5. Edit the ```Avalonia86.pupnet.conf``` conf file with the new version number<br>
+    *(Do this in Windows as the Linux Mint text editor will fail to save changes)*
+ 6. Run ```build.sh``` in the folder. *(It simply runs pupnet --kind appimage)*
+ 7. Rename the AppImage in the ```Deply/bin``` folder to something appropriate.
+
+# Setting up for building a AppImage for Linux
 
 This is a little tricky, so I decided to type down notes before I forget.
 
