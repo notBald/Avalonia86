@@ -101,8 +101,6 @@ public sealed class LinuxManager : UnixManager
         var appImage = Directory.GetFiles(exeDir, exe_name).FirstOrDefault();
         if (appImage != null && AppImageChecker.TryGetAppInfo(appImage, out var app_info))
         {
-            Console.WriteLine("Hello AppImage: "+appImage);
-
             try
             {
                 var line = app_info.Version;
@@ -168,36 +166,9 @@ public sealed class LinuxManager : UnixManager
                     }
                 }
             }
-            else
-            {
-                Console.WriteLine("Hello AppImage version: "+info.ToString());
-            }
         }
         return info;
     }
 
     public static string GetTmpDir() => "/tmp";
-
-    public static int FindMagicOffset(byte[] data, byte[] magicNumber, int pos = 0)
-    {
-        for (int i = pos; i <= data.Length - magicNumber.Length; i++)
-        {
-            bool found = true;
-            for (int j = 0; j < magicNumber.Length; j++)
-            {
-                if (data[i + j] != magicNumber[j])
-                {
-                    found = false;
-                    break;
-                }
-            }
-
-            if (found)
-            {
-                return i; // Return the starting position of the magic number
-            }
-        }
-
-        return -1; // Return -1 if the magic number is not found
-    }
 }
