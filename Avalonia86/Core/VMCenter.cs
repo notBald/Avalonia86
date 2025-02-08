@@ -746,7 +746,10 @@ internal static class VMCenter
                 foreach (var exe in exes)
                 {
                     var info = Platforms.Manager.Get86BoxInfo(exe);
-                    paths = new ExePaths(exe, AppSettings.Settings.ROMdir, "" + info.FilePrivatePart, info.Arch);
+                    if (info == null)
+                        paths = new ExePaths(exe, AppSettings.Settings.ROMdir, "", "");
+                    else
+                        paths = new ExePaths(exe, AppSettings.Settings.ROMdir, ""+info.FilePrivatePart, info.Arch);
                     if (!Directory.Exists(paths.RomPath))
                         paths.RomPath = null;
 
