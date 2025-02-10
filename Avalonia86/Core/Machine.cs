@@ -38,7 +38,7 @@ internal class Machine : IDisposable
     /// We throttle the events from file changer 
     /// </summary>
     /// <remarks>
-    /// Why 75ms? Well, we don't need instant UI updates every time the folder changes.
+    /// Why 125ms? Well, we don't need instant UI updates every time the folder changes.
     /// 
     /// This delay is still so short it is basically instant, so an even longer
     /// delay might not be such a bad idea.
@@ -47,7 +47,7 @@ internal class Machine : IDisposable
     ///       _last_fld_chk. This has nothing to do with _throttle_timer, it's
     ///       simply a convinient lock object.
     /// </remarks>
-    private readonly Timer _throttle_timer = new Timer(75) { AutoReset = false };
+    private readonly Timer _throttle_timer = new Timer(125) { AutoReset = false };
 
     /// <summary>
     /// Until the timer above elapses, all events are collected onto this queue.
