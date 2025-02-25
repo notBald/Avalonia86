@@ -32,6 +32,7 @@ internal static class HWDB
                 _db = new SQLiteConnection("Data Source=" + db);
 #else
                 _db = new SQLiteConnection("URI=file:" + db);
+                _db.ParseViaFramework = true;
 #endif
                 _db.Open();
             }

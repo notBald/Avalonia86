@@ -1,5 +1,6 @@
 ﻿using Avalonia86.Xplat;
 using Avalonia.Controls;
+using Avalonia86.Tools;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -90,21 +91,33 @@ internal sealed class DBStore
     }
     private static SQLiteConnection OpenDB()
     {
+        Console.WriteLine("Opening DB");
+
         string db_name = AppName + ".sqlite";
 
         //First, we look for a database in the local folder or appdata folder.
-        string local_path = Path.Combine(CurrentApp.TrueStartupPath, db_name);
+        string local_path = CurrentApp.TrueStartupPath;
+
+        Console.WriteLine("Local: "+ local_path);
         string app_folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SettingsFolder);
         string app_path = Path.Combine(app_folder, db_name);
         SQLiteConnection con;
+        bool use_local = true;
+        
+        try
+        {
+            use_local = FolderHelper.IsDirectoryWritable(local_path);
+            
+            local_path = Path.Combine(local_path, db_name);
+        } catch { use_local = false; }
 
         if (!Design.IsDesignMode)
         {
-            if (TryOpenDB(local_path, out con) || TryOpenDB(app_path, out con))
+            if (use_local && TryOpenDB(local_path, out con) || TryOpenDB(app_path, out con))
                 return con;
 
             //Next, we try to create a new settings database.
-            if (TryCreateDB(local_path, null, out con) || TryCreateDB(app_path, app_folder, out con))
+            if (use_local && TryCreateDB(local_path, null, out con) || TryCreateDB(app_path, app_folder, out con))
                 return con;
         }
 
@@ -264,6 +277,7 @@ internal sealed class DBStore
                 db = new SQLiteConnection("Data Source=" + path);
 #else
                 db = new SQLiteConnection("URI=file:" + path);
+                db.ParseViaFramework = true;
 #endif
                 db.Open();
 

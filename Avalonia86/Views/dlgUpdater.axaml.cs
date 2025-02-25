@@ -509,7 +509,7 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
                 SelectedArtifact = candidate;
             }
 
-            if (UpdateROMs && (_dm.LatestRomCommit == null || RomsLastUpdated == null || _dm.LatestRomCommit.Value > RomsLastUpdated.Value))
+            if (UpdateROMs && (RomsLastUpdated == null || _dm.LatestRomCommit != null && (_dm.LatestRomCommit.Value > RomsLastUpdated.Value)))
             {
                 DownloadROMs = true;
             }

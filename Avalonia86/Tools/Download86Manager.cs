@@ -664,33 +664,54 @@ public class Download86Manager : ReactiveObject
 
             try
             {
-                GithubCommit[] gjob;
+                GithubCommit[] gjob = null;
 
                 fjob.AddLog("Connecting to: " + ROMS_COMMITS_URL);
                 using (var response = await httpClient.GetAsync(github_url))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
-                        fjob.Error("Failed to contact server");
-                        return;
+                        if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                        {
+                            IEnumerable<string> values;
+                            if (response.Headers.TryGetValues("X-RateLimit-Remaining", out values))
+                            {
+                                foreach (var value in values)
+                                {
+                                    if (value == "0")
+                                    {
+                                        fjob.Error("GitHub rate limit exceeded for your IP address. Please try again later.");
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        fjob.Error("Failed to contact server, ROM download feature will likely not function");
                     }
-
-                    using (var json_str = await response.Content.ReadAsStreamAsync())
+                    else
                     {
-                        gjob = JsonSerializer.Deserialize<GithubCommit[]>(json_str);
+                        using (var json_str = await response.Content.ReadAsStreamAsync())
+                        {
+                            gjob = JsonSerializer.Deserialize<GithubCommit[]>(json_str);
+                        }
                     }
                 }
 
-                if (gjob.Length == 0 || gjob[0].Commit == null || gjob[0].Commit.Committer == null)
+                if (gjob != null && (gjob.Length == 0 || gjob[0].Commit == null || gjob[0].Commit.Committer == null))
                 {
                     fjob.Error($"Parsing failed, invalid response");
-                    return;
+                    gjob = null;
                 }
 
-                var date = gjob[0].Commit.Committer.Date;
-                fjob.AddLog("ROMs last updated: " + date.ToString("d", CultureInfo.CurrentCulture));
+                if (gjob != null)
+                {
+                    var date = gjob[0].Commit.Committer.Date;
+                    fjob.AddLog("ROMs last updated: " + date.ToString("d", CultureInfo.CurrentCulture));
+                    LatestRomCommit = date;
+                }
+
                 fjob.AddLog("");
-                LatestRomCommit = date;
+                
 
                 JenkinsBuild job;
                 fjob.AddLog("Connecting to: " + jenkins_url);
