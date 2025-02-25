@@ -91,14 +91,11 @@ internal sealed class DBStore
     }
     private static SQLiteConnection OpenDB()
     {
-        Console.WriteLine("Opening DB");
-
         string db_name = AppName + ".sqlite";
 
         //First, we look for a database in the local folder or appdata folder.
         string local_path = CurrentApp.TrueStartupPath;
 
-        Console.WriteLine("Local: "+ local_path);
         string app_folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SettingsFolder);
         string app_path = Path.Combine(app_folder, db_name);
         SQLiteConnection con;
