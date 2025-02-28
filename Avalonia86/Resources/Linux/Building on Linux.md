@@ -70,3 +70,11 @@ You need a folder for a config file, and a subfolder for some additional files.
  be used innstead of manually editing the conf file.
 
  Answer yes to any questions.
+
+ # Remote debugging with Visual Studio 2022
+
+ Open "Extensions -> Manage Extensions" and search for "[VS .NET Linux Debugger](https://github.com/SuessLabs/RemoteDebug.git)".
+
+ Follow the instructions for how to install SSH on Linux, along with how to set up the Linux debugger.
+
+ You do not need any private keys, however the dev machine should not be internet facing.
