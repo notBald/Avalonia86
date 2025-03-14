@@ -827,8 +827,15 @@ public class Download86Manager : ReactiveObject
             }
         }
 
-        if (job.ChangeSets == null || job.ChangeSets.Count == 0)
+        if (job.ChangeSets == null)
             return false;
+
+        if (job.ChangeSets.Count == 0)
+        {
+            //Some builds have no changes
+            return true;
+        }
+
         var cs = job.ChangeSets[0];
         
         if (cs.Items != null)
