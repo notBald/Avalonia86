@@ -158,6 +158,7 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
 {
     private dlgUpdaterModel _me;
     private IDtoNAME _sel_os, _sel_arch;
+    private Artifact _sel_art;
     bool _pref_ndr, _upt_roms, _save_roms;
     string _archive_path;
 
@@ -216,6 +217,9 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             {
                 this.RaiseAndSetIfChanged(ref _sel_arch, value);
                 this.RaisePropertyChanged(nameof(HasChanges));
+
+                if (Artifacts != null)
+                    SelectArtifact();
             }
         }
     }
@@ -228,6 +232,9 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             {
                 this.RaiseAndSetIfChanged(ref _sel_os, value);
                 this.RaisePropertyChanged(nameof(HasChanges));
+
+                if (Artifacts != null)
+                    SelectArtifact();
             }
         }
     }
@@ -240,6 +247,9 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
             {
                 this.RaiseAndSetIfChanged(ref _pref_ndr, value);
                 this.RaisePropertyChanged(nameof(HasChanges));
+
+                if (Artifacts != null)
+                    SelectArtifact();
             }
         } 
     }
@@ -287,7 +297,11 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
     public string ArchiveVersion { get; set; }
     public string ArchiveComment { get; set; }
 
-    public Artifact SelectedArtifact { get; set; }
+    public Artifact SelectedArtifact 
+    { 
+        get => _sel_art;
+        set => this.RaiseAndSetIfChanged(ref _sel_art, value);
+    }
 
     public int CurrentBuild
     {
@@ -485,16 +499,30 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
         //      done our work. This isn't strickly needed, but I'm being extra safe.
         if (e.PropertyName == nameof(Download86Manager.LatestBuild))
         {
-            Artifact candidate = null;
-            bool has_ndr = false;
+            SelectArtifact();
 
-            //We adjust the selection to the prefered artifact
-            if (Artifacts != null)
+            this.RaisePropertyChanged(nameof(DownloadROMs));
+            this.RaisePropertyChanged(nameof(CanUpdate));
+        }
+    }
+
+    private void SelectArtifact()
+    {
+        Artifact candidate = null;
+        Artifact fallback = null;
+        bool has_ndr = false;
+        bool dl_roms = false;
+
+        //We adjust the selection to the prefered artifact
+        if (Artifacts != null)
+        {
+            foreach (var art in Artifacts)
             {
-                foreach (var art in Artifacts)
+                if (art.FileName.Contains(SelectedOS.ID, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (art.FileName.Contains(SelectedOS.ID, StringComparison.InvariantCultureIgnoreCase)
-                        && art.FileName.Contains(SelectedArch.ID, StringComparison.InvariantCultureIgnoreCase))
+                    fallback = art;
+
+                    if (art.FileName.Contains(SelectedArch.ID, StringComparison.InvariantCultureIgnoreCase))
                     {
                         if (candidate == null || has_ndr != PrefNDR)
                         {
@@ -503,21 +531,24 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
                         }
                     }
                 }
+            }
+
+            if (candidate == null)
+            {
+                candidate = fallback;
 
                 if (candidate == null && Artifacts.Count > 0)
                     candidate = Artifacts[0];
-                SelectedArtifact = candidate;
             }
-
-            if (UpdateROMs && (RomsLastUpdated == null || _dm.LatestRomCommit != null && (_dm.LatestRomCommit.Value > RomsLastUpdated.Value)))
-            {
-                DownloadROMs = true;
-            }
-
-            this.RaisePropertyChanged(nameof(SelectedArtifact));
-            this.RaisePropertyChanged(nameof(DownloadROMs));
-            this.RaisePropertyChanged(nameof(CanUpdate));
+            SelectedArtifact = candidate;
         }
+
+        if (UpdateROMs && (RomsLastUpdated == null || _dm.LatestRomCommit != null && (_dm.LatestRomCommit.Value > RomsLastUpdated.Value)))
+        {
+            dl_roms = true;
+        }
+
+        DownloadROMs = dl_roms;
     }
 
     public void Commit()
