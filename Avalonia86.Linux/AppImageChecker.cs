@@ -1,6 +1,8 @@
 ﻿using DiscUtils.SquashFs;
 using System;
 using System.IO;
+using ELFSharp.ELF;
+using System.Text.RegularExpressions;
 
 namespace Avalonia86.Linux;
 
@@ -12,8 +14,76 @@ public class AppImageChecker
     public static bool TryGetAppInfo(string path, out AppImageInfo info)
     {
         using (var fs = File.OpenRead(path))
-            return TryGetAppInfo(fs, out info);
+        {
+            var is_appimage = TryGetAppInfo(fs, out info);
+
+            if (!is_appimage && IsELFFile(fs))
+            {
+                //Todo: Testing and error checking. 
+
+                string architecture;
+                fs.Position = 0;
+
+                using (var elf = ELFReader.Load(fs, false))
+                {
+                    switch (elf.Machine)
+                    {
+
+                        case Machine.AMD64:
+                            architecture = "x86-64";
+                            break;
+                        case Machine.AArch64:
+                            architecture = "AArch64";
+                            break;
+                        default:
+                            architecture = "Unknown architecture";
+                            break;
+
+                    }
+                }
+
+                fs.Position = 0;
+                var res = ExtractVersionAndBuild(fs);
+
+                if (info.Version != null)
+                {
+                    info = new AppImageInfo(architecture, Path.GetFileName(path), res.Version + "-b" + res.Build);
+
+                    return true;
+                }
+            }
+
+            return is_appimage;
+        }
     }
+
+    private static bool IsELFFile(FileStream fs)
+    {
+        byte[] buffer = new byte[4];
+        _ = fs.Read(buffer, 0, buffer.Length);
+        return buffer[0] == 0x7F && buffer[1] == (byte)'E' && buffer[2] == (byte)'L' && buffer[3] == (byte)'F';
+    }
+
+
+    public static (string Version, string Build) ExtractVersionAndBuild(Stream stream)
+    {
+        using (StreamReader reader = new StreamReader(stream))
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                var match = Regex.Match(line, @"(\d+\.\d+) \[build (\d+)\]");
+                if (match.Success)
+                {
+                    string version = match.Groups[1].Value;
+                    string build = match.Groups[2].Value;
+                    return (version, build);
+                }
+            }
+        }
+        return (null, null);
+    }
+
 
     public static bool TryGetAppInfo(Stream s, out AppImageInfo info)
     {
