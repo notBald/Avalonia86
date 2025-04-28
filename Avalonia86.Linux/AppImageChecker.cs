@@ -49,9 +49,13 @@ public class AppImageChecker
                 if (res.Version != null)
                 {
                     info = new AppImageInfo(architecture, Path.GetFileName(path), res.Version + "-b" + res.Build);
-
-                    return true;
                 }
+                else
+                {
+                    info = new AppImageInfo(architecture, Path.GetFileName(path), "4.2-b5000");
+                }
+
+                return true;
             }
 
             return is_appimage;
