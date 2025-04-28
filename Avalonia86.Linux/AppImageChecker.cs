@@ -16,6 +16,7 @@ public class AppImageChecker
         using (var fs = File.OpenRead(path))
         {
             var is_appimage = TryGetAppInfo(fs, out info);
+            fs.Position = 0;
 
             if (!is_appimage && IsELFFile(fs))
             {
@@ -45,7 +46,7 @@ public class AppImageChecker
                 fs.Position = 0;
                 var res = ExtractVersionAndBuild(fs);
 
-                if (info.Version != null)
+                if (res.Version != null)
                 {
                     info = new AppImageInfo(architecture, Path.GetFileName(path), res.Version + "-b" + res.Build);
 
