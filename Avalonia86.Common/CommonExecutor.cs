@@ -34,6 +34,11 @@ public abstract class CommonExecutor : IExecutor
     {
         var info = new ProcessStartInfo(args.FileName);
         var ops = info.ArgumentList;
+        if (!string.IsNullOrWhiteSpace(args.RomPath) && args.Build >= 3333)
+        {
+            ops.Add("-R");
+            ops.Add(args.RomPath);
+        }
         ops.Add("--settings");
         ops.Add("-P");
         ops.Add(args.VmPath);
