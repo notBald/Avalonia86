@@ -97,7 +97,7 @@ public class GithubCommit
         public string Payload { get; set; }
 
         [JsonPropertyName("verified_at")]
-        public DateTime VerifiedAt { get; set; }
+        public DateTime? VerifiedAt { get; set; }
     }
 
     public class User
