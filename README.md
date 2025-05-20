@@ -31,6 +31,10 @@ System requirements are the same as for 86Box. Additionally, the following is re
 
 You may have to install .net 9.0. In that case, you will get a message like the one above.
 
+### Windows 10 LTSC
+
+Avalonia 8.6 might not work on the Long-Term Support (LTS) release of Windows 10. The workaround for now is to either use the Windows 7 release or to follow [this guide](https://www.reddit.com/r/WindowsLTSC/comments/1klhp4e/comment/mst7tjf/).
+
 ## Using on Linux
 
 For older builds, see the [Linux Guide](Linux.md).
