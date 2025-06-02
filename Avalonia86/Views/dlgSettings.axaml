@@ -169,7 +169,7 @@
 									</RadioButton>
 									<Label Grid.Column="1" Content="Prefer default executable" Tapped="label_default_tapped" />
 								</Grid>
-								<DataGrid RowBackground="{DynamicResource GridRowBackground}" SelectedItem="{Binding SelectedExe}, Mode=OneWayToSource" BorderThickness="0"
+								<DataGrid x:Name="DG_Exes" RowBackground="{DynamicResource GridRowBackground}" SelectedItem="{Binding SelectedExe}, Mode=OneWayToSource" BorderThickness="0"
 									GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}" LoadingRow="DataGrid_LoadingRow">
 									<DataGrid.Styles>
 										<Style Selector="ScrollBar">

@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Avalonia.Styling;
 using Avalonia;
 using Avalonia86.DialogBox;
+using static Avalonia86.Views.dlgSettingsModel;
 
 namespace Avalonia86.Views;
 
@@ -570,10 +571,16 @@ public partial class dlgSettings : BaseWindow
     {
         if (_m.SelectedExe != null) 
         {
-            //We don't delete as that would mess up the "id" generating algo
-            _m.SelectedExe.IsDeleted = true;
-            if (_m.SelectedExe.IsDefault)
-                _m.IsDefChecked = true;
+            foreach (var selected in DG_Exes.SelectedItems)
+            {
+                if (selected is ExeEntery exe)
+                {
+                    //We don't delete as that would mess up the "id" generating algo
+                    exe.IsDeleted = true;
+                    if (exe.IsDefault)
+                        _m.IsDefChecked = true;
+                }
+            }
             _m.IsExeListChanged = true;
 
             //Deleted items are filtered away
