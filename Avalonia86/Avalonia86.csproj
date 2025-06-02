@@ -39,7 +39,7 @@
     </PackageReference>
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.0" />
     <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.0" />
-    <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.3.0.3" />
+    <PackageReference Include="Xaml.Behaviors.Interactivity" Version="11.3.0.10" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Debug-MSDB'">

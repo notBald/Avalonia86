@@ -122,6 +122,11 @@ internal sealed class DBStore
         //Message.Snack("Unable to open settings, sorry. Settings will note be saved.");
         con = new SQLiteConnection("Data Source=:memory:");
         con.Open();
+        using (var cmd = con.CreateCommand())
+        {
+            cmd.CommandText = "PRAGMA foreign_keys = OFF";
+            cmd.ExecuteNonQuery();
+        }
 
 #if MSDB
         if (!InitDB(con))
@@ -202,8 +207,9 @@ internal sealed class DBStore
             return true;
         }
         catch 
-        { 
+        {
             return false; 
+            //throw;
         }
     }
 
