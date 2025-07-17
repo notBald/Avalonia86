@@ -50,8 +50,9 @@ public sealed class WinManager : CommonManager, IManager
         return false;
     }
 
-    public override IVerInfo Get86BoxInfo(string path)
+    public override IVerInfo Get86BoxInfo(string path, out bool bad_image)
     {
+        bad_image = false;
         if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
         {
             var vi = new WinVerInfo(FileVersionInfo.GetVersionInfo(path));
@@ -60,8 +61,16 @@ public sealed class WinManager : CommonManager, IManager
             {
                 using (var reader = new PEReader(stream))
                 {
-                    var headers = reader.PEHeaders;
-                    vi.Arch = headers.CoffHeader.Machine.ToString();
+                    try
+                    {
+                        var headers = reader.PEHeaders;
+                        vi.Arch = headers.CoffHeader.Machine.ToString();
+                    } 
+                    catch (BadImageFormatException)
+                    {
+                        bad_image = true;
+                        return null;
+                    }
                 }
             }
 

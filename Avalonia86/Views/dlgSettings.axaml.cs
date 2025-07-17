@@ -251,7 +251,7 @@ public partial class dlgSettings : BaseWindow
             {
                 foreach (var file in files)
                 {
-                    var vi = Platforms.Manager.Get86BoxInfo(file);
+                    var vi = Platforms.Manager.Get86BoxInfo(file, out _);
                     if (vi != null)
                     {
                         if (vi.FilePrivatePart >= 3541) //Officially supported builds
@@ -497,7 +497,7 @@ public partial class dlgSettings : BaseWindow
 
                     if (add)
                     {
-                        var vi = Platforms.Manager.Get86BoxInfo(exe);
+                        var vi = Platforms.Manager.Get86BoxInfo(exe, out _);
                         if (vi != null)
                         {
 

@@ -12,8 +12,9 @@ public sealed class MacManager : UnixManager
 {
     public MacManager() : base(GetTmpDir()) { }
 
-    public override IVerInfo Get86BoxInfo(string path)
+    public override IVerInfo Get86BoxInfo(string path, out bool bad_image)
     {
+        bad_image = false;
         if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
             return GetBoxVersion(Path.GetDirectoryName(path));
         return null;

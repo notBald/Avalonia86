@@ -425,7 +425,11 @@ internal static class VMCenter
                 {
                     if (m.IsExecutable(exe))
                     {
-                        return (exe, m.Get86BoxInfo(exe));
+                        bool bad;
+                        var info = m.Get86BoxInfo(exe, out bad);
+                        if (bad) continue;
+                        
+                        return (exe, info);
                     }
                 }
             }
@@ -745,7 +749,10 @@ internal static class VMCenter
             {
                 foreach (var exe in exes)
                 {
-                    var info = Platforms.Manager.Get86BoxInfo(exe);
+                    bool bad;
+                    var info = Platforms.Manager.Get86BoxInfo(exe, out bad);
+                    if (bad) continue;
+
                     if (info != null)
                     {
                         paths = new ExePaths(exe, AppSettings.Settings.ROMdir, "" + info.FilePrivatePart, info.Arch);

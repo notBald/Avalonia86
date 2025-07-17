@@ -11,7 +11,7 @@ public interface IManager
 
     bool IsProcessRunning(string name);
 
-    IVerInfo Get86BoxInfo(string path);
+    IVerInfo Get86BoxInfo(string path, out bool bad_image);
 
     IVerInfo Get86BoxInfo(Stream file);
 

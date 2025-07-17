@@ -39,8 +39,10 @@ public sealed class LinuxManager : UnixManager
         return ei;
     }
 
-    public override IVerInfo Get86BoxInfo(string path)
+    public override IVerInfo Get86BoxInfo(string path, out bool bad_image)
     {
+        bad_image = false;
+
         CommonVerInfo ei = null;
         if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
         {

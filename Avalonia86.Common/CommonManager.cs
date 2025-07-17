@@ -76,7 +76,7 @@ public abstract class CommonManager : IManager
     }
 
     protected abstract bool IsExecutable(FileInfo fi);
-    public abstract IVerInfo Get86BoxInfo(string path);
+    public abstract IVerInfo Get86BoxInfo(string path, out bool bad_image);
     public virtual IVerInfo Get86BoxInfo(Stream file)
     {
         throw new NotImplementedException();

@@ -6,6 +6,7 @@ using Avalonia86.Tools;
 using Avalonia86.Xplat;
 using System.ComponentModel;
 using Avalonia86.DialogBox;
+using Avalonia.Platform.Storage;
 
 namespace Avalonia86.Views;
 
@@ -124,7 +125,7 @@ public partial class dlgAddExe : Window
 
         try
         {
-            var vi = Platforms.Manager.Get86BoxInfo(_m.ExePath);
+            var vi = Platforms.Manager.Get86BoxInfo(_m.ExePath, out _);
             if (vi != null)
             {
                 //Todo: this code is now in three locations.
