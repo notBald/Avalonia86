@@ -22,6 +22,7 @@ public class VMConfig : ReactiveObject
     /// Object uowned by the UI thread.
     /// </remarks>
     private readonly VMVisual _vis;
+    private bool _show_desc = false, _show_com = false;
 
     private readonly RawConfig _config;
     Dictionary<string, string> _machine, _other, _video, _sound, _floppy, _hdd, _input;
@@ -60,10 +61,16 @@ public class VMConfig : ReactiveObject
         {
             //We are on the UI thread.
             if (_vis != null)
-                return _vis.Desc;
+            {
+                var desc = _vis.Desc;
+                this.RaiseAndSetIfChanged(ref _show_desc, !string.IsNullOrEmpty(desc), nameof(ShowDescription));
+                return desc;
+            }
             return "";
         }
     }
+
+    public bool ShowDescription => _show_desc;
 
     public string SystemComment
     {
@@ -71,10 +78,16 @@ public class VMConfig : ReactiveObject
         {
             //We are on the UI thread.
             if (_vis != null)
-                return _vis.Comment;
+            {
+                var com = _vis.Comment;
+                this.RaiseAndSetIfChanged(ref _show_com, !string.IsNullOrEmpty(com), nameof(ShowComment));
+                return com;
+            }
             return "";
         }
     }
+
+    public bool ShowComment => _show_com;
 
     private string SystemInternal
     {
