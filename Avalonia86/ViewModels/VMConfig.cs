@@ -70,7 +70,15 @@ public class VMConfig : ReactiveObject
         }
     }
 
-    public bool ShowDescription => _show_desc;
+    public bool ShowDescription 
+    {
+        get 
+        {
+            // Quick race condition fix. A proper fix should compute the visibility when this property is requested.
+            this.RaisePropertyChanged(nameof(SystemDescription));
+            return _show_desc;
+        }
+    }
 
     public string SystemComment
     {
@@ -87,7 +95,15 @@ public class VMConfig : ReactiveObject
         }
     }
 
-    public bool ShowComment => _show_com;
+    public bool ShowComment
+    {
+        get
+        {
+            // Quick race condition fix. A proper fix should compute the visibility when this property is requested.
+            this.RaisePropertyChanged(nameof(SystemComment));
+            return _show_com;
+        }
+    }
 
     private string SystemInternal
     {
