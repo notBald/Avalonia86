@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Avalonia86.Views;
 
-public partial class dlgEditVM : Window
+public partial class dlgEditVM : BaseWindow
 {
     /// <summary>
     /// VM to be edited
@@ -22,9 +22,10 @@ public partial class dlgEditVM : Window
 
     internal VMVisual VM { get { return _vm; } set { _vm = value; } }
 
-    public dlgEditVM()
+    public dlgEditVM() : base("edit_vm")
     {
         InitializeComponent();
+        BaseInit();
         _m = new dlgEditModel(Program.Root != null ? AppSettings.Settings : null);
         DataContext = _m;
 
