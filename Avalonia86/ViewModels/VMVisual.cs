@@ -390,7 +390,8 @@ internal sealed class VMVisual : ReactiveObject
     /// <summary>
     /// https://github.com/AvaloniaUI/Avalonia/issues/17029
     /// </summary>
-    internal VMVisual()
+    /// <remarks>Set public for designer, should be internal</remarks>
+    public VMVisual()
     {
         _vm = new VM(-1);
     }
