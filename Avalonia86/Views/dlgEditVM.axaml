@@ -47,8 +47,8 @@
 			</StackPanel>
 			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10">
 				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
-					<StackPanel>
-						<gb:GroupBox Header="Fundamentals"
+					<DockPanel>
+						<gb:GroupBox Header="Fundamentals" DockPanel.Dock="Top"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<DockPanel Margin="20, 10, 20, 0">
 								<DockPanel DockPanel.Dock="Left" Height="100" VerticalAlignment="Top">
@@ -82,9 +82,9 @@
 												Watermark="{Binding DefaultCategory}"
 												ItemsSource="{Binding Categories}"
 												Text="{Binding Category}">
-												<i:Interaction.Behaviors>
-													<vm:AutoCompleteBehavior/>
-												</i:Interaction.Behaviors>
+											<i:Interaction.Behaviors>
+												<vm:AutoCompleteBehavior/>
+											</i:Interaction.Behaviors>
 										</AutoCompleteBox>
 										<!-- Spacer row 3 -->
 										<TextBlock Text="VM Path:"  Grid.Row="4" Grid.Column="0" FontSize="10" />
@@ -94,17 +94,19 @@
 								</Border>
 							</DockPanel>
 						</gb:GroupBox>
-						<gb:GroupBox Header="Description" Theme="{StaticResource GroupBoxClassic}">
-							<Border Padding="20, 10">
-								<TextBox Text="{Binding Description}" Watermark="Enter description" Height="120" AcceptsReturn="True" TextWrapping="Wrap"/>
-							</Border>
-						</gb:GroupBox>
-						<gb:GroupBox Header="Comment" Theme="{StaticResource GroupBoxClassic}">
-							<Border Padding="20, 10">
-								<TextBox Text="{Binding Comment}" Watermark="Enter comment" Height="120" AcceptsReturn="True" TextWrapping="Wrap"/>
-							</Border>
-						</gb:GroupBox>
-					</StackPanel>
+						<Grid RowDefinitions="*, *, 5" VerticalAlignment="Stretch">
+							<gb:GroupBox Header="Description" Theme="{StaticResource GroupBoxClassic}" Grid.Row="0">
+								<Border Padding="20, 10">
+									<TextBox Text="{Binding Description}" Watermark="Enter description" AcceptsReturn="True" TextWrapping="Wrap"/>
+								</Border>
+							</gb:GroupBox>
+							<gb:GroupBox Header="Comment" Theme="{StaticResource GroupBoxClassic}" Grid.Row="1">
+								<Border Padding="20, 10">
+									<TextBox Text="{Binding Comment}" Watermark="Enter comment" AcceptsReturn="True" TextWrapping="Wrap"/>
+								</Border>
+							</gb:GroupBox>
+						</Grid>
+					</DockPanel>
 				</TabItem>
 				<TabItem Header="Advanced" Theme="{StaticResource CustomTabItm}">
 					<v:ctrlSetExecutable DataContext="{Binding ExeModel}" />
