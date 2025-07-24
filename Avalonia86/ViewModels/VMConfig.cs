@@ -20,22 +20,15 @@ namespace Avalonia86.ViewModels;
 /// </remarks>
 public class VMConfig : ReactiveObject
 {
-    /// <remarks>
-    /// Object uowned by the UI thread.
-    /// </remarks>
-    private readonly VMVisual _vis;
-    private bool _show_desc = false, _show_com = false;
-
     private readonly RawConfig _config;
     Dictionary<string, string> _machine, _other, _video, _sound, _floppy, _hdd, _input;
 
     public bool IsDefault => _config.Count == 0;
 
     public VMConfig() { _config = new RawConfig(); CreateDicts(); }
-    internal VMConfig(VMVisual vis)
+    internal VMConfig(RawConfig config)
     {
-        _vis = vis;
-        _config = vis.VMConfig;
+        _config = config;
         CreateDicts();
     }
 
@@ -55,64 +48,6 @@ public class VMConfig : ReactiveObject
             _hdd = new Dictionary<string, string>();
         if (!_config.TryGetValue("Input devices", out _input))
             _input = new Dictionary<string, string>();
-    }
-    static int num = 1;
-    public string SystemDescription
-    {
-        get
-        {
-            //We are on the UI thread.
-            if (_vis != null)
-            {
-                var desc = _vis.Desc;
-                //this.RaiseAndSetIfChanged(ref _show_desc, !string.IsNullOrEmpty(desc), nameof(ShowDescription));
-
-                // Quick race condition fix. A proper fix should compute the visibility when this property is requested.
-                // Actually, the problem is a little more complex. Computing does not fix the problem. I'm unsure why. 
-                System.Diagnostics.Debug.WriteLine("" + (++num / 2) + " - " + desc);
-                return desc;
-            }
-            return "";
-        }
-    }
-
-    public bool ShowDescription => !string.IsNullOrEmpty(SystemDescription);
-
-    public string SystemComment
-    {
-        get
-        {
-            //We are on the UI thread.
-            if (_vis != null)
-            {
-                var com = _vis.Comment;
-                this.RaiseAndSetIfChanged(ref _show_com, !string.IsNullOrEmpty(com), nameof(ShowComment));
-                return com;
-            }
-            return "";
-        }
-    }
-
-    public bool ShowComment
-    {
-        get
-        {
-            // Quick race condition fix. A proper fix should compute the visibility when this property is requested.
-
-            ThreadPool.QueueUserWorkItem(_ =>
-            {
-                Thread.Sleep(20); // 20 ms delay
-
-                // I'm starting to think this is some sort of bug in Avalonia itself. I'll give up on this for now, seeing as
-                // I'm planning to implement this differently.
-                Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    this.RaisePropertyChanged(nameof(SystemComment));
-                });
-            });
-            
-            return _show_com;
-        }
     }
 
     private string SystemInternal

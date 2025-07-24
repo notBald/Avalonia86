@@ -77,12 +77,6 @@
 						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Joystick, Mode=OneWay}" />
 					</Grid>
 				</Expander>
-				<Expander HorizontalAlignment="Stretch" Header="Description" IsExpanded="True" IsVisible="{Binding ShowDescription, Mode=OneWay}">
-					<SelectableTextBlock Text="{Binding SystemDescription, Mode=OneWay}" />
-				</Expander>
-				<Expander HorizontalAlignment="Stretch" Header="Comment" IsExpanded="True" IsVisible="{Binding ShowComment, Mode=OneWay}">
-					<SelectableTextBlock Text="{Binding SystemComment, Mode=OneWay}" />
-				</Expander>
 			</StackPanel>
 		</ScrollViewer>
 	</Border>

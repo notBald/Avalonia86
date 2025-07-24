@@ -592,51 +592,58 @@
 										<view:ctrlMachineInfo DataContext="{Binding VMConfig, Mode=OneWay}" />
 									</Border>
 									<GridSplitter Grid.Column="1" ResizeDirection="Columns" Theme="{StaticResource VerticalGridSplitter}" Margin="7, 2, 8, 2" />
-									<DockPanel Grid.Column="2" Margin="0, 0, 18, 0">
-										<DockPanel DockPanel.Dock="Top" Background="{DynamicResource content_BackgroundColor}" Height="35">
-											<TextBlock DockPanel.Dock="Left" Text="Screenshots:" VerticalAlignment="Center" FontSize="12" TextDecorations="Underline" Foreground="#0066cc" Margin="0, 0, 0, 1" 
-													   PointerPressed="Screenshots_PointerPressed">
-												<TextBlock.Styles>
-													<Style Selector="TextBlock:pointerover">
-														<Setter Property="Cursor" Value="Hand" />
-													</Style>
-												</TextBlock.Styles>
-											</TextBlock>
-											<StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-												<Button Margin="0, 7" IsEnabled="{Binding Machine.HasMultipleImages}" Click="btnPrevImg_Click">
-													<TextBlock Margin="0, -1, 0, 1" FontSize="14">&lt;</TextBlock>
-												</Button>
-												<Button Margin="3, 7, 0, 7" IsEnabled="{Binding Machine.HasMultipleImages}" Click="btnNextImg_Click">
-													<TextBlock Margin="0, -1, 0, 1" FontSize="14">&gt;</TextBlock>
-												</Button>
-											</StackPanel>
-											<Rectangle Fill="Transparent" />
-										</DockPanel>
-										<Grid DockPanel.Dock="Bottom" ColumnDefinitions="*, *" RowDefinitions="*, *, *, *">
-											<TextBlock Grid.Row="0" Grid.Column="0" Text="VM Age"/>
-											<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Machine.SinceCreated, TargetNullValue='Unknown', Mode=OneWay}" HorizontalAlignment="Right"/>
-											<TextBlock Grid.Row="1" Grid.Column="0" Text="Uptime"/>
-											<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Machine.Uptime.Short, Mode=OneWay}" HorizontalAlignment="Right" ToolTip.Placement="Top">
-												<ToolTip.Tip>
-													<StackPanel Orientation="Horizontal">
-														<TextBlock>Total uptime: </TextBlock>
-														<TextBlock Margin="5, 0, 0, 0" Text="{Binding Machine.Uptime.Full, Mode=OneWay}" />
-													</StackPanel>
-												</ToolTip.Tip>
-											</TextBlock>
-											<TextBlock Grid.Row="2" Grid.Column="0" Text="Play count"/>
-											<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Machine.RunCount, Mode=OneWay}" HorizontalAlignment="Right"/>
-											<TextBlock Grid.Row="3" Grid.Column="0" Text="Disk usage"/>
-											<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Machine.VMSize, TargetNullValue='Calculating...', Mode=OneWay}" HorizontalAlignment="Right"/>
-										</Grid>
-										<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" Margin="0, 0, 0, 10">
-											<Grid>
-												<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="(None)" />
-												<Image Source="{Binding Machine.SelectedImage}" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-													   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+									<TabControl Grid.Column="2">
+										<TabItem Header="Statistics">
+											<DockPanel Margin="0, 0, 18, 0">
+											<DockPanel DockPanel.Dock="Top" Background="{DynamicResource content_BackgroundColor}" Height="35">
+												<TextBlock DockPanel.Dock="Left" Text="Screenshots:" VerticalAlignment="Center" FontSize="12" TextDecorations="Underline" Foreground="#0066cc" Margin="0, 0, 0, 1" 
+															PointerPressed="Screenshots_PointerPressed">
+													<TextBlock.Styles>
+														<Style Selector="TextBlock:pointerover">
+															<Setter Property="Cursor" Value="Hand" />
+														</Style>
+													</TextBlock.Styles>
+												</TextBlock>
+												<StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+													<Button Margin="0, 7" IsEnabled="{Binding Machine.HasMultipleImages}" Click="btnPrevImg_Click">
+														<TextBlock Margin="0, -1, 0, 1" FontSize="14">&lt;</TextBlock>
+													</Button>
+													<Button Margin="3, 7, 0, 7" IsEnabled="{Binding Machine.HasMultipleImages}" Click="btnNextImg_Click">
+														<TextBlock Margin="0, -1, 0, 1" FontSize="14">&gt;</TextBlock>
+													</Button>
+												</StackPanel>
+												<Rectangle Fill="Transparent" />
+											</DockPanel>
+											<Grid DockPanel.Dock="Bottom" ColumnDefinitions="*, *" RowDefinitions="*, *, *, *">
+												<TextBlock Grid.Row="0" Grid.Column="0" Text="VM Age"/>
+												<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Machine.SinceCreated, TargetNullValue='Unknown', Mode=OneWay}" HorizontalAlignment="Right"/>
+												<TextBlock Grid.Row="1" Grid.Column="0" Text="Uptime"/>
+												<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Machine.Uptime.Short, Mode=OneWay}" HorizontalAlignment="Right" ToolTip.Placement="Top">
+													<ToolTip.Tip>
+														<StackPanel Orientation="Horizontal">
+															<TextBlock>Total uptime: </TextBlock>
+															<TextBlock Margin="5, 0, 0, 0" Text="{Binding Machine.Uptime.Full, Mode=OneWay}" />
+														</StackPanel>
+													</ToolTip.Tip>
+												</TextBlock>
+												<TextBlock Grid.Row="2" Grid.Column="0" Text="Play count"/>
+												<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Machine.RunCount, Mode=OneWay}" HorizontalAlignment="Right"/>
+												<TextBlock Grid.Row="3" Grid.Column="0" Text="Disk usage"/>
+												<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Machine.VMSize, TargetNullValue='Calculating...', Mode=OneWay}" HorizontalAlignment="Right"/>
 											</Grid>
-										</Border>
-									</DockPanel>
+											<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" Margin="0, 0, 0, 10">
+												<Grid>
+													<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="(None)" />
+													<Image Source="{Binding Machine.SelectedImage}" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+														   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+												</Grid>
+											</Border>
+										</DockPanel>
+									</TabItem>
+									<TabItem Header="Information">
+										<view:ctrlInformation DataContext="{Binding Machine, Mode=OneWay}"></view:ctrlInformation>
+									</TabItem>
+								</TabControl>
 								</Grid>
 								<StackPanel IsVisible="{Binding !Machine.HasValidPath}" HorizontalAlignment="Center" VerticalAlignment="Center">
 									<TextBlock Text="Failed to find the VM's folder" HorizontalAlignment="Stretch" TextAlignment="Center"
