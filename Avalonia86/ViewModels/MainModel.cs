@@ -108,7 +108,7 @@ internal class MainModel : ReactiveObject, IDisposable
                 //IsSameDict checks if the internal RawConfig is the same as the one we
                 //got. If it's the same, it'd be a waste to have the InfoPanel refresh.
                 if (!_current_config.IsSameDict(con))
-                    _current_config = new VMConfig(con);                        
+                    _current_config = new VMConfig(_selected_machine);                        
             }
 
             return _current_config;

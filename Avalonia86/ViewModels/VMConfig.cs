@@ -1,4 +1,5 @@
 ﻿using Avalonia86.Core;
+using Avalonia86.Models;
 using Avalonia86.Tools;
 using ReactiveUI;
 using System;
@@ -9,17 +10,29 @@ using System.Threading.Tasks;
 
 namespace Avalonia86.ViewModels;
 
+/// <summary>
+/// The parsed configuration for the machine
+/// </summary>
+/// <remarks>
+/// These objects are short-lived/recreated when swaping between machines. 
+/// </remarks>
 public class VMConfig : ReactiveObject
 {
-    private RawConfig _config;
+    /// <remarks>
+    /// Object uowned by the UI thread.
+    /// </remarks>
+    private readonly VMVisual _vis;
+
+    private readonly RawConfig _config;
     Dictionary<string, string> _machine, _other, _video, _sound, _floppy, _hdd, _input;
 
     public bool IsDefault => _config.Count == 0;
 
     public VMConfig() { _config = new RawConfig(); CreateDicts(); }
-    public VMConfig(RawConfig config)
+    internal VMConfig(VMVisual vis)
     {
-        _config = config;
+        _vis = vis;
+        _config = vis.VMConfig;
         CreateDicts();
     }
 
@@ -39,6 +52,28 @@ public class VMConfig : ReactiveObject
             _hdd = new Dictionary<string, string>();
         if (!_config.TryGetValue("Input devices", out _input))
             _input = new Dictionary<string, string>();
+    }
+
+    public string SystemDescription
+    {
+        get
+        {
+            //We are on the UI thread.
+            if (_vis != null)
+                return _vis.Desc;
+            return "";
+        }
+    }
+
+    public string SystemComment
+    {
+        get
+        {
+            //We are on the UI thread.
+            if (_vis != null)
+                return _vis.Comment;
+            return "";
+        }
     }
 
     private string SystemInternal
