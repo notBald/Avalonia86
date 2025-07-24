@@ -1,4 +1,5 @@
-﻿using Avalonia86.Core;
+﻿using Avalonia.Threading;
+using Avalonia86.Core;
 using Avalonia86.Models;
 using Avalonia86.Tools;
 using ReactiveUI;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Avalonia86.ViewModels;
@@ -54,7 +56,7 @@ public class VMConfig : ReactiveObject
         if (!_config.TryGetValue("Input devices", out _input))
             _input = new Dictionary<string, string>();
     }
-
+    static int num = 1;
     public string SystemDescription
     {
         get
@@ -63,22 +65,18 @@ public class VMConfig : ReactiveObject
             if (_vis != null)
             {
                 var desc = _vis.Desc;
-                this.RaiseAndSetIfChanged(ref _show_desc, !string.IsNullOrEmpty(desc), nameof(ShowDescription));
+                //this.RaiseAndSetIfChanged(ref _show_desc, !string.IsNullOrEmpty(desc), nameof(ShowDescription));
+
+                // Quick race condition fix. A proper fix should compute the visibility when this property is requested.
+                // Actually, the problem is a little more complex. Computing does not fix the problem. I'm unsure why. 
+                System.Diagnostics.Debug.WriteLine("" + (++num / 2) + " - " + desc);
                 return desc;
             }
             return "";
         }
     }
 
-    public bool ShowDescription 
-    {
-        get 
-        {
-            // Quick race condition fix. A proper fix should compute the visibility when this property is requested.
-            this.RaisePropertyChanged(nameof(SystemDescription));
-            return _show_desc;
-        }
-    }
+    public bool ShowDescription => !string.IsNullOrEmpty(SystemDescription);
 
     public string SystemComment
     {
@@ -100,7 +98,19 @@ public class VMConfig : ReactiveObject
         get
         {
             // Quick race condition fix. A proper fix should compute the visibility when this property is requested.
-            this.RaisePropertyChanged(nameof(SystemComment));
+
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                Thread.Sleep(20); // 20 ms delay
+
+                // I'm starting to think this is some sort of bug in Avalonia itself. I'll give up on this for now, seeing as
+                // I'm planning to implement this differently.
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    this.RaisePropertyChanged(nameof(SystemComment));
+                });
+            });
+            
             return _show_com;
         }
     }
