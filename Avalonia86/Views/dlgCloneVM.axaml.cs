@@ -157,7 +157,7 @@ public partial class dlgCloneVM : Window
 
                 var new_vis = _s.RefreshVisual(_s.PathToId(sp.Path));
 
-                new_vis.Comment = vis.Comment;
+                new_vis.SaveComment(vis.Comment);
             }
             catch (Exception ex) { importFailed = true; error = ex.Message; }
 

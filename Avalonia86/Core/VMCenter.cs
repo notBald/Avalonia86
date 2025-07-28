@@ -188,7 +188,7 @@ internal static class VMCenter
         var visual = Sett.RefreshVisual(id);
         if (visual == null)
             throw new Exception("Failed to create database entery");
-        visual.Desc = desc;
+        visual.SaveDescription(desc);
 
         //Create the folder, but only if it's in the VM folder we manage
         CreateVMFolder(vm_path);
@@ -379,8 +379,8 @@ internal static class VMCenter
             if (vm == null)
                 throw new Exception("Failed to refresh database");
 
-            vm.Desc = desc;
-            vm.Comment = comment;
+            vm.SaveDescription(desc);
+            vm.SaveComment(comment);
 
             if (rename && !Directory.Exists(new_folder))
             {

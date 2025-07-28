@@ -1,13 +1,16 @@
-﻿using Avalonia86.Core;
+﻿using Avalonia.Media.Imaging;
+using Avalonia.Threading;
+using Avalonia86.Core;
 using Avalonia86.Models;
 using Avalonia86.Tools;
-using Avalonia.Media.Imaging;
-using Avalonia.Threading;
 using ReactiveUI;
+using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Avalonia86.ViewModels;
 
@@ -209,34 +212,80 @@ internal sealed class VMVisual : ReactiveObject
         }
     }
 
+
+    private string _description = null;
+    private Timer _descriptionSaveTimer;
+
+    internal void SaveDescription(string desc)
+    {
+        DebouncedDBUpdate(ref _description, ref _descriptionSaveTimer, desc, "description", nameof(Desc), true);
+    }
+
     public string Desc
     {
-        get => _s.FetchSetting(_vm.UID, "description", "");
-        set
+        get
         {
-            var old = Desc;
-            var val = value ?? "";
-            if (!string.Equals(old, val))
+            if (_description == null)
+                _description = _s.FetchSetting(_vm.UID, "description", "");
+            return _description;
+        }
+        set => DebouncedDBUpdate(ref _description, ref _descriptionSaveTimer, value, "description", nameof(Desc));
+    }
+
+
+    private string _comment = null;
+    private Timer _commentSaveTimer;
+
+    public string Comment
+    {
+        get
+        {
+            if (_comment == null)
+                _comment = _s.FetchSetting(_vm.UID, "comment", "");
+            return _comment;
+        }
+        set => DebouncedDBUpdate(ref _comment, ref _commentSaveTimer, value, "comment", nameof(Comment));
+    }
+
+    internal void SaveComment(string comment)
+    {
+        DebouncedDBUpdate(ref _comment, ref _commentSaveTimer, comment, "comment", nameof(Comment), true);
+    }
+
+    private void DebouncedDBUpdate(ref string backingField, ref Timer timerRef, string newValue, string field, string prop, bool saveImmediately = false)
+    {
+        if (backingField != newValue)
+        {
+            backingField = newValue;
+            this.RaisePropertyChanged(prop);
+
+            // Dispose old timer if it exists
+            timerRef?.Dispose();
+            
+            if (saveImmediately)
             {
-                _s.SetSetting(_vm.UID, "description", val);
-                this.RaisePropertyChanged();
+                _s.SetSetting(_vm.UID, field, newValue);
+            }
+            else
+            {
+                var uid = _vm.UID;
+                Timer localTimer = null;
+
+                // Create a new timer that fires once after 500ms
+                localTimer = new Timer(_ =>
+                {
+                    Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        _s.SetSetting(uid, field, newValue);
+                        localTimer.Dispose(); // Dispose after use
+                    });
+                }, null, 500, Timeout.Infinite);
+
+                timerRef = localTimer; // assign after creation
             }
         }
     }
 
-    public string Comment
-    {
-        get => _s.FetchSetting(_vm.UID, "comment", "");
-        set
-        {
-            var old = Comment;
-            if (!string.Equals(old, value))
-            {
-                _s.SetSetting(_vm.UID, "comment", value);
-                this.RaisePropertyChanged();
-            }
-        }
-    }
 
     private string _vm_size = null;
     public string VMSize { get => _vm_size; set => this.RaiseAndSetIfChanged(ref _vm_size, value); }
