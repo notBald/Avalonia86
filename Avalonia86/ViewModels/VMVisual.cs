@@ -225,7 +225,7 @@ internal sealed class VMVisual : ReactiveObject
     {
         get
         {
-            if (_description == null)
+            if (_description == null && _s != null)
                 _description = _s.FetchSetting(_vm.UID, "description", "");
             return _description;
         }
@@ -240,7 +240,7 @@ internal sealed class VMVisual : ReactiveObject
     {
         get
         {
-            if (_comment == null)
+            if (_comment == null && _s != null)
                 _comment = _s.FetchSetting(_vm.UID, "comment", "");
             return _comment;
         }
