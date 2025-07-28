@@ -65,7 +65,7 @@
 			</ResourceDictionary.ThemeDictionaries>
 		</ResourceDictionary>
 		
-		<ControlTheme x:Key="VerticalGridSplitter" TargetType="GridSplitter">
+		<!--<ControlTheme x:Key="VerticalGridSplitter" TargetType="GridSplitter">
 			<Setter Property="Focusable" Value="True" />
 			<Setter Property="MinWidth" Value="6" />
 			<Setter Property="MinHeight" Value="6" />
@@ -80,6 +80,22 @@
 						<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect1}"></Rectangle>
 						<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect2}"></Rectangle>
 					</StackPanel>
+				</ControlTemplate>
+			</Setter>
+		</ControlTheme>-->
+
+		<ControlTheme x:Key="VerticalTransparentGridSplitter" TargetType="GridSplitter">
+			<Setter Property="Focusable" Value="True" />
+			<Setter Property="MinWidth" Value="6" />
+			<Setter Property="MinHeight" Value="6" />
+			<Setter Property="PreviewContent">
+				<Template>
+					<Rectangle Fill="{DynamicResource SystemAccentColor}" />
+				</Template>
+			</Setter>
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Rectangle Width="3" VerticalAlignment="Stretch" Fill="Transparent"></Rectangle>
 				</ControlTemplate>
 			</Setter>
 		</ControlTheme>
@@ -550,7 +566,7 @@
 								</Button.Styles>
 							</Button>
 							<!-- Status -->
-							<Border DockPanel.Dock="Bottom" Margin="3, 4, 3, 0" BorderBrush="#a0a0a0" BorderThickness="0, 1, 0, 0">
+							<Border DockPanel.Dock="Bottom" Margin="3, 3, 3, 0" BorderBrush="#a0a0a0" BorderThickness="0, 0, 0, 0">
 								<DockPanel>
 									<StackPanel DockPanel.Dock="Left" Orientation="Horizontal" ToolTip.Placement="Top">
 										<ToolTip.Tip>
@@ -591,9 +607,9 @@
 									<Border Margin="3, 0, 0, 0" BorderBrush="{DynamicResource info_Border1}" BorderThickness="1, 1, 0, 0">
 										<view:ctrlMachineInfo DataContext="{Binding VMConfig, Mode=OneWay}" />
 									</Border>
-									<GridSplitter Grid.Column="1" ResizeDirection="Columns" Theme="{StaticResource VerticalGridSplitter}" Margin="7, 2, 8, 2" />
-									<TabControl Grid.Column="2">
-										<TabItem Header="Statistics">
+									<GridSplitter Grid.Column="1" ResizeDirection="Columns" Theme="{StaticResource VerticalTransparentGridSplitter}" Margin="3, 2, 0, 2" />
+									<TabControl Grid.Column="2" Theme="{StaticResource CustomTabCtrlForFrmMain}" Margin="0, 0, -3, 0">
+										<TabItem Header="Statistics" Theme="{StaticResource CustomTabItm}">
 											<DockPanel Margin="0, 0, 18, 0">
 											<DockPanel DockPanel.Dock="Top" Background="{DynamicResource content_BackgroundColor}" Height="35">
 												<TextBlock DockPanel.Dock="Left" Text="Screenshots:" VerticalAlignment="Center" FontSize="12" TextDecorations="Underline" Foreground="#0066cc" Margin="0, 0, 0, 1" 
@@ -614,7 +630,7 @@
 												</StackPanel>
 												<Rectangle Fill="Transparent" />
 											</DockPanel>
-											<Grid DockPanel.Dock="Bottom" ColumnDefinitions="*, *" RowDefinitions="*, *, *, *">
+											<Grid DockPanel.Dock="Bottom" ColumnDefinitions="*, *" RowDefinitions="*, *, *, *" Margin="0,0,0,2">
 												<TextBlock Grid.Row="0" Grid.Column="0" Text="VM Age"/>
 												<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Machine.SinceCreated, TargetNullValue='Unknown', Mode=OneWay}" HorizontalAlignment="Right"/>
 												<TextBlock Grid.Row="1" Grid.Column="0" Text="Uptime"/>
@@ -631,7 +647,7 @@
 												<TextBlock Grid.Row="3" Grid.Column="0" Text="Disk usage"/>
 												<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Machine.VMSize, TargetNullValue='Calculating...', Mode=OneWay}" HorizontalAlignment="Right"/>
 											</Grid>
-											<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" Margin="0, 0, 0, 10">
+											<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" Margin="0, 0, 0, 8">
 												<Grid>
 													<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="(None)" />
 													<Image Source="{Binding Machine.SelectedImage}" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -640,7 +656,7 @@
 											</Border>
 										</DockPanel>
 									</TabItem>
-									<TabItem Header="Information">
+									<TabItem Header="Information" Theme="{StaticResource CustomTabItm}">
 										<view:ctrlInformation DataContext="{Binding Machine, Mode=OneWay}"></view:ctrlInformation>
 									</TabItem>
 								</TabControl>

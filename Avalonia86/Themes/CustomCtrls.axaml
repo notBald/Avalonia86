@@ -83,6 +83,29 @@
 		</Setter>
 	</ControlTheme>
 
+	<ControlTheme x:Key="CustomTabCtrlForFrmMain" TargetType="TabControl">
+		<Setter Property="Margin" Value="0" />
+		<Setter Property="Template">
+			<ControlTemplate>
+				<DockPanel>
+					<!-- The way we get rid of the boarder below the selected tab is by slightly overdrawing the ItemsPresenter over the ContentPresenter,
+						 then not drawing the lower boarder on TabItem. ZIndex is key here. -->
+					<ItemsPresenter Name="PART_ItemsPresenter"
+									ItemsPanel="{TemplateBinding ItemsPanel}"
+									DockPanel.Dock="Top"
+									ZIndex="5" />
+					<ContentPresenter Name="PART_SelectedContentHost"
+									  Margin="0, -1, 0, 0"
+									  Padding="5, 5, 5, 0"
+									  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+									  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+									  Content="{TemplateBinding SelectedContent}"
+									  ContentTemplate="{TemplateBinding SelectedContentTemplate}"  BorderBrush="{DynamicResource TabCtrlBorderBrush}" BorderThickness="1" Background="{DynamicResource TabCtrlBackgroundBrush}" ZIndex="4" />
+				</DockPanel>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+
 	<ControlTheme x:Key="CustomTabItm" TargetType="TabItem">
 		<Setter Property="VerticalContentAlignment" Value="Center" />
 		<Setter Property="Template">
