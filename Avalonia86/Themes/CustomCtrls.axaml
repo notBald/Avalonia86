@@ -25,7 +25,7 @@
 			<SolidColorBrush x:Key="ArrowBrush" Color="White" />
 
 			<!-- Colors most borders on the custom tab theme -->
-			<SolidColorBrush x:Key="TabCtrlBorderBrush" Color="#d9d9d9"/>
+			<SolidColorBrush x:Key="TabCtrlBorderBrush" Color="#a0a0a0"/>
 			<SolidColorBrush x:Key="TabCtrlBackgroundBrush" Color="#222222"/>
 			<SolidColorBrush x:Key="TabCtrlUnselectedBrush" Color="Black"/>
 			<SolidColorBrush x:Key="TabDlgBackground" Color="Black"/>
@@ -113,7 +113,7 @@
 				<Border
 					Name="PART_LayoutRoot"
 					Background="{DynamicResource TabCtrlUnselectedBrush}"
-					BorderBrush="{StaticResource TabCtrlBorderBrush}"
+					BorderBrush="{DynamicResource TabCtrlBorderBrush}"
 					BorderThickness="1"
 					CornerRadius="{TemplateBinding CornerRadius}"
 					Padding="5, 2">
