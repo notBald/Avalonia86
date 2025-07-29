@@ -13,7 +13,8 @@
         x:Class="Avalonia86.Views.frmMain"
         Icon="/Assets/86Box-gray.ico"
         Opened="Main_OnOpened" 
-        Closing="Window_OnClosing">
+        Closing="Window_OnClosing"
+		x:Name="MainWindow">
 	<Design.DataContext>
 		<vm:MainModel/>
 	</Design.DataContext>
@@ -102,6 +103,7 @@
 
 		<conv:BitmapAssetValueConverter x:Key="variableImage"/>
 		<conv:StatusToColorConverter x:Key="colorConv"/>
+		<conv:HeightToIsVisibleConverter x:Key="HeightToIsVisible" />
 	</Window.Resources>
 	<!--
 	UI Structur
@@ -382,7 +384,7 @@
 				<ColumnDefinition Width="10"><!-- Where we put the "Grip resizer" dots --></ColumnDefinition>
 			</Grid.ColumnDefinitions>
 			<Grid.RowDefinitions>
-				<RowDefinition Height="1"><!-- Used to create a thin boarder over the status bar --></RowDefinition>
+				<RowDefinition Height="1"><!-- Used to create a thin border over the status bar --></RowDefinition>
 				<RowDefinition Height="18"></RowDefinition>
 			</Grid.RowDefinitions>
 			<Rectangle Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Height="1" Fill="{DynamicResource statusbar_LineBrush}"/>
@@ -630,23 +632,26 @@
 												</StackPanel>
 												<Rectangle Fill="Transparent" />
 											</DockPanel>
-											<Grid DockPanel.Dock="Bottom" ColumnDefinitions="*, *" RowDefinitions="*, *, *, *" Margin="0,0,0,2">
-												<TextBlock Grid.Row="0" Grid.Column="0" Text="VM Age"/>
-												<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Machine.SinceCreated, TargetNullValue='Unknown', Mode=OneWay}" HorizontalAlignment="Right"/>
-												<TextBlock Grid.Row="1" Grid.Column="0" Text="Uptime"/>
-												<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Machine.Uptime.Short, Mode=OneWay}" HorizontalAlignment="Right" ToolTip.Placement="Top">
-													<ToolTip.Tip>
-														<StackPanel Orientation="Horizontal">
-															<TextBlock>Total uptime: </TextBlock>
-															<TextBlock Margin="5, 0, 0, 0" Text="{Binding Machine.Uptime.Full, Mode=OneWay}" />
-														</StackPanel>
-													</ToolTip.Tip>
-												</TextBlock>
-												<TextBlock Grid.Row="2" Grid.Column="0" Text="Play count"/>
-												<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Machine.RunCount, Mode=OneWay}" HorizontalAlignment="Right"/>
-												<TextBlock Grid.Row="3" Grid.Column="0" Text="Disk usage"/>
-												<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Machine.VMSize, TargetNullValue='Calculating...', Mode=OneWay}" HorizontalAlignment="Right"/>
-											</Grid>
+											<StackPanel DockPanel.Dock="Bottom">
+												<view:ctrlInformation Height="200" DataContext="{Binding Machine, Mode=OneWay}" IsVisible = "{Binding #MainWindow.Height, Converter={StaticResource HeightToIsVisible}, ConverterParameter = 600}" />
+												<Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *, *" Margin="0,0,0,2">
+													<TextBlock Grid.Row="0" Grid.Column="0" Text="VM Age"/>
+													<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Machine.SinceCreated, TargetNullValue='Unknown', Mode=OneWay}" HorizontalAlignment="Right"/>
+													<TextBlock Grid.Row="1" Grid.Column="0" Text="Uptime"/>
+													<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Machine.Uptime.Short, Mode=OneWay}" HorizontalAlignment="Right" ToolTip.Placement="Top">
+														<ToolTip.Tip>
+															<StackPanel Orientation="Horizontal">
+																<TextBlock>Total uptime: </TextBlock>
+																<TextBlock Margin="5, 0, 0, 0" Text="{Binding Machine.Uptime.Full, Mode=OneWay}" />
+															</StackPanel>
+														</ToolTip.Tip>
+													</TextBlock>
+													<TextBlock Grid.Row="2" Grid.Column="0" Text="Play count"/>
+													<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Machine.RunCount, Mode=OneWay}" HorizontalAlignment="Right"/>
+													<TextBlock Grid.Row="3" Grid.Column="0" Text="Disk usage"/>
+													<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Machine.VMSize, TargetNullValue='Calculating...', Mode=OneWay}" HorizontalAlignment="Right"/>
+												</Grid>
+											</StackPanel>
 											<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" Margin="0, 0, 0, 8">
 												<Grid>
 													<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="(None)" />
@@ -657,7 +662,7 @@
 										</DockPanel>
 									</TabItem>
 									<TabItem Header="Information" Theme="{StaticResource CustomTabItm}">
-										<view:ctrlInformation DataContext="{Binding Machine, Mode=OneWay}"></view:ctrlInformation>
+										<view:ctrlInformation DataContext="{Binding Machine, Mode=OneWay}" />
 									</TabItem>
 								</TabControl>
 								</Grid>

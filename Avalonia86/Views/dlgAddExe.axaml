@@ -13,7 +13,7 @@
 	<Window.Styles>
 		<Style Selector="Button">
 			<Setter Property="Background" Value="{DynamicResource DlgBtnBackground}"/>
-			<Setter Property="BorderBrush" Value="{DynamicResource DlgBtnBoarderBrush}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource DlgBtnBorderBrush}"/>
 			<Setter Property="BorderThickness" Value="1"/>
 		</Style>
 

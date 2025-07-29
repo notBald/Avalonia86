@@ -15,7 +15,7 @@
 			
 			<!-- Colors used on dialog buttons -->
 			<SolidColorBrush x:Key="DlgBtnBackground" Color="#e1e1e1" />
-			<SolidColorBrush x:Key="DlgBtnBoarderBrush" Color="#adadad" />
+			<SolidColorBrush x:Key="DlgBtnBorderBrush" Color="#adadad" />
 
 			<!-- Colors used on data tables -->
 			<SolidColorBrush x:Key="GridRowBackground" Color="White"/>
@@ -35,7 +35,7 @@
 
 			<!-- Colors used on dialog buttons -->
 			<SolidColorBrush x:Key="DlgBtnBackground" Color="#111111" />
-			<SolidColorBrush x:Key="DlgBtnBoarderBrush" Color="#adadad" />
+			<SolidColorBrush x:Key="DlgBtnBorderBrush" Color="#adadad" />
 
 			<!-- Colors used on data tables -->
 			<SolidColorBrush x:Key="GridRowBackground" Color="Black"/>
@@ -65,8 +65,8 @@
 		<Setter Property="Template">
 			<ControlTemplate>
 				<DockPanel>
-					<!-- The way we get rid of the boarder below the selected tab is by slightly overdrawing the ItemsPresenter over the ContentPresenter,
-						 then not drawing the lower boarder on TabItem. ZIndex is key here. -->
+					<!-- The way we get rid of the border below the selected tab is by slightly overdrawing the ItemsPresenter over the ContentPresenter,
+						 then not drawing the lower border on TabItem. ZIndex is key here. -->
 					<ItemsPresenter Name="PART_ItemsPresenter"
 									ItemsPanel="{TemplateBinding ItemsPanel}"
 									DockPanel.Dock="Top"
@@ -88,8 +88,8 @@
 		<Setter Property="Template">
 			<ControlTemplate>
 				<DockPanel>
-					<!-- The way we get rid of the boarder below the selected tab is by slightly overdrawing the ItemsPresenter over the ContentPresenter,
-						 then not drawing the lower boarder on TabItem. ZIndex is key here. -->
+					<!-- The way we get rid of the border below the selected tab is by slightly overdrawing the ItemsPresenter over the ContentPresenter,
+						 then not drawing the lower border on TabItem. ZIndex is key here. -->
 					<ItemsPresenter Name="PART_ItemsPresenter"
 									ItemsPanel="{TemplateBinding ItemsPanel}"
 									DockPanel.Dock="Top"
