@@ -556,7 +556,7 @@ public class Download86Manager : ReactiveObject
                 {
                     using (var t = AppSettings.Settings.BeginTransaction())
                     {
-                        string exe_name = Path.Combine((string)path, store_path);
+                        string exe_name = Path.Combine((string)path, "86Box.exe");
                         AppSettings.Settings.AddExe(job.ArchiveName, exe_name, null, job.ArchiveComment, job.ArchiveVersion, job.CurrentExe.Arch, job.CurrentExe.Build, false);
                         t.Commit();
                     }
