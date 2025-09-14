@@ -339,6 +339,7 @@ internal class AppSettings
     }
 
     public DBStore.Transaction BeginTransaction() => _store.BeginTransaction();
+    public bool InTransaction => _store.InTransaction;
 
     public long RegisterVM(string name, string vm_path, string icon_path, string cat, DateTime created, long? exe_id)
     {

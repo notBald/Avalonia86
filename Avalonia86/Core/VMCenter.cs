@@ -821,12 +821,21 @@ internal static class VMCenter
 
                 ui.UpdateState();
 
-                using (var t = Sett.BeginTransaction())
+                DBStore.Transaction t = null;
+                if (!Sett.InTransaction)
+                    t = Sett.BeginTransaction();
+                try
                 {
                     vis.RunCount++;
                     vis.SetLastRun(start_time);
-
-                    t.Commit();
+                }
+                finally
+                {
+                    if (t != null)
+                    {
+                        t.Commit();
+                        t.Dispose();
+                    }
                 }
             }
         }
