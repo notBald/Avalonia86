@@ -1,12 +1,15 @@
-﻿using Avalonia86.Views;
+﻿using Avalonia.Controls;
+using Avalonia.Threading;
+using Avalonia86.Core;
+using Avalonia86.Views;
+using DynamicData;
+using DynamicData.Binding;
+using ReactiveUI;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using DynamicData;
-using DynamicData.Binding;
-using Avalonia.Threading;
-using Avalonia86.Core;
+using System.Reactive.Linq;
 
 namespace Avalonia86.ViewModels;
 
@@ -19,6 +22,8 @@ internal class MainModel : ReactiveObject, IDisposable
     public static readonly VMVisual Dummy = new VMVisual();
 
     private readonly Machine _machine;
+
+    private string _filter_machines = "";
 
     #region State information
 
@@ -67,6 +72,12 @@ internal class MainModel : ReactiveObject, IDisposable
     private VMConfig _current_config = new VMConfig();
 
     public AppSettings Settings => AppSettings.Settings;
+
+    public string FilterMachines
+    {
+        get => _filter_machines;
+        set => this.RaiseAndSetIfChanged(ref _filter_machines, value ?? "");
+    }
 
     /// <summary>
     /// Reactive object that is used by the frontend to extract data from RawDict
@@ -206,8 +217,28 @@ internal class MainModel : ReactiveObject, IDisposable
         Settings.RefreshVMs();
         Settings.RefreshCats();
 
+        //This is used to filter on the search string.
+        var predicates =
+            //This is a more "correct" way of detecting changes. Category filtering use the
+            // "this.PropertyChanged += MainModel_PropertyChanged;" method instead.
+            this.WhenAnyValue(vm => vm.FilterMachines)
+            .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(200), RxApp.MainThreadScheduler)
+            .Select(
+                text =>
+                {
+                    text = text?.Trim() ?? string.Empty;
+                    var hasText = !string.IsNullOrWhiteSpace(text);
+
+                    return new Func<VMVisual, bool>(m =>
+                        (!hasText || (!string.IsNullOrEmpty(m.Name) &&
+                                      m.Name.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0))
+                    );
+                });
+
         Settings.Machines.Connect()
             .Filter(x => _cat_idx == 0 || x.VMCat.IsChecked)
+            .Filter(predicates)
             .Sort(SortExpressionComparer<VMVisual>.Ascending(x => x.OrderIndex))
             .Bind(out _filtered_machines)
             .Subscribe();
