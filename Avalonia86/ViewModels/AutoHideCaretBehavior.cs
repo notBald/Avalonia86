@@ -63,8 +63,8 @@ public sealed class AutoHideCaretBehavior : Behavior<TextBox>
         set => SetValue(PauseOnLostFocusProperty, value);
     }
 
+    private IDisposable? _themeSub;
     private DispatcherTimer _timer;
-    private IBrush _defaultCaretBrush = null;   // The brush at attach time (may be null => theme-driven)
     private bool _isAttached;
 
     protected override void OnAttached()
@@ -103,12 +103,21 @@ public sealed class AutoHideCaretBehavior : Behavior<TextBox>
 
         // Initial state: caret visible (if not focused yet, timer won't run).
         ShowCaretAndMaybeStartTimer();
+
+        //// React to theme changes:
+        //_themeSub = AssociatedObject
+        //    .GetObservable(TopLevel.ActualThemeVariantProperty)
+        //    .Subscribe(_ => OnThemeChanged());
+
     }
 
     protected override void OnDetaching()
     {
         if (!_isAttached)
             return;
+
+        _themeSub?.Dispose();
+        _themeSub = null;
 
         _isAttached = false;
 
@@ -122,7 +131,7 @@ public sealed class AutoHideCaretBehavior : Behavior<TextBox>
             AssociatedObject.LostFocus -= OnLostFocus;
 
             // Restore the original caret state (theme-aware).
-            AssociatedObject.CaretBrush = _defaultCaretBrush;
+            AssociatedObject.ClearValue(TextBox.CaretBrushProperty);
         }
 
         this.PropertyChanged -= OnBehaviorPropertyChanged;
@@ -136,6 +145,26 @@ public sealed class AutoHideCaretBehavior : Behavior<TextBox>
 
         base.OnDetaching();
     }
+
+
+    //private void OnThemeChanged()
+    //{
+    //    var tb = AssociatedObject;
+    //    if (tb is null) return;
+
+    //    // If caret is visible (not hidden), update it for the new theme
+    //    if (!ReferenceEquals(tb.CaretBrush, Brushes.Transparent))
+    //    {
+    //        // EITHER: delegate to theme (recommended)
+    //        tb.ClearValue(TextBox.CaretBrushProperty);
+
+    //        // OR: recompute your custom brush (less recommended)
+    //        // tb.CaretBrush = GetEffectiveCaretBrush(tb);
+
+    //        tb.InvalidateVisual();
+    //    }
+    //}
+
 
     private void OnBehaviorPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
     {
@@ -202,16 +231,38 @@ public sealed class AutoHideCaretBehavior : Behavior<TextBox>
             return;
 
         // Restore original brush if caret is currently hidden
-        if (AssociatedObject.CaretBrush == Brushes.Transparent)
-            AssociatedObject.CaretBrush = _defaultCaretBrush;
+        if (ReferenceEquals(AssociatedObject.CaretBrush, Brushes.Transparent))
+        {
+            //AssociatedObject.CaretBrush = GetEffectiveCaretBrush(AssociatedObject);
+            AssociatedObject.ClearValue(TextBox.CaretBrushProperty);
+        }
     }
+
+    //IBrush GetEffectiveCaretBrush(TextBox tb)
+    //{
+    //    //// 1) If explicitly set, use it
+    //    //if (tb.CaretBrush is { } b)
+    //    //    return b;
+
+    //    // 2) Otherwise invert the Background color (if solid),
+    //    //    which is what TextPresenter does internally
+    //    var bg = (tb.Background as ISolidColorBrush)?.Color;
+    //    if (bg.HasValue)
+    //    {
+    //        var c = bg.Value;
+    //        return new SolidColorBrush(Color.FromRgb((byte)~c.R, (byte)~c.G, (byte)~c.B));
+    //    }
+
+    //    // 3) Otherwise fall back to black
+    //    return Brushes.Black;
+    //}
+
 
     private void HideCaret()
     {
         if (AssociatedObject is null) return;
-        if (AssociatedObject.CaretBrush != Brushes.Transparent)
+        if (!ReferenceEquals(AssociatedObject.CaretBrush, Brushes.Transparent))
         {
-            _defaultCaretBrush = AssociatedObject.CaretBrush;
             AssociatedObject.CaretBrush = Brushes.Transparent;
         }
     }
