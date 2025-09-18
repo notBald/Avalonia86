@@ -498,7 +498,13 @@ internal sealed class DBStore
     /// Nested transactions are not supported, so this is useful
     /// to know.
     /// </summary>
+#if MSDB
     public bool InTransaction => _current_transaction != null;
+#else
+    // Nested transactions are supported, so there's no need to
+    // avoid starting a new one.
+    public bool InTransaction => false;
+#endif
 
     public Transaction BeginTransaction()
     {
