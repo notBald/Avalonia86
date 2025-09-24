@@ -1,5 +1,4 @@
-﻿
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -7,7 +6,6 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.Xaml.Interactivity;
 using System;
-
 
 namespace Avalonia86.ViewModels;
 
@@ -29,7 +27,6 @@ namespace Avalonia86.ViewModels;
 //        </TextBox>
 //    </Grid>
 //</UserControl>
-
 
 
 /// <summary>
@@ -216,5 +213,3 @@ public sealed class AutoHideCaretBehavior : Behavior<TextBox>
         }
     }
 }
-
-

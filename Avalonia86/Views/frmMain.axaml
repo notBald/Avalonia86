@@ -66,7 +66,8 @@
 				</ResourceDictionary>
 			</ResourceDictionary.ThemeDictionaries>
 		</ResourceDictionary>
-		
+
+		<!-- This is alternative styling for a grid splitter -->
 		<!--<ControlTheme x:Key="VerticalGridSplitter" TargetType="GridSplitter">
 			<Setter Property="Focusable" Value="True" />
 			<Setter Property="MinWidth" Value="6" />
@@ -618,9 +619,8 @@
 										<view:ctrlMachineInfo DataContext="{Binding VMConfig, Mode=OneWay}" />
 									</Border>
 									<GridSplitter Grid.Column="1" ResizeDirection="Columns" Theme="{StaticResource VerticalTransparentGridSplitter}" Margin="3, 2, 0, 2" />
-									<TabControl Grid.Column="2" Theme="{StaticResource CustomTabCtrlForFrmMain}" Margin="0, 0, -3, 0">
-										<TabItem Header="Statistics" Theme="{StaticResource CustomTabItm}">
-											<DockPanel Margin="0, 0, 18, 0">
+									<Border Grid.Column="2" Margin="0, 0, -3, 0" BorderBrush="{DynamicResource info_Border1}" BorderThickness="1">
+										<DockPanel Margin="6, 0, 6, 0">
 											<DockPanel DockPanel.Dock="Top" Background="{DynamicResource content_BackgroundColor}" Height="35">
 												<TextBlock DockPanel.Dock="Left" Text="Screenshots:" VerticalAlignment="Center" FontSize="12" TextDecorations="Underline" Foreground="#0066cc" Margin="0, 0, 0, 1" 
 															PointerPressed="Screenshots_PointerPressed">
@@ -664,15 +664,11 @@
 												<Grid>
 													<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="(None)" />
 													<Image Source="{Binding Machine.SelectedImage}" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-														   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+															RenderOptions.BitmapInterpolationMode="HighQuality"/>
 												</Grid>
 											</Border>
 										</DockPanel>
-									</TabItem>
-									<TabItem Header="Information" Theme="{StaticResource CustomTabItm}">
-										<view:ctrlInformation DataContext="{Binding Machine, Mode=OneWay}" />
-									</TabItem>
-								</TabControl>
+									</Border>
 								</Grid>
 								<StackPanel IsVisible="{Binding !Machine.HasValidPath}" HorizontalAlignment="Center" VerticalAlignment="Center">
 									<TextBlock Text="Failed to find the VM's folder" HorizontalAlignment="Stretch" TextAlignment="Center"
