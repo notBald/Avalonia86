@@ -13,8 +13,6 @@ namespace Avalonia86.ViewModels;
 ///     - The first child is treated as the "image container."
 ///     - The second child is the "content area."
 /// - Image sizing rules:
-///     - If <see cref="DoAspectCorrection"/> returns true (typically for PNG images), the image is forced to 4:3 aspect ratio.
-///     - Otherwise, the image uses its natural aspect ratio.
 ///     - The image height is constrained by:
 ///         - An absolute minimum (<see cref="AbsoluteMinImageHeight"/>).
 ///         - A relative minimum ratio (<see cref="MinImageHeightRatio"/> of the panel height).
@@ -99,35 +97,6 @@ public class ConditionalContentPanel : Panel
             ImageMaxHeightRatioProperty);
     }
 
-    /// <summary>
-    /// Determines whether aspect ratio correction should be applied to the image.
-    /// 
-    /// This method checks if the control's DataContext is a MainModel, and if a Machine
-    /// and a SelectedImage are present. If so, it inspects the filename of the selected image.
-    /// 
-    /// PNG images are forced into a 4:3 aspect ratio because they typically represent
-    /// screenshots or assets from CGA, EGA, or VGA games, and there is no reliable way
-    /// to determine their true aspect ratio from metadata or pixel dimensions alone.
-    /// 
-    /// JPEG and other formats are assumed to be user-supplied and are displayed using
-    /// their natural aspect ratio. A PNG image supplied by the user will also be forced
-    /// into 4:3, as the format itself does not provide sufficient information to infer
-    /// the correct aspect ratio.
-    /// </summary>
-    private bool DoAspectCorrection(Control ctrl)
-    {
-        if (ctrl.DataContext is MainModel m && m.Machine is not null && m.Machine.SelectedImage is not null)
-        {
-            // We assume that if SelectedImage is not null, then SelectedImageIndex and Images
-            // are valid and consistent, since SelectedImage is derived from that list.
-            var name = m.Machine.Images[m.Machine.SelectedImageIndex] ?? "";
-
-            return name.EndsWith(".png", StringComparison.InvariantCultureIgnoreCase);
-        }
-
-        return false;
-    }
-
     protected override Size MeasureOverride(Size availableSize)
     {
         // The panel expects exactly two children. If not, be defensive and return a zero size.
@@ -156,8 +125,7 @@ public class ConditionalContentPanel : Panel
             availableSize,
             image.DesiredSize,
             image.Margin,
-            content.Margin,
-            doAspectCorrection: DoAspectCorrection(image));
+            content.Margin);
 
         // Based on the layout decision, measure the content control.
         if (layout.CollapseContent)
@@ -207,8 +175,7 @@ public class ConditionalContentPanel : Panel
             finalSize,
             image.DesiredSize,
             imageMargin,
-            contentMargin,
-            doAspectCorrection: DoAspectCorrection(image));
+            contentMargin);
 
         // Arrange the image control based on the calculated height.
         double imageWidthNoMargins = Math.Max(0, finalSize.Width - imageMargin.Left - imageMargin.Right);
@@ -270,8 +237,7 @@ public class ConditionalContentPanel : Panel
         Size availableSize,
         Size imageDesired,
         Thickness imageMargin,
-        Thickness contentMargin,
-        bool doAspectCorrection)
+        Thickness contentMargin)
     {
         double availWidth = SanitizeNonNegative(availableSize.Width);
         double availHeight = SanitizeNonNegative(availableSize.Height);
@@ -279,17 +245,11 @@ public class ConditionalContentPanel : Panel
         double imageWidthNoMargins = Math.Max(0, availWidth - imageMargin.Left - imageMargin.Right);
 
         double aspectHeight;
-        if (doAspectCorrection)
-        {
-            aspectHeight = imageWidthNoMargins * 3.0 / 4.0;
-        }
+        if (imageDesired.Width > 0 && IsFinite(imageDesired.Width))
+            aspectHeight = imageWidthNoMargins * imageDesired.Height / imageDesired.Width;
         else
-        {
-            if (imageDesired.Width > 0 && IsFinite(imageDesired.Width))
-                aspectHeight = imageWidthNoMargins * imageDesired.Height / imageDesired.Width;
-            else
-                aspectHeight = IsFinite(imageDesired.Height) ? imageDesired.Height : 0;
-        }
+            aspectHeight = IsFinite(imageDesired.Height) ? imageDesired.Height : 0;
+
         if (!IsFinite(aspectHeight) || aspectHeight < 0)
             aspectHeight = 0;
 

@@ -663,8 +663,10 @@
 												<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" Margin="0, 0, 0, 8">
 													<Grid>
 														<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="(None)" />
-														<Image Source="{Binding Machine.SelectedImage}" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-																RenderOptions.BitmapInterpolationMode="HighQuality"/>
+														<vm:AspectContentPanel>
+															<Image Source="{Binding Machine.SelectedImage}" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+																   RenderOptions.BitmapInterpolationMode="HighQuality"/>
+														</vm:AspectContentPanel>
 													</Grid>
 												</Border>
 												<view:ctrlInformation DataContext="{Binding Machine, Mode=OneWay}" />
