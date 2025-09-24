@@ -641,7 +641,6 @@
 												<Rectangle Fill="Transparent" />
 											</DockPanel>
 											<StackPanel DockPanel.Dock="Bottom">
-												<view:ctrlInformation Height="200" DataContext="{Binding Machine, Mode=OneWay}" IsVisible = "{Binding #MainWindow.Height, Converter={StaticResource HeightToIsVisible}, ConverterParameter = 600}" />
 												<Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *, *" Margin="0,0,0,2">
 													<TextBlock Grid.Row="0" Grid.Column="0" Text="VM Age"/>
 													<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Machine.SinceCreated, TargetNullValue='Unknown', Mode=OneWay}" HorizontalAlignment="Right"/>
@@ -660,13 +659,16 @@
 													<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Machine.VMSize, TargetNullValue='Calculating...', Mode=OneWay}" HorizontalAlignment="Right"/>
 												</Grid>
 											</StackPanel>
-											<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" Margin="0, 0, 0, 8">
-												<Grid>
-													<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="(None)" />
-													<Image Source="{Binding Machine.SelectedImage}" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-															RenderOptions.BitmapInterpolationMode="HighQuality"/>
-												</Grid>
-											</Border>
+											<vm:ConditionalContentPanel>
+												<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" Margin="0, 0, 0, 8">
+													<Grid>
+														<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="(None)" />
+														<Image Source="{Binding Machine.SelectedImage}" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+																RenderOptions.BitmapInterpolationMode="HighQuality"/>
+													</Grid>
+												</Border>
+												<view:ctrlInformation DataContext="{Binding Machine, Mode=OneWay}" />
+											</vm:ConditionalContentPanel>
 										</DockPanel>
 									</Border>
 								</Grid>
