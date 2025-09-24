@@ -407,7 +407,7 @@
 					<DockPanel>
 						<TextBox Watermark="Filter" Text="{Binding FilterMachines}" DockPanel.Dock="Bottom" BorderThickness="0" Name="SearchBox">
 							<i:Interaction.Behaviors>
-								<vm:AutoHideCaretBehavior IdleAfter = "0:0:5" PauseOnLostFocus="True" />
+								<vm:AutoHideCaretBehavior IdleAfter = "0:0:5" />
 							</i:Interaction.Behaviors>
 						</TextBox>
 						<ListBox BorderThickness="1" BorderBrush="{DynamicResource content_BackgroundColor}" Padding="0"

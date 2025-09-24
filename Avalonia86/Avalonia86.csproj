@@ -31,20 +31,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.3.5" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.5" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.3.5" />
+    <PackageReference Include="Avalonia" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.6" />
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.2" />
     <PackageReference Include="Avalonia.Diagnostics" Condition="'$(Configuration)'=='Debug-MSDB'">
-      <Version>11.3.5</Version>
+      <Version>11.3.6</Version>
     </PackageReference>
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.5" />
-    <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.5" />
-    <PackageReference Include="Xaml.Behaviors.Interactivity" Version="11.3.2" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.6" />
+    <PackageReference Include="Xaml.Behaviors.Interactivity" Version="11.3.6.1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Debug-MSDB'">
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.9" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Release-MSDB'">
