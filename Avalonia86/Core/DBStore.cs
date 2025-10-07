@@ -159,7 +159,7 @@ internal sealed class DBStore
             for (int c=0;c < scripts.Length; c++)
             {
                 var script = scripts[c].TrimStart();
-                int end = script.IndexOfAny(['\n' , '\r'], SCRIPT_VERSION_NR.Length);
+                int end = script.IndexOfAny(new char[] { '\n', '\r' }, SCRIPT_VERSION_NR.Length);
 
                 //Gets the version number
                 if (!script.StartsWith(SCRIPT_VERSION_NR) || !int.TryParse(script.AsSpan(SCRIPT_VERSION_NR.Length, end - SCRIPT_VERSION_NR.Length + 1), out minor_version))

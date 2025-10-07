@@ -19,7 +19,7 @@ internal static class Program
 
     internal static frmMain Root;
 
-    public readonly static List<ErrorMsg> ErrorLog = [];
+    public readonly static List<ErrorMsg> ErrorLog = new List<ErrorMsg>();
 
     public class ErrorMsg
     {
