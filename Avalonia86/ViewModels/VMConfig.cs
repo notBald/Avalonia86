@@ -99,7 +99,7 @@ public class VMConfig : ReactiveObject
             {
                 memory = kb_mem * 1024;
 
-                if (SystemType == "8088")
+                if (SystemType == "8088" || SystemType == "ISA")
                 {
                     foreach(var s in IsaMemory)
                     {
@@ -152,6 +152,8 @@ public class VMConfig : ReactiveObject
     {
         get
         {
+            //Known issue:
+            // Should look at the start address. If memory overlaps, it should only be counted once.
             List<string> list = new List<string>(4);
 
             for (int c = 0; c < 4; c++)
@@ -168,14 +170,29 @@ public class VMConfig : ReactiveObject
                     {
                         switch(mem_card)
                         {
+                            case "brxt":
+                            case "ev159":
+                            case "genericat":
+                            case "ibmat":
+                                list.Add("512");
+                                break;
+                            case "ev165a":
+                                list.Add("256");
+                                break;
+                            case "ibmat_128k":
                             case "ibmxt":
                                 list.Add("128");
                                 break;
+                            case "a6pak":
+                            case "msramcard":
                             case "ibmxt_64k":
                                 list.Add("64");
                                 break;
                             case "ibmxt_32k":
                                 list.Add("32");
+                                break;
+                            case "genericxt":
+                                list.Add("16");
                                 break;
                         }
                     }
