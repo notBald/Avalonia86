@@ -21,91 +21,97 @@
 	</Design.DataContext>
 	<Window.Resources>
 		<ResourceDictionary>
-			<ResourceDictionary.ThemeDictionaries>
-				<ResourceDictionary x:Key="Default">
-					<Color x:Key="LineColor">#f0f0f0</Color>
-					<Color x:Key="LineColor3">#a0a0a0</Color>
+			<ResourceDictionary.MergedDictionaries>
+			<ResourceDictionary>
+				<ResourceDictionary.ThemeDictionaries>
+					<ResourceDictionary x:Key="Default">
+						<Color x:Key="LineColor">#f0f0f0</Color>
+						<Color x:Key="LineColor3">#a0a0a0</Color>
 					
-					<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
-						<GradientStop Color="#FFFFFF" Offset="0.0"/>
-						<GradientStop Color="#D6D6D6" Offset="1.0"/>
-					</LinearGradientBrush>
+						<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
+							<GradientStop Color="#FFFFFF" Offset="0.0"/>
+							<GradientStop Color="#D6D6D6" Offset="1.0"/>
+						</LinearGradientBrush>
 
-					<SolidColorBrush Color="{StaticResource LineColor3}" x:Key="VerticalGridSplitter_rect1"/>
-					<SolidColorBrush Color="{StaticResource LineColor}" x:Key="VerticalGridSplitter_rect2"/>
+						<SolidColorBrush Color="{StaticResource LineColor3}" x:Key="VerticalGridSplitter_rect1"/>
+						<SolidColorBrush Color="{StaticResource LineColor}" x:Key="VerticalGridSplitter_rect2"/>
 
-					<SolidColorBrush Color="{StaticResource LineColor}" x:Key="StatusBarBackgroundColor" />
-					<SolidColorBrush Color="White" x:Key="content_BackgroundColor" />
-					<SolidColorBrush Color="#E2EAF1" x:Key="caption_btn_BackgroundColor" />
-					<SolidColorBrush Color="#E5EDF4" x:Key="caption_btn_HoverColor" />
-					<SolidColorBrush Color="#828790" x:Key="listVMs_BorderBrush" />
-					<SolidColorBrush Color="#d9d9d9" x:Key="main_BorderBrush" />
-					<SolidColorBrush Color="#d7d7d7" x:Key="statusbar_LineBrush" />
+						<SolidColorBrush Color="{StaticResource LineColor}" x:Key="StatusBarBackgroundColor" />
+						<SolidColorBrush Color="White" x:Key="content_BackgroundColor" />
+						<SolidColorBrush Color="#E2EAF1" x:Key="caption_btn_BackgroundColor" />
+						<SolidColorBrush Color="#E5EDF4" x:Key="caption_btn_HoverColor" />
+						<SolidColorBrush Color="#828790" x:Key="listVMs_BorderBrush" />
+						<SolidColorBrush Color="#d9d9d9" x:Key="main_BorderBrush" />
+						<SolidColorBrush Color="#d7d7d7" x:Key="statusbar_LineBrush" />
 					
-					<!-- The info pane has multiple borders, only part of the outer border is here -->
-					<SolidColorBrush Color="{StaticResource LineColor3}" x:Key="info_Border1" />
+						<!-- The info pane has multiple borders, only part of the outer border is here -->
+						<SolidColorBrush Color="{StaticResource LineColor3}" x:Key="info_Border1" />
+					</ResourceDictionary>
+					<ResourceDictionary x:Key="Dark">
+						<Color x:Key="LineColor">#111111</Color>
+						<Color x:Key="LineColor2">#828790</Color>
+					
+						<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
+							<GradientStop Color="#666666" Offset="0.0"/>
+							<GradientStop Color="#222222" Offset="1.0"/>
+						</LinearGradientBrush>
+
+						<SolidColorBrush Color="#000000" x:Key="VerticalGridSplitter_rect1"/>
+						<SolidColorBrush Color="#000000" x:Key="VerticalGridSplitter_rect2"/>
+					
+						<SolidColorBrush Color="#222222" x:Key="StatusBarBackgroundColor" />
+						<SolidColorBrush Color="#222222" x:Key="content_BackgroundColor" />
+						<SolidColorBrush Color="#262626" x:Key="caption_btn_BackgroundColor" />
+						<SolidColorBrush Color="#333333" x:Key="caption_btn_HoverColor" />
+						<SolidColorBrush Color="{StaticResource LineColor2}" x:Key="main_BorderBrush" />
+						<SolidColorBrush Color="{StaticResource LineColor2}" x:Key="statusbar_LineBrush" />
+					</ResourceDictionary>
+				</ResourceDictionary.ThemeDictionaries>
+			</ResourceDictionary>
+		
+			<ResourceDictionary>
+				<!-- This is alternative styling for a grid splitter -->
+				<!--<ControlTheme x:Key="VerticalGridSplitter" TargetType="GridSplitter">
+					<Setter Property="Focusable" Value="True" />
+					<Setter Property="MinWidth" Value="6" />
+					<Setter Property="MinHeight" Value="6" />
+					<Setter Property="PreviewContent">
+						<Template>
+							<Rectangle Fill="{DynamicResource SystemAccentColor}" />
+						</Template>
+					</Setter>
+					<Setter Property="Template">
+						<ControlTemplate>
+							<StackPanel Orientation="Horizontal">
+								<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect1}"></Rectangle>
+								<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect2}"></Rectangle>
+							</StackPanel>
+						</ControlTemplate>
+					</Setter>
+				</ControlTheme>-->
+
+				<ControlTheme x:Key="VerticalTransparentGridSplitter" TargetType="GridSplitter">
+					<Setter Property="Focusable" Value="True" />
+					<Setter Property="MinWidth" Value="6" />
+					<Setter Property="MinHeight" Value="6" />
+					<Setter Property="PreviewContent">
+						<Template>
+							<Rectangle Fill="{DynamicResource SystemAccentColor}" />
+						</Template>
+					</Setter>
+					<Setter Property="Template">
+						<ControlTemplate>
+							<Rectangle Width="3" VerticalAlignment="Stretch" Fill="Transparent"></Rectangle>
+						</ControlTemplate>
+					</Setter>
+				</ControlTheme>
+
+				<conv:BitmapAssetValueConverter x:Key="variableImage"/>
+				<conv:StatusToColorConverter x:Key="colorConv"/>
+				<conv:HeightToIsVisibleConverter x:Key="HeightToIsVisible" />
 				</ResourceDictionary>
-				<ResourceDictionary x:Key="Dark">
-					<Color x:Key="LineColor">#111111</Color>
-					<Color x:Key="LineColor2">#828790</Color>
-					
-					<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
-						<GradientStop Color="#666666" Offset="0.0"/>
-						<GradientStop Color="#222222" Offset="1.0"/>
-					</LinearGradientBrush>
-
-					<SolidColorBrush Color="#000000" x:Key="VerticalGridSplitter_rect1"/>
-					<SolidColorBrush Color="#000000" x:Key="VerticalGridSplitter_rect2"/>
-					
-					<SolidColorBrush Color="#222222" x:Key="StatusBarBackgroundColor" />
-					<SolidColorBrush Color="#222222" x:Key="content_BackgroundColor" />
-					<SolidColorBrush Color="#262626" x:Key="caption_btn_BackgroundColor" />
-					<SolidColorBrush Color="#333333" x:Key="caption_btn_HoverColor" />
-					<SolidColorBrush Color="{StaticResource LineColor2}" x:Key="main_BorderBrush" />
-					<SolidColorBrush Color="{StaticResource LineColor2}" x:Key="statusbar_LineBrush" />
-				</ResourceDictionary>
-			</ResourceDictionary.ThemeDictionaries>
+			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
-
-		<!-- This is alternative styling for a grid splitter -->
-		<!--<ControlTheme x:Key="VerticalGridSplitter" TargetType="GridSplitter">
-			<Setter Property="Focusable" Value="True" />
-			<Setter Property="MinWidth" Value="6" />
-			<Setter Property="MinHeight" Value="6" />
-			<Setter Property="PreviewContent">
-				<Template>
-					<Rectangle Fill="{DynamicResource SystemAccentColor}" />
-				</Template>
-			</Setter>
-			<Setter Property="Template">
-				<ControlTemplate>
-					<StackPanel Orientation="Horizontal">
-						<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect1}"></Rectangle>
-						<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect2}"></Rectangle>
-					</StackPanel>
-				</ControlTemplate>
-			</Setter>
-		</ControlTheme>-->
-
-		<ControlTheme x:Key="VerticalTransparentGridSplitter" TargetType="GridSplitter">
-			<Setter Property="Focusable" Value="True" />
-			<Setter Property="MinWidth" Value="6" />
-			<Setter Property="MinHeight" Value="6" />
-			<Setter Property="PreviewContent">
-				<Template>
-					<Rectangle Fill="{DynamicResource SystemAccentColor}" />
-				</Template>
-			</Setter>
-			<Setter Property="Template">
-				<ControlTemplate>
-					<Rectangle Width="3" VerticalAlignment="Stretch" Fill="Transparent"></Rectangle>
-				</ControlTemplate>
-			</Setter>
-		</ControlTheme>
-
-		<conv:BitmapAssetValueConverter x:Key="variableImage"/>
-		<conv:StatusToColorConverter x:Key="colorConv"/>
-		<conv:HeightToIsVisibleConverter x:Key="HeightToIsVisible" />
 	</Window.Resources>
 	<!--
 	UI Structur
@@ -458,7 +464,7 @@
 											<Image Source="/Assets/Actions/2 - cad 32x32.png" />
 										</MenuItem.Icon>
 									</MenuItem>
-									<MenuItem Header="Hard reset" Click="hardResetToolStripMenuItem_Click" IsEnabled="True">
+									<MenuItem Header="Hard reset" Click="hardResetToolStripMenuItem_Click">
 										<MenuItem.IsEnabled>
 											<MultiBinding Converter="{x:Static BoolConverters.And}">
 												<Binding Path="SelVmRunning"/>

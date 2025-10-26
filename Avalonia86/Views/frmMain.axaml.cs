@@ -775,7 +775,7 @@ public partial class frmMain : BaseWindow
     /// <summary>
     /// For double clicking an item, do something based on VM status
     /// </summary>
-    private void lstVMs_MouseDoubleClick(object sender, RoutedEventArgs e)
+    private void lstVMs_MouseDoubleClick(object sender, TappedEventArgs e)
     {
         if (sender is ListBox box)
         {
