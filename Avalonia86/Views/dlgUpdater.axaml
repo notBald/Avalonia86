@@ -169,6 +169,16 @@
 						</gb:GroupBox>
 					</DockPanel>
 				</TabItem>
+				<TabItem Header="Download" Theme="{StaticResource CustomTabItm}">
+					<StackPanel>
+						<gb:GroupBox Header="Download release a build" Theme="{StaticResource GroupBoxClassic}">
+						
+						</gb:GroupBox>
+						<gb:GroupBox Header="Download a github build" Theme="{StaticResource GroupBoxClassic}">
+						
+						</gb:GroupBox>
+					</StackPanel>
+				</TabItem>
 				<TabItem Header="Information" Theme="{StaticResource CustomTabItm}">
 					<TabItem.Styles>
 						<Style Selector="SelectableTextBlock">

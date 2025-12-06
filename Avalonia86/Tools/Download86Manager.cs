@@ -747,7 +747,7 @@ public class Download86Manager : ReactiveObject
                 var changelog = await FetchChangelog(job, fjob, httpClient);
 
                 if (changelog.Count == 0)
-                    fjob.AddLog($" -- There was no enteries in the changelog --");
+                    fjob.AddLog($" -- There were no enteries in the changelog --");
                 else if (changelog.Count == 1)
                     fjob.AddLog($" -- There was 1 entery in the changelog --");
                 else
