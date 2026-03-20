@@ -349,7 +349,11 @@ public partial class dlgSettings : BaseWindow
                         catch { }
                     }
                     else if (exe.IsNew) {
-                        try { s.AddExe(exe.Name, exe.VMPath, exe.VMRoms, exe.Comment, exe.Version, exe.Arch, exe.Build, exe.IsDefault); }
+                        try 
+                        { 
+                            exe.ID = s.AddExe(exe.Name, exe.VMPath, exe.VMRoms, exe.Comment, exe.Version, exe.Arch, exe.Build, exe.IsDefault);
+                            exe.IsNew = false;
+                        }
                         catch { }
                     }
                     else if(exe.IsChanged)
@@ -1035,7 +1039,7 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
     {
         private bool _is_default;
 
-        public readonly bool IsNew;
+        public bool IsNew;
         public bool IsChanged { get; private set; }
 
         public ExeEntery(bool is_default, bool is_new = true) { IsNew = is_new; _is_default = is_default; }

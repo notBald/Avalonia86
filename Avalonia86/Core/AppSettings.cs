@@ -419,7 +419,7 @@ internal class AppSettings
         _store.Execute("DELETE FROM Executables where ID = @id", p);
     }
 
-    public void AddExe(string name, string vm_exe, string vm_roms, string comment, string version, string arch, string build, bool def)
+    public long AddExe(string name, string vm_exe, string vm_roms, string comment, string version, string arch, string build, bool def)
     {
         _store.Execute("INSERT INTO Executables (IsDef, Name, VMExe, VMRoms, \"Version\", Comment, Arch, Build) " +
                        " VALUES "+
@@ -427,6 +427,17 @@ internal class AppSettings
                        new SQLParam("name", name), new SQLParam("vmpath", vm_exe), new SQLParam("vmroms", vm_roms),
                        new SQLParam("comment", comment), new SQLParam("vers", version), new SQLParam("arch", arch),
                        new SQLParam("build", build), new SQLParam("def", def));
+        long id = -1;
+
+        foreach(var row in _store.Query("SELECT last_insert_rowid() as id"))
+        {
+            var obj = row["id"];
+
+            if (obj is long)
+                id = (long) row["id"];
+        }
+
+        return id;
     }
 
     public void UpdateExe(long id, string name, string vm_exe, string vm_roms, string comment, string version, string arch, string build, bool def)
