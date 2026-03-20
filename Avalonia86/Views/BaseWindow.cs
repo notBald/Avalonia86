@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Avalonia86.Views;
 
@@ -19,7 +21,8 @@ public abstract class BaseWindow : Window
     private Size RestoreSize;
     private PixelPoint OldPos, NewPos;
     private PixelPoint CurPos;
-    private double CurWidth, CurHeight; 
+    private double CurWidth, CurHeight;
+    private WindowState OldWindowState;
 
     #endregion
     public BaseWindow(string id)
@@ -30,6 +33,7 @@ public abstract class BaseWindow : Window
         //we need to know the size of the window before it was maximized when saving the window size.
         RestoreSize = new Size(Width, Height);
         OldPos = NewPos = Position;
+        OldWindowState = WindowState;
 
         Closing += BaseWindow_Closing;
         Closed += BaseWindow_Closed;
@@ -68,7 +72,16 @@ public abstract class BaseWindow : Window
         });
         PositionChanged += (s, e) =>
         {
-            OldPos = NewPos;
+            //Note, position change before window state, so a "wrong" positon will be set in "NewPos" and
+            //      the position we want to change will be set in OldPos. Then, if the WindowsState change
+            //      between maximized and minimized, the OldPos will now not be overwritten as in both
+            //      those cases the WindowState will not be normal.
+            if (WindowState == WindowState.Normal)
+            {
+                OldPos = NewPos;
+            }
+
+            //CurPos is updated later, so we keep NewPos up to date
             NewPos = e.Point;
         };
 
@@ -104,8 +117,8 @@ public abstract class BaseWindow : Window
 
         using (var t = s.BeginTransaction())
         {
-            if (WindowState == WindowState.Maximized)
-                DBStore.UpdateWindow(ID, OldPos.Y, OldPos.X, RestoreSize.Height, RestoreSize.Width, true);
+            if (WindowState == WindowState.Maximized || WindowState == WindowState.Minimized)
+                DBStore.UpdateWindow(ID, OldPos.Y, OldPos.X, double.IsNaN(RestoreSize.Height) ? CurHeight : RestoreSize.Height, double.IsNaN(RestoreSize.Width) ? CurWidth : RestoreSize.Width, WindowState == WindowState.Maximized || OldWindowState == WindowState.Maximized);
             else
                 DBStore.UpdateWindow(ID, CurPos.Y, CurPos.X, CurHeight, CurWidth, false);
 
@@ -121,6 +134,17 @@ public abstract class BaseWindow : Window
 
     protected virtual void SaveWindowParams() { }
     protected virtual void SetWindowParams() { }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == WindowStateProperty)
+        {
+            OldWindowState = change.GetOldValue<WindowState>();
+        }
+            
+    }
 
     /// <summary>
     /// Sets the window size, but makes sure not to set the window in a bad location.
