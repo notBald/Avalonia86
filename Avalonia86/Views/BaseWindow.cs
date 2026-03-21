@@ -1,14 +1,9 @@
-﻿using Avalonia86.Core;
-using Avalonia86.Tools;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia86.Core;
+using Avalonia86.Tools;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace Avalonia86.Views;
 
@@ -18,10 +13,16 @@ public abstract class BaseWindow : Window
 
     #region Private fields
 
+    //When windows are maximized / minimuzed, we need to know the values the window is to be restored to.
+    //This value needs to be fetched before the window state changes, so we save it away.
     private Size RestoreSize;
+
+    //These values are only usable after closing the window.
     private PixelPoint OldPos, NewPos;
     private PixelPoint CurPos;
     private double CurWidth, CurHeight;
+
+    //For when you minimuze a maximuzed window, we need to know that it was perviusly maximized.
     private WindowState OldWindowState;
 
     #endregion
@@ -68,6 +69,14 @@ public abstract class BaseWindow : Window
                 //window was maximized, as this event will fire with the Max size in NewValue
                 //and "WindowState == WindowState.Normal", annoyingly enough.
                 RestoreSize = rs;
+
+                //Note, this event will fire when the app opens with the window in "normal state" and
+                //      the app have a saved window position. This because the size is first set in
+                //      the constructor, then later set in the window size function. This results
+                //      in tjis handler triggering and restore size being set to the value set by the
+                //      constructor.
+                //
+                //      This error is corrected in the OnOpened function
             }
         });
         PositionChanged += (s, e) =>
@@ -79,6 +88,10 @@ public abstract class BaseWindow : Window
             if (WindowState == WindowState.Normal)
             {
                 OldPos = NewPos;
+
+                //We need to grab the restore size before we get the window state changed event, as it is too
+                //late to grab the right size then
+                RestoreSize = new Size(Width, Height);
             }
 
             //CurPos is updated later, so we keep NewPos up to date
@@ -89,6 +102,19 @@ public abstract class BaseWindow : Window
         NativeMSG.SetDarkMode(this);
         if (App.Current != null)
             App.Current.PropertyChanged += Current_PropertyChanged;
+    }
+
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+
+        if (WindowState == WindowState.Normal)
+        {
+            RestoreSize = new Size(Width, Height);
+
+            //Makes sure the restore size have the values set by the SetWindowSize function.
+            //This because restore size is overwritten by the ClientSizeProperty changed handler.
+        }
     }
 
     private void Current_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
@@ -118,7 +144,12 @@ public abstract class BaseWindow : Window
         using (var t = s.BeginTransaction())
         {
             if (WindowState == WindowState.Maximized || WindowState == WindowState.Minimized)
-                DBStore.UpdateWindow(ID, OldPos.Y, OldPos.X, double.IsNaN(RestoreSize.Height) ? CurHeight : RestoreSize.Height, double.IsNaN(RestoreSize.Width) ? CurWidth : RestoreSize.Width, WindowState == WindowState.Maximized || OldWindowState == WindowState.Maximized);
+            {
+                Debug.Write("Save size: ");
+                Debug.WriteLine(RestoreSize);
+
+                DBStore.UpdateWindow(ID, OldPos.Y, OldPos.X, RestoreSize.Height, RestoreSize.Width, WindowState == WindowState.Maximized || OldWindowState == WindowState.Maximized);
+            }
             else
                 DBStore.UpdateWindow(ID, CurPos.Y, CurPos.X, CurHeight, CurWidth, false);
 
@@ -141,9 +172,9 @@ public abstract class BaseWindow : Window
 
         if (change.Property == WindowStateProperty)
         {
+            //This is used to determie if the previous state is maximized when the window has been closed while minimzed.
             OldWindowState = change.GetOldValue<WindowState>();
         }
-            
     }
 
     /// <summary>
@@ -187,8 +218,10 @@ public abstract class BaseWindow : Window
                 Width = size.Width;
                 Height = size.Height;
                 if (size.Maximized)
+                {
                     WindowState = WindowState.Maximized;
-
+                    RestoreSize = new Size(size.Width, size.Height);
+                }
                 SetWindowParams();
             }
         }
