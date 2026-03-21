@@ -12,7 +12,7 @@ public abstract class BaseWindow : Window
 
     #region Private fields
 
-    //When windows are maximized / minimuzed, we need to know the values the window is to be restored to.
+    //When windows are maximized / minimized, we need to know the values the window is to be restored to.
     //This value needs to be fetched before the window state changes, so we save it away.
     private Size RestoreSize;
 
@@ -21,7 +21,7 @@ public abstract class BaseWindow : Window
     private PixelPoint CurPos;
     private double CurWidth, CurHeight;
 
-    //For when you minimuze a maximuzed window, we need to know that it was perviusly maximized.
+    //For when you minimize a maximized window, we need to know that it was previously maximized.
     private WindowState OldWindowState;
 
     #endregion
@@ -40,7 +40,8 @@ public abstract class BaseWindow : Window
     }
 
     /// <summary>
-    /// Must be done after the InitializeComponent call
+    /// Called during initialization to safely restore window size and bounds from persistence.
+    /// Must be invoked after InitializeComponent().
     /// </summary>
     protected void BaseInit()
     {
@@ -59,7 +60,8 @@ public abstract class BaseWindow : Window
         //
         //One problem with this implementation is that we don't handle events where the screen layout
         //changes, such as when a screen is removed. There aren't really any good ways of handling
-        //this in Avalonia.
+        //this in Avalonia (though this comment probably is out of date, and 11.2.7 has added more
+        //rezise events, as noted in the issue above - I have not looked into this).
         this.GetPropertyChangedObservable(ClientSizeProperty).AddClassHandler<Visual>((t, args) =>
         {
             if (WindowState == WindowState.Normal && args.OldValue is Size rs)
@@ -72,7 +74,7 @@ public abstract class BaseWindow : Window
                 //Note, this event will fire when the app opens with the window in "normal state" and
                 //      the app have a saved window position. This because the size is first set in
                 //      the constructor, then later set in the window size function. This results
-                //      in tjis handler triggering and restore size being set to the value set by the
+                //      in this handler triggering and restore size being set to the value set by the
                 //      constructor.
                 //
                 //      This error is corrected in the OnOpened function
@@ -93,11 +95,12 @@ public abstract class BaseWindow : Window
                 RestoreSize = new Size(Width, Height);
             }
 
-            //CurPos is updated later, so we keep NewPos up to date
+            //Sometimes the value here will be wrong, but we don't know if it is 
+            //a wrong or right value here, so we always keep NewPos up to date. 
             NewPos = e.Point;
         };
 
-        //Windows 10 workarround
+        //Windows 10 workaround
         NativeMSG.SetDarkMode(this);
         if (App.Current != null)
             App.Current.PropertyChanged += Current_PropertyChanged;
@@ -111,7 +114,7 @@ public abstract class BaseWindow : Window
         {
             RestoreSize = new Size(Width, Height);
 
-            //Makes sure the restore size have the values set by the SetWindowSize function.
+            //Makes sure the restore size has the values set by the SetWindowSize function.
             //This because restore size is overwritten by the ClientSizeProperty changed handler.
         }
     }
@@ -127,7 +130,8 @@ public abstract class BaseWindow : Window
     private void BaseWindow_Closing(object sender, WindowClosingEventArgs e)
     {
         //These values are not trustable in the "Closed" handle. But we don't
-        //know for sure that the window actually closed until then.
+        //know for sure that the window actually closed until then. Thus we
+        //save them here and use these values in the close handler. 
         CurPos = Position;
         CurWidth = Width;
         CurHeight = Height;
@@ -166,7 +170,7 @@ public abstract class BaseWindow : Window
 
         if (change.Property == WindowStateProperty)
         {
-            //This is used to determie if the previous state is maximized when the window has been closed while minimzed.
+            //This is used to determine if the previous state is maximized when the window has been closed while minimized.
             OldWindowState = change.GetOldValue<WindowState>();
         }
     }
@@ -178,8 +182,8 @@ public abstract class BaseWindow : Window
     {
         var size = DBStore.FetchWindowSize(ID);
 
-        //If size for some reason fails to load, we do nothing. The window will the open with
-        //default size.
+        //If size for some reason fails to load, we do nothing. The window will then open with
+        //its default size.
         if (size != null && size.Width > 50 && size.Height > 50)
         {
             var left_pos = new PixelPoint((int)size.Left, (int)size.Top);
@@ -189,12 +193,12 @@ public abstract class BaseWindow : Window
             double totalIntersectionArea = 0;
             bool isPositionValid = false;
 
-            //What we want is to furfill two conditions.
+            //What we want is to fulfill two conditions.
             // 1. That the top/left position on the window is visible on at least one screen.
             //    The goal here is to avoid situations where the top of the window is above
             //    the screen.
-            // 2. At least 50% of the window is visible on all screens combinded. Maybe we can
-            //    reduse this number, as what we want is a decent chunk of the app visible.
+            // 2. At least 50% of the window is visible on all screens combined. Maybe we can
+            //    reduce this number, as what we want is a decent chunk of the app visible.
             foreach (var screen in Screens.All)
             {
                 var intersection = screen.Bounds.Intersect(windowRect);
@@ -204,7 +208,7 @@ public abstract class BaseWindow : Window
                     isPositionValid = true;
             }
 
-            //Note that "windowArea" referes to the size of the app's window, and we've halved it
+            //Note that "windowArea" refers to the size of the app's window, and we've halved it
             //so that we'll pass the check with half the window intersecting with all screens.
             if (totalIntersectionArea >= windowArea && isPositionValid)
             {
