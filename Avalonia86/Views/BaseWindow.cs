@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia86.Core;
 using Avalonia86.Tools;
 using System;
-using System.Diagnostics;
 
 namespace Avalonia86.Views;
 
@@ -144,12 +143,7 @@ public abstract class BaseWindow : Window
         using (var t = s.BeginTransaction())
         {
             if (WindowState == WindowState.Maximized || WindowState == WindowState.Minimized)
-            {
-                Debug.Write("Save size: ");
-                Debug.WriteLine(RestoreSize);
-
                 DBStore.UpdateWindow(ID, OldPos.Y, OldPos.X, RestoreSize.Height, RestoreSize.Width, WindowState == WindowState.Maximized || OldWindowState == WindowState.Maximized);
-            }
             else
                 DBStore.UpdateWindow(ID, CurPos.Y, CurPos.X, CurHeight, CurWidth, false);
 
