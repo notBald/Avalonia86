@@ -650,6 +650,7 @@ internal static class VMCenter
         {
             FileName = paths.ExePath,
             RomPath = paths.RomPath,
+            AssetPath = paths.AssetPath,
             VmPath = vmPath,
             Build = paths.Build,
             Arch = paths.Arch,

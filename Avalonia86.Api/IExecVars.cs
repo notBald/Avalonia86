@@ -6,6 +6,8 @@ public interface IExecVars
 
     string RomPath { get; }
 
+    string AssetPath { get; }
+
     string LogFile { get; }
 
     string VmPath { get; }

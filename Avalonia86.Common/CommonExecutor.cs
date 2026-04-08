@@ -14,6 +14,11 @@ public abstract class CommonExecutor : IExecutor
             ops.Add("-R");
             ops.Add(args.RomPath);
         }
+        if (!string.IsNullOrWhiteSpace(args.AssetPath) && args.Build >= 3333)
+        {
+            ops.Add("-A");
+            ops.Add(args.AssetPath);
+        }
         if (!string.IsNullOrWhiteSpace(args.LogFile))
         {
             ops.Add("-L");
@@ -38,6 +43,11 @@ public abstract class CommonExecutor : IExecutor
         {
             ops.Add("-R");
             ops.Add(args.RomPath);
+        }
+        if (!string.IsNullOrWhiteSpace(args.AssetPath) && args.Build >= 3333)
+        {
+            ops.Add("-A");
+            ops.Add(args.AssetPath);
         }
         ops.Add("--settings");
         ops.Add("-P");

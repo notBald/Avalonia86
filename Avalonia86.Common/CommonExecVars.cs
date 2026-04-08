@@ -8,6 +8,8 @@ public sealed class CommonExecVars : IExecVars
 
     public string RomPath { get; set; }
 
+    public string AssetPath { get; set; }
+
     public string LogFile { get; set; }
 
     public string VmPath { get; set; }
