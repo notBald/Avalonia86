@@ -464,12 +464,12 @@ internal class AppSettings
     }
     public IEnumerable<DataReader> GetDefExe()
     {
-        return _store.Query("SELECT ID, Name, VMExe, VMRoms, \"Version\", Comment, Arch, Build FROM Executables WHERE IsDef = TRUE");
+        return _store.Query("SELECT ID, Name, VMExe, VMRoms, VMAssets, \"Version\", Comment, Arch, Build FROM Executables WHERE IsDef = TRUE");
     }
 
     public IEnumerable<DataReader> GetExePaths(long uid)
     {
-        return _store.Query("SELECT VMExe, VMRoms, Arch, Build FROM Executables WHERE ID = @id", new SQLParam("id", uid));
+        return _store.Query("SELECT VMExe, VMRoms, VMAssets, Arch, Build FROM Executables WHERE ID = @id", new SQLParam("id", uid));
     }
 
     /// <summary>

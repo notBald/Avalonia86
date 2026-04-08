@@ -22,6 +22,7 @@ public class ctrlSetExecutableModel : ReactiveObject
 
     public string Default86BoxFolder { get; private set; }
     public string Default86BoxRoms { get; private set; }
+    public string Default86BoxAssets { get; private set; }
     internal List<ExeModel> ExeFiles { get; } = new();
 
     public string SelExePath
@@ -114,6 +115,30 @@ public class ctrlSetExecutableModel : ReactiveObject
         }
     }
 
+    public string SelExeAssetDir
+    {
+        get
+        {
+            try
+            {
+                if (SelectedItem != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(SelectedItem.VMAssets))
+                        return SelectedItem.VMAssets;
+
+                    if (!string.IsNullOrWhiteSpace(Default86BoxAssets))
+                    {
+                        if (Directory.Exists(Default86BoxAssets))
+                            return Default86BoxAssets;
+                    }
+                }
+            }
+            catch { }
+
+            return "";
+        }
+    }
+
     internal ExeModel SelectedItem
     {
         get => _exeModel;
@@ -123,6 +148,7 @@ public class ctrlSetExecutableModel : ReactiveObject
             {
                 this.RaiseAndSetIfChanged(ref _exeModel, value);
                 this.RaisePropertyChanged(nameof(SelExeRomDir));
+                this.RaisePropertyChanged(nameof(SelExeAssetDir));
                 this.RaisePropertyChanged(nameof(SelExePath));
                 this.RaisePropertyChanged(nameof(SelVersion));
             }
@@ -168,6 +194,7 @@ public class ctrlSetExecutableModel : ReactiveObject
         {
             Default86BoxFolder = s.EXEdir;
             Default86BoxRoms = s.ROMdir;
+            Default86BoxAssets = s.AssetDir;
 
             foreach (var r in s.ListExecutables())
             {
@@ -177,6 +204,7 @@ public class ctrlSetExecutableModel : ReactiveObject
                     Name = r["Name"] as string,
                     VMExe = r["VMExe"] as string,
                     VMRoms = r["VMRoms"] as string,
+                    VMAssets = r["VMAssets"] as string,
                     Version = r["Version"] as string,
                     Comment = r["Comment"] as string,
                     Build = r["Build"] as string,

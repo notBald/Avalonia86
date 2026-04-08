@@ -707,10 +707,17 @@ internal static class VMCenter
         foreach(var exe in AppSettings.Settings.GetDefExe())
         {
             paths = new ExePaths((string)exe["VMExe"],
-                exe["VMRoms"] as string, exe["Build"] as string, exe["Arch"] as string);
+                exe["VMRoms"] as string, exe["VMAssets"] as string,
+                exe["Build"] as string, exe["Arch"] as string);
 
             if (File.Exists(paths.ExePath))
             {
+                if (paths.AssetPath == null || !Directory.Exists (paths.AssetPath))
+                {
+                    //Use the global default if the path is not set for this exe file
+                    paths.AssetPath = AppSettings.Settings.AssetDir;
+                }
+
                 if (paths.RomPath == null || !Directory.Exists(paths.RomPath))
                 {
                     paths.RomPath = null;
@@ -755,7 +762,7 @@ internal static class VMCenter
 
                     if (info != null)
                     {
-                        paths = new ExePaths(exe, AppSettings.Settings.ROMdir, "" + info.FilePrivatePart, info.Arch);
+                        paths = new ExePaths(exe, AppSettings.Settings.ROMdir, AppSettings.Settings.AssetDir, "" + info.FilePrivatePart, info.Arch);
                         if (!Directory.Exists(paths.RomPath))
                             paths.RomPath = null;
 

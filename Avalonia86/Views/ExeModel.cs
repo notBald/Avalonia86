@@ -13,6 +13,7 @@ public class ExeModel : ReactiveObject
     public string Version { get; set; }
     public string VMExe { get; set; }
     public string VMRoms { get; set; }
+    public string VMAssets { get; set; }
     public string Arch { get; set; }
     public string Build { get; set; }
     public string Comment { get; set; }

@@ -29,7 +29,7 @@
 				</ComboBox.ItemTemplate>
 			</ComboBox>
 			<Grid
-				ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+				ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
 				<Grid.Styles>
 					<Style Selector="TextBlock">
 						<Setter Property="Margin" Value="0, 2, 2, 2" />
@@ -46,8 +46,10 @@
 				<SelectableTextBlock TextTrimming="CharacterEllipsis" Text="{Binding SelExePath}" Grid.Column="1" Grid.Row="2" />
 				<TextBlock Text="Firmware folder:" Grid.Column="0" Grid.Row="3" />
 				<SelectableTextBlock TextTrimming="CharacterEllipsis" Text="{Binding SelExeRomDir}" Grid.Column="1" Grid.Row="3" />
-				<TextBlock Text="Comment:" Grid.Column="0" Grid.Row="4" />
-				<SelectableTextBlock Text="{Binding SelectedItem.Comment}" Grid.Column="1" Grid.Row="4" />
+				<TextBlock Text="Assets folder:" Grid.Column="0" Grid.Row="4" />
+				<SelectableTextBlock TextTrimming="CharacterEllipsis" Text="{Binding SelExeAssetDir}" Grid.Column="1" Grid.Row="4" />
+				<TextBlock Text="Comment:" Grid.Column="0" Grid.Row="5" />
+				<SelectableTextBlock Text="{Binding SelectedItem.Comment}" Grid.Column="1" Grid.Row="5" />
 			</Grid>
 		</StackPanel>
 	</gb:GroupBox>

@@ -141,6 +141,7 @@ internal sealed class VMVisual : ReactiveObject
                     return new ExePaths(
                         (string) p["VMExe"], 
                         p["VMRoms"] as string,
+                        p["VMAssets"] as string,
                         p["Build"] as string,
                         p["Arch"] as string);
                 }
