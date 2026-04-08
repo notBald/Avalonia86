@@ -166,6 +166,16 @@ internal class AppSettings
         set => SetProperty("compact_list", value);
     }
 
+    public string SortMachineListOrder
+    {
+        get => FetchProperty("vm_list_sort", "name");
+        set
+        {
+            SetProperty("vm_list_sort", value ?? "name");
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(SortMachineListOrder)));
+        }
+    }
+
     public string PreferedCPUArch
     {
         get => FetchProperty("pref_cpu_arch", (string) null);
@@ -302,7 +312,9 @@ internal class AppSettings
         int count = 0;
         bool notify = false;
 
-        foreach (var vm in _store.Query("select id, name, category, iconpath from VMs order by name"))
+        string order_by = SortMachineListOrder == "name" ? "order by name" : "order by created desc";
+
+        foreach (var vm in _store.Query("select id, name, category, iconpath from VMs " + order_by))
         {
             var uid = (long)vm["id"];
 

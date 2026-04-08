@@ -1,10 +1,7 @@
-﻿using Avalonia.Controls;
-using Avalonia.Threading;
-using Avalonia86.Core;
+﻿using Avalonia86.Core;
 using Avalonia86.Views;
 using DynamicData;
 using DynamicData.Binding;
-using ReactiveUI;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -179,6 +176,11 @@ internal class MainModel : ReactiveObject, IDisposable
         }
     }
 
+    public bool SortListToggle 
+    {
+        get => Settings.SortMachineListOrder != "name";
+        set { Settings.SortMachineListOrder = value ? "date" : "name"; }
+    }
     public bool CompactList { get => Settings.CompactMachineList; }
     public bool Toolbar86Btn { get => Settings.Has86ToolbarBtn; }
     public bool ToolbarPSBtn { get => Settings.HasPSToolbarBtn; }
@@ -266,6 +268,10 @@ internal class MainModel : ReactiveObject, IDisposable
         if (e.PropertyName == nameof(AppSettings.CompactMachineList))
         {
             this.RaisePropertyChanged(nameof(CompactList));
+        }
+        else if (e.PropertyName == nameof(AppSettings.SortMachineListOrder))
+        {
+            this.RaisePropertyChanged(nameof(SortListToggle));
         }
         else if (e.PropertyName == nameof(AppSettings.IsTrayEnabled))
         {

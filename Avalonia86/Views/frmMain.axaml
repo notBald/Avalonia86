@@ -22,97 +22,164 @@
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-			<ResourceDictionary>
-				<ResourceDictionary.ThemeDictionaries>
-					<ResourceDictionary x:Key="Default">
-						<Color x:Key="LineColor">#f0f0f0</Color>
-						<Color x:Key="LineColor3">#a0a0a0</Color>
+				<ResourceDictionary>
+					<ResourceDictionary.ThemeDictionaries>
+						<ResourceDictionary x:Key="Default">
+							<Color x:Key="LineColor">#f0f0f0</Color>
+							<Color x:Key="LineColor3">#a0a0a0</Color>
+							<SolidColorBrush Color="#333" x:Key="toolbar_toggle_text" />
 					
-						<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
-							<GradientStop Color="#FFFFFF" Offset="0.0"/>
-							<GradientStop Color="#D6D6D6" Offset="1.0"/>
-						</LinearGradientBrush>
+							<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
+								<GradientStop Color="#FFFFFF" Offset="0.0"/>
+								<GradientStop Color="#D6D6D6" Offset="1.0"/>
+							</LinearGradientBrush>
 
-						<SolidColorBrush Color="{StaticResource LineColor3}" x:Key="VerticalGridSplitter_rect1"/>
-						<SolidColorBrush Color="{StaticResource LineColor}" x:Key="VerticalGridSplitter_rect2"/>
+							<SolidColorBrush Color="{StaticResource LineColor3}" x:Key="VerticalGridSplitter_rect1"/>
+							<SolidColorBrush Color="{StaticResource LineColor}" x:Key="VerticalGridSplitter_rect2"/>
+							
+							<SolidColorBrush Color="{StaticResource LineColor}" x:Key="StatusBarBackgroundColor" />
+							<SolidColorBrush Color="White" x:Key="content_BackgroundColor" />
+							<SolidColorBrush Color="#E2EAF1" x:Key="caption_btn_BackgroundColor" />
+							<SolidColorBrush Color="#E5EDF4" x:Key="caption_btn_HoverColor" />
+							<SolidColorBrush Color="#828790" x:Key="listVMs_BorderBrush" />
+							<SolidColorBrush Color="#d9d9d9" x:Key="main_BorderBrush" />
+							<SolidColorBrush Color="#d7d7d7" x:Key="statusbar_LineBrush" />
+					
+							<!-- The info pane has multiple borders, only part of the outer border is here -->
+							<SolidColorBrush Color="{StaticResource LineColor3}" x:Key="info_Border1" />
+						</ResourceDictionary>
+						<ResourceDictionary x:Key="Dark">
+							<Color x:Key="LineColor">#111111</Color>
+							<Color x:Key="LineColor2">#828790</Color>
+							<SolidColorBrush Color="#FFF" x:Key="toolbar_toggle_text" />
+					
+							<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
+								<GradientStop Color="#666666" Offset="0.0"/>
+								<GradientStop Color="#222222" Offset="1.0"/>
+							</LinearGradientBrush>
 
-						<SolidColorBrush Color="{StaticResource LineColor}" x:Key="StatusBarBackgroundColor" />
-						<SolidColorBrush Color="White" x:Key="content_BackgroundColor" />
-						<SolidColorBrush Color="#E2EAF1" x:Key="caption_btn_BackgroundColor" />
-						<SolidColorBrush Color="#E5EDF4" x:Key="caption_btn_HoverColor" />
-						<SolidColorBrush Color="#828790" x:Key="listVMs_BorderBrush" />
-						<SolidColorBrush Color="#d9d9d9" x:Key="main_BorderBrush" />
-						<SolidColorBrush Color="#d7d7d7" x:Key="statusbar_LineBrush" />
+							<SolidColorBrush Color="#000000" x:Key="VerticalGridSplitter_rect1"/>
+							<SolidColorBrush Color="#000000" x:Key="VerticalGridSplitter_rect2"/>
 					
-						<!-- The info pane has multiple borders, only part of the outer border is here -->
-						<SolidColorBrush Color="{StaticResource LineColor3}" x:Key="info_Border1" />
-					</ResourceDictionary>
-					<ResourceDictionary x:Key="Dark">
-						<Color x:Key="LineColor">#111111</Color>
-						<Color x:Key="LineColor2">#828790</Color>
-					
-						<LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="ToolbarBackgroundBrush">
-							<GradientStop Color="#666666" Offset="0.0"/>
-							<GradientStop Color="#222222" Offset="1.0"/>
-						</LinearGradientBrush>
-
-						<SolidColorBrush Color="#000000" x:Key="VerticalGridSplitter_rect1"/>
-						<SolidColorBrush Color="#000000" x:Key="VerticalGridSplitter_rect2"/>
-					
-						<SolidColorBrush Color="#222222" x:Key="StatusBarBackgroundColor" />
-						<SolidColorBrush Color="#222222" x:Key="content_BackgroundColor" />
-						<SolidColorBrush Color="#262626" x:Key="caption_btn_BackgroundColor" />
-						<SolidColorBrush Color="#333333" x:Key="caption_btn_HoverColor" />
-						<SolidColorBrush Color="{StaticResource LineColor2}" x:Key="main_BorderBrush" />
-						<SolidColorBrush Color="{StaticResource LineColor2}" x:Key="statusbar_LineBrush" />
-					</ResourceDictionary>
-				</ResourceDictionary.ThemeDictionaries>
-			</ResourceDictionary>
+							<SolidColorBrush Color="#222222" x:Key="StatusBarBackgroundColor" />
+							<SolidColorBrush Color="#222222" x:Key="content_BackgroundColor" />
+							<SolidColorBrush Color="#262626" x:Key="caption_btn_BackgroundColor" />
+							<SolidColorBrush Color="#333333" x:Key="caption_btn_HoverColor" />
+							<SolidColorBrush Color="{StaticResource LineColor2}" x:Key="main_BorderBrush" />
+							<SolidColorBrush Color="{StaticResource LineColor2}" x:Key="statusbar_LineBrush" />
+						</ResourceDictionary>
+					</ResourceDictionary.ThemeDictionaries>
+				</ResourceDictionary>
 		
-			<ResourceDictionary>
-				<!-- This is alternative styling for a grid splitter -->
-				<!--<ControlTheme x:Key="VerticalGridSplitter" TargetType="GridSplitter">
-					<Setter Property="Focusable" Value="True" />
-					<Setter Property="MinWidth" Value="6" />
-					<Setter Property="MinHeight" Value="6" />
-					<Setter Property="PreviewContent">
-						<Template>
-							<Rectangle Fill="{DynamicResource SystemAccentColor}" />
-						</Template>
-					</Setter>
-					<Setter Property="Template">
-						<ControlTemplate>
-							<StackPanel Orientation="Horizontal">
-								<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect1}"></Rectangle>
-								<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect2}"></Rectangle>
-							</StackPanel>
-						</ControlTemplate>
-					</Setter>
-				</ControlTheme>-->
+				<ResourceDictionary>
+					<!-- This is alternative styling for a grid splitter -->
+					<!--<ControlTheme x:Key="VerticalGridSplitter" TargetType="GridSplitter">
+						<Setter Property="Focusable" Value="True" />
+						<Setter Property="MinWidth" Value="6" />
+						<Setter Property="MinHeight" Value="6" />
+						<Setter Property="PreviewContent">
+							<Template>
+								<Rectangle Fill="{DynamicResource SystemAccentColor}" />
+							</Template>
+						</Setter>
+						<Setter Property="Template">
+							<ControlTemplate>
+								<StackPanel Orientation="Horizontal">
+									<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect1}"></Rectangle>
+									<Rectangle Width="1" VerticalAlignment="Stretch" Fill="{DynamicResource VerticalGridSplitter_rect2}"></Rectangle>
+								</StackPanel>
+							</ControlTemplate>
+						</Setter>
+					</ControlTheme>-->
 
-				<ControlTheme x:Key="VerticalTransparentGridSplitter" TargetType="GridSplitter">
-					<Setter Property="Focusable" Value="True" />
-					<Setter Property="MinWidth" Value="6" />
-					<Setter Property="MinHeight" Value="6" />
-					<Setter Property="PreviewContent">
-						<Template>
-							<Rectangle Fill="{DynamicResource SystemAccentColor}" />
-						</Template>
-					</Setter>
-					<Setter Property="Template">
-						<ControlTemplate>
-							<Rectangle Width="3" VerticalAlignment="Stretch" Fill="Transparent"></Rectangle>
-						</ControlTemplate>
-					</Setter>
-				</ControlTheme>
+					<ControlTemplate x:Key="IconBackdrop">
+						<Canvas Width="64" Height="64">
+							<Rectangle Canvas.Left="8" Canvas.Top="10" Width="48" Height="6" RadiusX="2" RadiusY="2" Fill="#D3D3D3" />
+							<Rectangle Canvas.Left="8" Canvas.Top="20" Width="48" Height="6" RadiusX="2" RadiusY="2" Fill="#D3D3D3" />
+							<Rectangle Canvas.Left="8" Canvas.Top="30" Width="48" Height="6" RadiusX="2" RadiusY="2" Fill="#D3D3D3" />
+						</Canvas>
+					</ControlTemplate>
 
-				<conv:BitmapAssetValueConverter x:Key="variableImage"/>
-				<conv:StatusToColorConverter x:Key="colorConv"/>
-				<conv:HeightToIsVisibleConverter x:Key="HeightToIsVisible" />
+					<ControlTemplate x:Key="TemplateSortByName">
+						<Canvas Width="64" Height="64">
+							<Path Fill="{DynamicResource toolbar_toggle_text}" 
+								  Data="M19,52 L21.5,42 L24.5,42 L27,52 L24.8,52 L24.2,49 L21.8,49 L21.2,52 Z M22.2,47 L23.8,47 L23,43.5 Z M28.3,52 L28.3,42 L31.8,42 C33.3,42 34.3,43 34.3,44.5 C34.3,45.5 33.8,46.3 32.8,46.7 C34.1,47 34.8,48 34.8,49.2 C34.8,51 33.6,52 31.8,52 Z M29.8,46 L31.3,46 C32.1,46 32.8,45.6 32.8,44.8 C32.8,44 32.1,43.5 31.3,43.5 L29.8,43.5 Z M29.8,50.5 L31.5,50.5 C32.5,50.5 33.3,50 33.3,49 C33.3,48 32.5,47.5 31.5,47.5 L29.8,47.5 Z M44.5,48.5 C44.5,50.8 42.8,52.2 40.5,52.2 C38.2,52.2 36.5,50.8 36.5,48.5 L36.5,45.5 C36.5,43.2 38.2,41.8 40.5,41.8 C42.8,41.8 44.5,43.2 44.5,45.5 L43,45.5 C43,44 42,43.2 40.5,43.2 C39,43.2 38,44 38,45.5 L38,48.5 C38,50 39,50.8 40.5,50.8 C42,50.8 43,50 43,48.5 Z" />
+						</Canvas>
+					</ControlTemplate>
+
+					<ControlTemplate x:Key="TemplateSortByDate">
+						<Canvas Width="64" Height="64">
+							<Rectangle Canvas.Left="22" Canvas.Top="36" Width="20" Height="20" RadiusX="3" RadiusY="3" 
+									   Stroke="#D3D3D3" StrokeThickness="2" Fill="White" />
+							<Line StartPoint="22,42" EndPoint="42,42" Stroke="#333" StrokeThickness="2" />
+							<Rectangle Canvas.Left="25" Canvas.Top="44" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
+							<Rectangle Canvas.Left="30" Canvas.Top="44" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
+							<Rectangle Canvas.Left="35" Canvas.Top="44" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
+							<Rectangle Canvas.Left="25" Canvas.Top="49" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
+							<Rectangle Canvas.Left="30" Canvas.Top="49" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
+							<Rectangle Canvas.Left="35" Canvas.Top="49" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
+						</Canvas>
+					</ControlTemplate>
+
+					<ControlTheme x:Key="VerticalTransparentGridSplitter" TargetType="GridSplitter">
+						<Setter Property="Focusable" Value="True" />
+						<Setter Property="MinWidth" Value="6" />
+						<Setter Property="MinHeight" Value="6" />
+						<Setter Property="PreviewContent">
+							<Template>
+								<Rectangle Fill="{DynamicResource SystemAccentColor}" />
+							</Template>
+						</Setter>
+						<Setter Property="Template">
+							<ControlTemplate>
+								<Rectangle Width="3" VerticalAlignment="Stretch" Fill="Transparent"></Rectangle>
+							</ControlTemplate>
+						</Setter>
+					</ControlTheme>
+
+					<conv:BitmapAssetValueConverter x:Key="variableImage"/>
+					<conv:StatusToColorConverter x:Key="colorConv"/>
+					<conv:HeightToIsVisibleConverter x:Key="HeightToIsVisible" />
 				</ResourceDictionary>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>
+	<Window.Styles>
+		<Style Selector="ToggleButton.SortToggle">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border x:Name="BaseBorder"
+							Background="{TemplateBinding Background}"
+							BorderBrush="Transparent"
+							BorderThickness="1"
+							CornerRadius="4">
+                
+						<Panel Width="64" Height="64" x:Name="IconContainer">
+							<Panel.Transitions>
+								<Transitions>
+									<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.05"/>
+								</Transitions>
+							</Panel.Transitions>
+                    
+							<ContentControl Template="{StaticResource IconBackdrop}"/>
+                    
+							<ContentControl x:Name="IconPresenter"
+											Template="{StaticResource TemplateSortByName}"/>
+						</Panel>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="ToggleButton.SortToggle:checked /template/ ContentControl#IconPresenter">
+			<Setter Property="Template" Value="{StaticResource TemplateSortByDate}" />
+		</Style>
+
+		<Style Selector="ToggleButton.SortToggle:pressed /template/ Panel#IconContainer">
+			<Setter Property="RenderTransform" Value="scale(0.95) translateY(2px)" />
+		</Style>
+	</Window.Styles>
 	<!--
 	UI Structur
 	 stackpanel Dock.Top
@@ -381,6 +448,7 @@
 						<TextBlock Text="Exe Manager" />
 					</StackPanel>
 				</Button>
+				<ToggleButton Width="64" Height="64" Classes="SortToggle" IsChecked="{Binding SortListToggle, Mode=TwoWay}" />
 				<Rectangle Fill="#8a8a8a" Width="1" Margin="1,2,0,2"/>
 				<Rectangle Fill="#FFFFFF" Opacity=".3" Width="1" Margin="0,2,1,2"/>
 				<ComboBox SelectedIndex="{Binding CategoryIndex}" Background="transparent" Width="150" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Center" ItemsSource="{Binding Categories}" />
@@ -416,6 +484,7 @@
 								<vm:AutoHideCaretBehavior IdleAfter = "0:0:5" />
 							</i:Interaction.Behaviors>
 						</TextBox>
+						<!-- list of VMs -->
 						<ListBox BorderThickness="1" BorderBrush="{DynamicResource content_BackgroundColor}" Padding="0"
 								 x:Name="lstVMs" SelectedIndex="{Binding MachineIndex}" ItemsSource="{Binding Path=Machines}" 
 								 KeyDown="lstVMs_KeyDown" Background="{DynamicResource content_BackgroundColor}" DoubleTapped="lstVMs_MouseDoubleClick"
