@@ -169,7 +169,7 @@
 						</gb:GroupBox>
 					</DockPanel>
 				</TabItem>
-				<TabItem Header="Download" Theme="{StaticResource CustomTabItm}">
+				<TabItem Header="Download" Theme="{StaticResource CustomTabItm}" IsVisible="False">
 					<StackPanel>
 						<gb:GroupBox Header="Download release a build" Theme="{StaticResource GroupBoxClassic}">
 						
