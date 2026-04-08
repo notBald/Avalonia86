@@ -61,6 +61,8 @@ public partial class dlgAddExe : Window
         }
         if (string.IsNullOrWhiteSpace(_m.RomDir))
             _m.RomDir = null;
+        if (string.IsNullOrWhiteSpace(_m.AssetDir))
+            _m.AssetDir = null;
         if (string.IsNullOrWhiteSpace(_m.Comment))
             _m.Comment = null;
         if (string.IsNullOrWhiteSpace(_m.RomDir))
@@ -108,6 +110,19 @@ public partial class dlgAddExe : Window
         if (folder_name != null)
         {
             _m.RomDir = folder_name;
+        }
+    }
+
+    private async void btnAssBrowse_click(object sender, RoutedEventArgs e)
+    {
+        var text = "Select a Asset folder for 86Box";
+
+        string path = string.IsNullOrWhiteSpace(DefExePath) ? "" : DefExePath;
+        var folder_name = await Dialogs.SelectFolder(path, text, this);
+
+        if (folder_name != null)
+        {
+            _m.AssetDir = folder_name;
         }
     }
 
@@ -174,7 +189,7 @@ public partial class dlgAddExe : Window
 internal class dlgAddExeModel : ReactiveObject
 {
     dlgAddExeModel _me;
-    private string _rom_dir, _exe_path, _exe_ver;
+    private string _rom_dir, _exe_path, _exe_ver, _asset_dir;
     private string _name, _version, _comment, _arch, _build;
     internal string _sugested_name, _sugested_ver;
 
@@ -277,6 +292,7 @@ internal class dlgAddExeModel : ReactiveObject
 
             return _me._exe_path != _exe_path ||
                    _me._rom_dir != _rom_dir ||
+                   _me._asset_dir != _asset_dir ||
                    _me._arch != _arch ||
                    _me._build != _build ||
                    _me._name != _name ||
@@ -324,6 +340,18 @@ internal class dlgAddExeModel : ReactiveObject
         }
     }
 
+    public string AssetDir
+    {
+        get => _asset_dir;
+        set
+        {
+            if (value != _asset_dir)
+            {
+                this.RaiseAndSetIfChanged(ref _asset_dir, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
 
     public void Commit()
     {

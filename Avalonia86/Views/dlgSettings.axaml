@@ -74,7 +74,7 @@
 					<DockPanel>
 						<gb:GroupBox Header="Paths" DockPanel.Dock="Top"
 									 Theme="{StaticResource GroupBoxClassic}">
-							<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto">
+							<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
 								<Label Content="Path to the default 86Box executable:" 
 									   Target="{Binding ElementName=tbPath}"
 									   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
@@ -105,6 +105,14 @@
 									   Grid.Row="6" Grid.Column="0"/>
 								<Button Content="Browse..." Click="btnBrowse_rom_Click"
 										Grid.Row="6" Grid.Column="2"/>
+
+								<Label Content="Path to assets:"
+									   Target="{Binding ElementName=tbAss}"
+									   Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3"/>
+								<TextBox Text="{Binding AssetDir}" Name="tbAss" Watermark="Default assets is determined by 86Box"
+									   Grid.Row="8" Grid.Column="0"/>
+								<Button Content="Browse..." Click="btnBrowse_asset_Click"
+										Grid.Row="9" Grid.Column="2"/>
 							</Grid>
 						</gb:GroupBox>
 						<gb:GroupBox Header="Apperance" VerticalAlignment="Top"

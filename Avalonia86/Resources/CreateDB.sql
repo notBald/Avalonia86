@@ -128,3 +128,25 @@ DROP TABLE "Window";
 --§
 ALTER TABLE Window_new RENAME TO "Windows";
 --§Main
+--§Version
+--§v1.3
+CREATE TABLE Executables_new (
+    ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    IsDef BOOLEAN NOT NULL DEFAULT FALSE,
+    Name TEXT,
+    VMExe TEXT NOT NULL,
+    VMRoms Text,
+    VMAssets Text,
+    "Version" Text,
+    Build Text,
+    Comment Text,
+    Arch Text
+);
+--§
+INSERT INTO Executables_new (ID, IsDef, Name, VMExe, VMRoms, "Version", Build, Comment, Arch)
+SELECT ID, IsDef, Name, VMExe, VMRoms, "Version", Build, Comment, Arch FROM Executables;
+--§
+DROP TABLE Executables;
+--§
+ALTER TABLE Executables_new RENAME TO Executables;
+--§Main

@@ -23,8 +23,16 @@ namespace Avalonia86.Core;
 /// </summary>
 internal sealed class DBStore
 {
-    const int CUR_MINOR_DB_VER = 2;
-    const int CUR_MAJOR_DB_VER = 3;
+    /// <summary>
+    /// Increment when making any change in the DB layout
+    /// </summary>
+    /// <remarks>Do not set this to zero when incrementing the major version</remarks>
+    const int CUR_MINOR_DB_VER = 3;
+
+    /// <summary>
+    /// Increment when you don't want the previous version of the app to open the new DB
+    /// </summary>
+    const int CUR_MAJOR_DB_VER = 4;
 
     #region Static fields
 

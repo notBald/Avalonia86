@@ -59,7 +59,7 @@
 					<DockPanel>
 						<gb:GroupBox Header="Paths" Margin="0, 0, 0, 20" DockPanel.Dock="Top"
 										 Theme="{StaticResource GroupBoxClassic}">
-							<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
+							<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
 								<Label Content="Path to the 86Box executable:"
 									   Target="{Binding ElementName=tbPath}"
 									   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
@@ -81,12 +81,21 @@
 									   Grid.Row="4" Grid.Column="0"/>
 								<Button Content="Browse..." Click="btnRomBrowse_click"
 										Grid.Row="4" Grid.Column="2"/>
-								<TextBlock Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="3" Margin="0, 2, 0, 0">
+
+								<Label Content="Path to assets:"
+									   Target="{Binding ElementName=tbASS}"
+									   Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"/>
+								<TextBox Text="{Binding AssetDir}" Name="tbASS" Watermark="Default is that 86Box finds the asset folder"
+									   Grid.Row="6" Grid.Column="0"/>
+								<Button Content="Browse..." Click="btnAssBrowse_click"
+										Grid.Row="6" Grid.Column="2"/>
+
+								<!--<TextBlock Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="3" Margin="0, 2, 0, 0">
 									The way roms are prioritized:<LineBreak />
 									<Run xml:space="preserve"> 1. Use the path above, if set.</Run><LineBreak />
 									<Run xml:space="preserve"> 2. Use the "roms" folder in the 86Box directory.</Run><LineBreak />
 									<Run xml:space="preserve"> 3. Use the default roms folder for the application.</Run>
-								</TextBlock>
+								</TextBlock>-->
 							</Grid>
 						</gb:GroupBox>
 						<gb:GroupBox Header="About this version" Margin="0, 0, 0, 20"

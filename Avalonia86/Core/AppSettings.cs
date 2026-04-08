@@ -59,6 +59,15 @@ internal class AppSettings
     }
 
     /// <summary>
+    /// Path to assets for 86Box
+    /// </summary>
+    public string AssetDir
+    {
+        get => FetchProperty("asset_dir", "");
+        set => SetProperty("asset_dir", value);
+    }
+
+    /// <summary>
     /// Whenever to use a sys tray or not
     /// </summary>
     public bool IsTrayEnabled
@@ -419,14 +428,14 @@ internal class AppSettings
         _store.Execute("DELETE FROM Executables where ID = @id", p);
     }
 
-    public long AddExe(string name, string vm_exe, string vm_roms, string comment, string version, string arch, string build, bool def)
+    public long AddExe(string name, string vm_exe, string vm_roms, string vm_assets, string comment, string version, string arch, string build, bool def)
     {
-        _store.Execute("INSERT INTO Executables (IsDef, Name, VMExe, VMRoms, \"Version\", Comment, Arch, Build) " +
+        _store.Execute("INSERT INTO Executables (IsDef, Name, VMExe, VMRoms, VMAssets, \"Version\", Comment, Arch, Build) " +
                        " VALUES "+
-                       "(@def, @name, @vmpath, @vmroms, @vers, @comment, @arch, @build)",
-                       new SQLParam("name", name), new SQLParam("vmpath", vm_exe), new SQLParam("vmroms", vm_roms),
-                       new SQLParam("comment", comment), new SQLParam("vers", version), new SQLParam("arch", arch),
-                       new SQLParam("build", build), new SQLParam("def", def));
+                       "(@def, @name, @vmpath, @vmroms, @vmassets, @vers, @comment, @arch, @build)",
+                       new SQLParam("name", name), new SQLParam("vmpath", vm_exe), new SQLParam("vmroms", vm_roms), 
+                       new SQLParam("vmassets", vm_assets), new SQLParam("comment", comment), new SQLParam("vers", version), 
+                       new SQLParam("arch", arch), new SQLParam("build", build), new SQLParam("def", def));
         long id = -1;
 
         foreach(var row in _store.Query("SELECT last_insert_rowid() as id"))
@@ -440,18 +449,18 @@ internal class AppSettings
         return id;
     }
 
-    public void UpdateExe(long id, string name, string vm_exe, string vm_roms, string comment, string version, string arch, string build, bool def)
+    public void UpdateExe(long id, string name, string vm_exe, string vm_roms, string vm_assets, string comment, string version, string arch, string build, bool def)
     {
-        _store.Execute("UPDATE Executables SET IsDef = @def, Name = @name, VMExe = @vmpath, VMRoms = @vmroms, \"Version\" = @vers, Comment = @comment, Arch = @arch, Build = @build " +
+        _store.Execute("UPDATE Executables SET IsDef = @def, Name = @name, VMExe = @vmpath, VMRoms = @vmroms, VMAssets = @vmassets,\"Version\" = @vers, Comment = @comment, Arch = @arch, Build = @build " +
                        "WHERE ID = @id",
                        new SQLParam("name", name), new SQLParam("vmpath", vm_exe), new SQLParam("vmroms", vm_roms),
-                       new SQLParam("comment", comment), new SQLParam("vers", version), new SQLParam("arch", arch),
-                       new SQLParam("build", build), new SQLParam("def", def), new SQLParam("id", id));
+                       new SQLParam("vmassets", vm_assets), new SQLParam("comment", comment), new SQLParam("vers", version), 
+                       new SQLParam("arch", arch), new SQLParam("build", build), new SQLParam("def", def), new SQLParam("id", id));
     }
 
     public IEnumerable<DataReader> ListExecutables()
     {
-        return _store.Query("SELECT ID, IsDef, Name, VMExe, VMRoms, \"Version\", Comment, Arch, Build FROM Executables ORDER BY Name");
+        return _store.Query("SELECT ID, IsDef, Name, VMExe, VMRoms, VMAssets, \"Version\", Comment, Arch, Build FROM Executables ORDER BY Name");
     }
     public IEnumerable<DataReader> GetDefExe()
     {

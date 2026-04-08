@@ -15,6 +15,7 @@ using Avalonia.Styling;
 using Avalonia;
 using Avalonia86.DialogBox;
 using static Avalonia86.Views.dlgSettingsModel;
+using System.Security.Cryptography;
 
 namespace Avalonia86.Views;
 
@@ -162,6 +163,7 @@ public partial class dlgSettings : BaseWindow
         _m.CFGDir = cfgPath;
         _m.ExeDir = exePath;
         _m.ROMDir = null;
+        _m.AssetDir = null;
         _m.MinOnStart = false;
         _m.EnableConsole = true;
         _m.IsTrayEnabled = false;
@@ -231,6 +233,27 @@ public partial class dlgSettings : BaseWindow
         if (!string.IsNullOrWhiteSpace(fileName))
         {
             _m.ROMDir = fileName.CheckTrail();
+        }
+    }
+
+    private async void btnBrowse_asset_Click(object sender, RoutedEventArgs e)
+    {
+        var text = "Select the folder where 86Box can find asset files";
+        var dir = _m.AssetDir;
+        if (string.IsNullOrWhiteSpace(dir))
+        {
+            var exe = _m.ExeDir;
+            if (!string.IsNullOrWhiteSpace(exe))
+            {
+                try { dir = Path.GetDirectoryName(exe); } catch { }
+            }
+        }
+
+        var fileName = await Dialogs.SelectFolder(dir, text, parent: this);
+
+        if (!string.IsNullOrWhiteSpace(fileName))
+        {
+            _m.AssetDir = fileName.CheckTrail();
         }
     }
 
@@ -324,6 +347,12 @@ public partial class dlgSettings : BaseWindow
                 else if (dir != null)
                     dir = dir.CheckTrail();
                 s.ROMdir = dir;
+                dir = _m.AssetDir;
+                if (string.IsNullOrWhiteSpace(dir))
+                    dir = null;
+                else if (dir != null)
+                    dir = dir.CheckTrail();
+                s.AssetDir = dir;
                 s.MinimizeOnVMStart = _m.MinOnStart;
                 s.ShowConsole = _m.EnableConsole;
                 s.IsTrayEnabled = _m.IsTrayEnabled;
@@ -351,14 +380,14 @@ public partial class dlgSettings : BaseWindow
                     else if (exe.IsNew) {
                         try 
                         { 
-                            exe.ID = s.AddExe(exe.Name, exe.VMPath, exe.VMRoms, exe.Comment, exe.Version, exe.Arch, exe.Build, exe.IsDefault);
+                            exe.ID = s.AddExe(exe.Name, exe.VMPath, exe.VMRoms, exe.VMAssets, exe.Comment, exe.Version, exe.Arch, exe.Build, exe.IsDefault);
                             exe.IsNew = false;
                         }
                         catch { }
                     }
                     else if(exe.IsChanged)
                     {
-                        try { s.UpdateExe(exe.ID, exe.Name, exe.VMPath, exe.VMRoms, exe.Comment, exe.Version, exe.Arch, exe.Build, exe.IsDefault); }
+                        try { s.UpdateExe(exe.ID, exe.Name, exe.VMPath, exe.VMRoms, exe.VMAssets, exe.Comment, exe.Version, exe.Arch, exe.Build, exe.IsDefault); }
                         catch { }
                     }
                 }
@@ -397,6 +426,7 @@ public partial class dlgSettings : BaseWindow
         _m.ExeDir = s.EXEdir;
         _m.CFGDir = s.CFGdir;
         _m.ROMDir = s.ROMdir;
+        _m.AssetDir = s.AssetDir;
         _m.LogPath = s.LogPath;
         _m.MinOnStart = s.MinimizeOnVMStart;
         _m.EnableConsole = s.ShowConsole;
@@ -439,6 +469,7 @@ public partial class dlgSettings : BaseWindow
                 Name = r["Name"] as string,
                 VMPath = r["VMExe"] as string,
                 VMRoms = r["VMRoms"] as string,
+                VMAssets = r["VMAssets"] as string,
                 Version = r["Version"] as string,
                 Comment = r["Comment"] as string,
                 Arch = r["Arch"] as string,
@@ -557,6 +588,7 @@ public partial class dlgSettings : BaseWindow
                         ID = -1 - _m.Executables.Count,
                         VMPath = m.ExePath,
                         VMRoms = m.RomDir,
+                        VMAssets = m.AssetDir,
                         Name = m.Name,
                         Version = m.Version,
                         Comment = m.Comment,
@@ -609,6 +641,7 @@ public partial class dlgSettings : BaseWindow
         m.Comment = sel.Comment;
         m.Name = sel.Name;
         m.RomDir = sel.VMRoms;
+        m.AssetDir = sel.VMAssets;
         m.ExePath = sel.VMPath;
         m.Commit();
         await Tools.Dialogs.RunDialog(this, win, (dr) =>
@@ -621,6 +654,7 @@ public partial class dlgSettings : BaseWindow
                 sel.Comment = m.Comment;
                 sel.Name = m.Name;
                 sel.VMRoms = m.RomDir;
+                sel.VMAssets = m.AssetDir;
                 sel.VMPath = m.ExePath;
                 sel.SetChanged();
 
@@ -643,7 +677,7 @@ public partial class dlgSettings : BaseWindow
 
 internal class dlgSettingsModel : ReactiveObject, IDisposable
 {
-    private string _exe_dir, _exe_path, _cfg_dir, _rom_dir;
+    private string _exe_dir, _exe_path, _cfg_dir, _rom_dir, _asset_dir;
     private bool _min_start, _min_tray, _close_tray;
     private bool _enable_logging, _enable_tray, _rename_folders;
     private bool _is_default_selected, _is_exe_list_changed;
@@ -773,6 +807,7 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
                    _me.ExeDir != ExeDir ||
                    _me.CFGDir != CFGDir ||
                    _me.ROMDir != ROMDir ||
+                   _me.AssetDir != AssetDir ||
                    _me.IsTrayEnabled != IsTrayEnabled ||
                    _me.MinToTray != MinToTray ||
                    _me.MinOnStart != MinOnStart ||
@@ -847,6 +882,20 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
             }
         }
     }
+
+    public string AssetDir
+    {
+        get => _asset_dir;
+        set
+        {
+            if (_asset_dir != value)
+            {
+                this.RaiseAndSetIfChanged(ref _asset_dir, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
+
     public bool IsTrayEnabled
     {
         get => _enable_tray;
@@ -1048,6 +1097,7 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
         public string Name { get; set; }
         public string VMPath { get; set; }
         public string VMRoms { get; set; }
+        public string VMAssets { get; set; }
         public string Version { get; set; }
         public string Comment { get; set; }
         public string Arch { get; set; }
@@ -1075,6 +1125,7 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
             this.RaisePropertyChanged(nameof(Name));
             this.RaisePropertyChanged(nameof(VMPath));
             this.RaisePropertyChanged(nameof(VMRoms));
+            this.RaisePropertyChanged(nameof(VMAssets));
             this.RaisePropertyChanged(nameof(Version));
             this.RaisePropertyChanged(nameof(Comment));
             this.RaisePropertyChanged(nameof(Arch));
