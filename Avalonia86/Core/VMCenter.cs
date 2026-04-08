@@ -216,7 +216,11 @@ internal static class VMCenter
         }
         if (openCFG)
         {
-            Configure();
+            //Done to prevent the settings from popping up behind the app
+            DispatcherTimer.RunOnce(() =>
+            {
+                Configure();
+            }, TimeSpan.FromMilliseconds(50));
         }
         
         CountRefresh();
