@@ -93,31 +93,42 @@
 					</ControlTheme>-->
 
 					<ControlTemplate x:Key="IconBackdrop">
-						<Canvas Width="64" Height="64">
-							<Rectangle Canvas.Left="8" Canvas.Top="10" Width="48" Height="6" RadiusX="2" RadiusY="2" Fill="#D3D3D3" />
-							<Rectangle Canvas.Left="8" Canvas.Top="20" Width="48" Height="6" RadiusX="2" RadiusY="2" Fill="#D3D3D3" />
-							<Rectangle Canvas.Left="8" Canvas.Top="30" Width="48" Height="6" RadiusX="2" RadiusY="2" Fill="#D3D3D3" />
+						<Canvas Width="20" Height="14">
+							<Rectangle Canvas.Left="0" Canvas.Top="1" Width="20" Height="1.5" RadiusX="0.25" RadiusY="0.25" Fill="#D3D3D3" />
+							<Rectangle Canvas.Left="0" Canvas.Top="4" Width="20" Height="1.5" RadiusX="0.25" RadiusY="0.25" Fill="#D3D3D3" />
+							<Rectangle Canvas.Left="0" Canvas.Top="7" Width="20" Height="1.5" RadiusX="0.25" RadiusY="0.25" Fill="#D3D3D3" />
+							<Rectangle Canvas.Left="0" Canvas.Top="10" Width="20" Height="1.5" RadiusX="0.25" RadiusY="0.25" Fill="#D3D3D3" />
+							<Rectangle Canvas.Left="0" Canvas.Top="13" Width="20" Height="1.5" RadiusX="0.25" RadiusY="0.25" Fill="#D3D3D3" />
+							<Rectangle Canvas.Left="0" Canvas.Top="16" Width="20" Height="1.5" RadiusX="0.25" RadiusY="0.25" Fill="#D3D3D3" />
 						</Canvas>
 					</ControlTemplate>
 
 					<ControlTemplate x:Key="TemplateSortByName">
-						<Canvas Width="64" Height="64">
-							<Path Fill="{DynamicResource toolbar_toggle_text}" 
-								  Data="M19,52 L21.5,42 L24.5,42 L27,52 L24.8,52 L24.2,49 L21.8,49 L21.2,52 Z M22.2,47 L23.8,47 L23,43.5 Z M28.3,52 L28.3,42 L31.8,42 C33.3,42 34.3,43 34.3,44.5 C34.3,45.5 33.8,46.3 32.8,46.7 C34.1,47 34.8,48 34.8,49.2 C34.8,51 33.6,52 31.8,52 Z M29.8,46 L31.3,46 C32.1,46 32.8,45.6 32.8,44.8 C32.8,44 32.1,43.5 31.3,43.5 L29.8,43.5 Z M29.8,50.5 L31.5,50.5 C32.5,50.5 33.3,50 33.3,49 C33.3,48 32.5,47.5 31.5,47.5 L29.8,47.5 Z M44.5,48.5 C44.5,50.8 42.8,52.2 40.5,52.2 C38.2,52.2 36.5,50.8 36.5,48.5 L36.5,45.5 C36.5,43.2 38.2,41.8 40.5,41.8 C42.8,41.8 44.5,43.2 44.5,45.5 L43,45.5 C43,44 42,43.2 40.5,43.2 C39,43.2 38,44 38,45.5 L38,48.5 C38,50 39,50.8 40.5,50.8 C42,50.8 43,50 43,48.5 Z" />
+						<Canvas Width="32" Height="32">
+							<TextBlock Foreground="{DynamicResource toolbar_toggle_text}" Text="ABC" Canvas.Left="8" Canvas.Top="13" FontSize="10" FontWeight="DemiBold" />
 						</Canvas>
 					</ControlTemplate>
 
 					<ControlTemplate x:Key="TemplateSortByDate">
-						<Canvas Width="64" Height="64">
-							<Rectangle Canvas.Left="22" Canvas.Top="36" Width="20" Height="20" RadiusX="3" RadiusY="3" 
-									   Stroke="#D3D3D3" StrokeThickness="2" Fill="White" />
-							<Line StartPoint="22,42" EndPoint="42,42" Stroke="#333" StrokeThickness="2" />
-							<Rectangle Canvas.Left="25" Canvas.Top="44" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
-							<Rectangle Canvas.Left="30" Canvas.Top="44" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
-							<Rectangle Canvas.Left="35" Canvas.Top="44" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
-							<Rectangle Canvas.Left="25" Canvas.Top="49" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
-							<Rectangle Canvas.Left="30" Canvas.Top="49" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
-							<Rectangle Canvas.Left="35" Canvas.Top="49" Width="4" Height="4" RadiusX="1" RadiusY="1" Fill="#333" />
+						<Canvas Width="32" Height="32">
+							<Rectangle Canvas.Left="8" Canvas.Top="11" Width="18" Height="16" RadiusX="1" RadiusY="1" 
+									   Stroke="#A3A3A3" StrokeThickness="1" Fill="White" />
+							<Line StartPoint="8,15" EndPoint="26,15" Stroke="#222" StrokeThickness="1" />
+							<Rectangle Canvas.Left="9.5" Canvas.Top="17" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="13" Canvas.Top="17" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="16.5" Canvas.Top="17" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="19" Canvas.Top="17" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="22" Canvas.Top="17" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="9.5" Canvas.Top="20" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="13" Canvas.Top="20" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="16.5" Canvas.Top="20" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="19" Canvas.Top="20" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="22" Canvas.Top="20" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="9.5" Canvas.Top="23" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="13" Canvas.Top="23" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="16.5" Canvas.Top="23" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="19" Canvas.Top="23" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
+							<Rectangle Canvas.Left="22" Canvas.Top="23" Width="2" Height="2" RadiusX="0.5" RadiusY="0.5" Fill="#333" />
 						</Canvas>
 					</ControlTemplate>
 
@@ -152,21 +163,21 @@
 					<Border x:Name="BaseBorder"
 							Background="{TemplateBinding Background}"
 							BorderBrush="Transparent"
-							BorderThickness="1"
-							CornerRadius="4">
-                
-						<Panel Width="64" Height="64" x:Name="IconContainer">
-							<Panel.Transitions>
+							BorderThickness="2,5,2,2">
+						<StackPanel Classes="start" x:Name="IconContainer">
+							<StackPanel.Transitions>
 								<Transitions>
 									<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.05"/>
 								</Transitions>
-							</Panel.Transitions>
+							</StackPanel.Transitions>
+							<Canvas Width="32" Height="32">                    
+								<ContentControl Template="{StaticResource IconBackdrop}" />
                     
-							<ContentControl Template="{StaticResource IconBackdrop}"/>
-                    
-							<ContentControl x:Name="IconPresenter"
-											Template="{StaticResource TemplateSortByName}"/>
-						</Panel>
+								<ContentControl x:Name="IconPresenter"
+												Template="{StaticResource TemplateSortByName}"/>
+							</Canvas>
+							<TextBlock Text="Sort order" />
+						</StackPanel>
 					</Border>
 				</ControlTemplate>
 			</Setter>
@@ -176,8 +187,8 @@
 			<Setter Property="Template" Value="{StaticResource TemplateSortByDate}" />
 		</Style>
 
-		<Style Selector="ToggleButton.SortToggle:pressed /template/ Panel#IconContainer">
-			<Setter Property="RenderTransform" Value="scale(0.95) translateY(2px)" />
+		<Style Selector="ToggleButton.SortToggle:pressed /template/ StackPanel#IconContainer">
+			<Setter Property="RenderTransform" Value="scale(0.95) translate(2px, 1px)" />
 		</Style>
 	</Window.Styles>
 	<!--
@@ -448,7 +459,7 @@
 						<TextBlock Text="Exe Manager" />
 					</StackPanel>
 				</Button>
-				<ToggleButton Width="64" Height="64" Classes="SortToggle" IsChecked="{Binding SortListToggle, Mode=TwoWay}" />
+				<ToggleButton Classes="SortToggle" IsChecked="{Binding SortListToggle, Mode=TwoWay}" />
 				<Rectangle Fill="#8a8a8a" Width="1" Margin="1,2,0,2"/>
 				<Rectangle Fill="#FFFFFF" Opacity=".3" Width="1" Margin="0,2,1,2"/>
 				<ComboBox SelectedIndex="{Binding CategoryIndex}" Background="transparent" Width="150" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Center" ItemsSource="{Binding Categories}" />
