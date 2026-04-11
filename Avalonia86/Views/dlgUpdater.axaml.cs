@@ -522,7 +522,7 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
                 {
                     fallback = art;
 
-                    if (art.FileName.Contains(SelectedArch.ID, StringComparison.InvariantCultureIgnoreCase))
+                    if (art.FileName.Contains("-" + SelectedArch.ID, StringComparison.InvariantCultureIgnoreCase))
                     {
                         if (candidate == null || has_ndr != PrefNDR)
                         {
