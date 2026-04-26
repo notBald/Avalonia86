@@ -1,14 +1,7 @@
-﻿using Avalonia.Threading;
-using Avalonia86.Core;
-using Avalonia86.Models;
+﻿using Avalonia86.Core;
 using Avalonia86.Tools;
 using ReactiveUI;
-using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Avalonia86.ViewModels;
 
@@ -97,16 +90,12 @@ public class VMConfig : ReactiveObject
 
             if (_machine.TryGetValue("mem_size", out string str_mem) && int.TryParse(str_mem, out int kb_mem) )
             {
-                memory = kb_mem * 1024;
-
-                if (SystemType == "8088" || SystemType == "ISA")
+                if (SystemType == "8088" || SystemType == "8086" || SystemType == "ISA")
                 {
-                    foreach(var s in IsaMemory)
-                    {
-                        if (int.TryParse(s, out int num))
-                            memory += num * 1024;
-                    }
+                    kb_mem = (int) RangeCalculator.Calculate((uint)kb_mem, IsaMemory);
                 }
+
+                memory = kb_mem * 1024;
             }
 
             return FolderSizeCalculator.ConvertBytesToReadableSize(memory);
@@ -148,53 +137,121 @@ public class VMConfig : ReactiveObject
         }
     }
 
-    public string[] IsaMemory
+    private class MemInfo
+    {
+        public string start;
+        public string size;
+        public bool ems;
+        public string ems_start;
+        public MemInfo(string start, string size, bool ems = false, string ems_start = null)
+        {
+            this.start = start;
+            this.size = size;
+            this.ems = ems;
+            this.ems_start = ems_start;
+        }
+    }
+
+    public (string start, string size)[] IsaMemory
     {
         get
         {
             //Known issue:
             // Should look at the start address. If memory overlaps, it should only be counted once.
-            List<string> list = new List<string>(4);
+            List<(string start, string size)> list = new List<(string start, string size)>(4);
 
             for (int c = 0; c < 4; c++)
             {
                 if (_other.TryGetValue("isamem" + c + "_type", out string mem_card))
                 {
-                    if (HWDB.Device.TryGetValue(mem_card, out string full_name) 
-                        && _config.TryGetValue(full_name+" #"+(c+1), out var dict)
-                        && dict.TryGetValue("size", out string size))
+                    MemInfo def_range = null;
+
+                    switch (mem_card)
                     {
-                        list.Add(size);
+                        case "lotechems": // Lo-tech EMS Board
+                            def_range = new(null, "2048", true, "260H");
+                            break;
+                        case "brxt": // BocaRAM/XT
+                            def_range = new(null, "512", true, "268H");
+                            break;
+                        case "ev159": // Everex EV-159 RAM 3000 Deluxe
+                            //Known issue: Ignoring the 268H > 2MB range
+                            def_range = new("0", "512", false, "258H");
+                            break;
+                        case "genericat": // Generic PC/AT Memory Expansion
+                        case "ibmat": // IBM PC/AT Memory Expansion
+                            def_range = new("1024", "512");
+                            break;
+                        case "ems5150": // Micro Mainframe EMS-5150(T)
+                            //This card is disabled by default
+                            def_range = new(null, "256", false, null);
+                            break;
+                        case "ev165a": // Everex Maxi Magic EV-165A
+                            def_range = new("64", "256", false, "258H");
+                            break;
+                        case "p5pak": // Paradise Systems 5-PAK
+                        case "ibmat_128k":
+                            def_range = new("512", "128");
+                            break;
+                        case "ibmxt": // IBM PC/XT 64/256K Memory Expansion Option
+                            def_range = new("256", "128");
+                            break;
+                        case "mplus2": // AST MegaPlus II
+                        case "a6pak": // AST SixPakPlus
+                            def_range = new("256", "64");
+                            break;
+                        case "ibmxt_64k": // IBM PC/XT 64K Memory Expansion Option
+                            def_range = new("64", "64");
+                            break;
+                        case "msramcard": // Microsoft RAMCard
+                        case "mssystemcard": // Microsoft SystemCard
+                            def_range = new("0", "64");
+                            break;
+                        case "ibmxt_32k": // IBM PC/XT 32K Memory Expansion Option
+                            def_range = new("64", "32");
+                            break;
+                        case "genericxt": // Generic PC/XT Memory Expansion
+                            def_range = new("0", "16");
+                            break;
                     }
-                    else
+
+                    if (HWDB.Device.TryGetValue(mem_card, out string full_name) 
+                        && _config.TryGetValue(full_name+" #"+(c+1), out var dict))
                     {
-                        switch(mem_card)
+                        string start = null;
+                        string size = null;
+                        bool is_ems = def_range != null && def_range.ems;
+
+                        if (!dict.TryGetValue("size", out size) && def_range != null)
+                            size = def_range.size;
+                        if (!dict.TryGetValue("start", out start) && def_range != null)
+                            start = def_range.start;
+
+                        if (start == null && def_range != null && !def_range.ems)
                         {
-                            case "brxt":
-                            case "ev159":
-                            case "genericat":
-                            case "ibmat":
-                                list.Add("512");
-                                break;
-                            case "ev165a":
-                                list.Add("256");
-                                break;
-                            case "ibmat_128k":
-                            case "ibmxt":
-                                list.Add("128");
-                                break;
-                            case "a6pak":
-                            case "msramcard":
-                            case "ibmxt_64k":
-                                list.Add("64");
-                                break;
-                            case "ibmxt_32k":
-                                list.Add("32");
-                                break;
-                            case "genericxt":
-                                list.Add("16");
-                                break;
+                            //This is the ems5150. It is disabled if the base key is not there
+                            if (!dict.ContainsKey("base"))
+                                size = null;
+
+                            is_ems = true;
                         }
+
+                        
+                        if (dict.ContainsKey("ems"))
+                            is_ems = dict["ems"] == "1";
+                            
+                        //For now we blindly add EMS
+                        if (is_ems)
+                            start = null;
+
+                        if (size != null)
+                            list.Add((start, size));
+                    }
+                    else if (def_range != null)
+                    {
+                        //The ems5150 is disabled, so we filter it out here
+                        if(def_range.start != null && !def_range.ems)
+                            list.Add((def_range.start, def_range.size));
                     }
                 }
             }
