@@ -497,7 +497,7 @@
 						</TextBox>
 						<!-- list of VMs -->
 						<ListBox BorderThickness="1" BorderBrush="{DynamicResource content_BackgroundColor}" Padding="0"
-								 x:Name="lstVMs" SelectedIndex="{Binding MachineIndex}" ItemsSource="{Binding Path=Machines}" 
+								 x:Name="lstVMs" SelectedItem="{Binding Machine}" ItemsSource="{Binding Path=Machines}" 
 								 KeyDown="lstVMs_KeyDown" Background="{DynamicResource content_BackgroundColor}" DoubleTapped="lstVMs_MouseDoubleClick"
 								 ScrollViewer.AllowAutoHide="False">
 							<ListBox.Resources>

@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using static Avalonia86.Core.DBStore;
+using Avalonia;
 
 namespace Avalonia86.Core;
 
@@ -303,11 +304,13 @@ internal class AppSettings
             _categories.Refresh();
     }
 
+    /// <summary>
+    /// Refreshes the sorted list of VMs
+    /// </summary>
+    /// <remarks>The selected item is not garanteed to survive this refresh, so make sure to set it back</remarks>
     public void RefreshVMs()
     {
-        var to_remove = new HashSet<long>(_machines.Count);
-        foreach (var val in _machines.Keys)
-            to_remove.Add(val);
+        var to_remove = new HashSet<long>(_machines.Keys);
 
         int count = 0;
         bool notify = false;

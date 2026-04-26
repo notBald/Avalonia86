@@ -129,7 +129,9 @@ public partial class frmMain : BaseWindow
                     mts.CompactMachine = dc.CompactList;
                 else if (e.PropertyName == nameof(MainModel.SortListToggle))
                 {
+                    var hold = dc.Machine;
                     AppSettings.Settings.RefreshVMs();
+                    dc.Machine = hold;
                 }
             };
         }
