@@ -14,7 +14,7 @@
 
         public readonly string DisplayName;
 
-        public Language(string key, string displayName)
+        private Language(string key, string displayName)
         {
             Key = key;
             DisplayName = displayName;
