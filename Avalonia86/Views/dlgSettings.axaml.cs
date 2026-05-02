@@ -16,7 +16,6 @@ using Avalonia.Styling;
 using Avalonia;
 using Avalonia86.DialogBox;
 using static Avalonia86.Views.dlgSettingsModel;
-using System.Security.Cryptography;
 
 namespace Avalonia86.Views;
 
@@ -175,6 +174,7 @@ public partial class dlgSettings : BaseWindow
         _m.CompactList = false;
         _m.RenameFolders = true;
         _m.SelectedTheme = ThemeVariant.Default;
+        _m.SelectedLanguage = Language.Find("os-default") ?? Language.Languages[0];
         _m.ToolBar86Settings = true;
         _m.ToolBarPSSettings = false;
         _m.IsDefChecked = true;
@@ -364,6 +364,7 @@ public partial class dlgSettings : BaseWindow
                 s.AllowInstances = _m.AllowInstances;
                 s.CompactMachineList = _m.CompactList;
                 s.Theme = _m.SelectedTheme;
+                s.UILanguage = _m.SelectedLanguage;
                 s.Has86ToolbarBtn = _m.ToolBar86Settings;
                 s.HasPSToolbarBtn = _m.ToolBarPSSettings;
 
@@ -438,6 +439,7 @@ public partial class dlgSettings : BaseWindow
         _m.AllowInstances = s.AllowInstances;
         _m.CompactList = s.CompactMachineList;
         _m.SelectedTheme = s.Theme;
+        _m.SelectedLanguage = s.UILanguage;
         _m.ToolBarPSSettings = s.HasPSToolbarBtn;
         _m.ToolBar86Settings = s.Has86ToolbarBtn;
 
@@ -687,6 +689,7 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
     private bool _compact_list;
     private ExeEntery _sel_exe;
     private ThemeVariant _theme;
+    private Language _language;
 
     public SourceCache<ExeEntery, long> Executables = new(o => o.ID);
     private readonly ReadOnlyObservableCollection<ExeEntery> _filtered_executables;
@@ -819,7 +822,8 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
                    _me.RenameFolders != RenameFolders ||
                    _me.ToolBar86Settings != ToolBar86Settings ||
                    _me.ToolBarPSSettings != ToolBarPSSettings ||
-                   !ReferenceEquals(_me.SelectedTheme, SelectedTheme);
+                   !ReferenceEquals(_me.SelectedTheme, SelectedTheme) ||
+                   !ReferenceEquals(_me.SelectedLanguage, SelectedLanguage);
         }
     }
 
@@ -1043,6 +1047,21 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
 
     public ThemeVariant[] Themes { get; private set; }
 
+    public Language[] Languages => Language.Languages;
+
+    public Language SelectedLanguage
+    {
+        get => _language;
+        set
+        {
+            if (!ReferenceEquals(value, _language))
+            {
+                this.RaiseAndSetIfChanged(ref _language, value);
+                this.RaisePropertyChanged(nameof(HasChanges));
+            }
+        }
+    }
+
     public dlgSettingsModel()
     {
         _exe_sub = Executables.Connect()
@@ -1069,6 +1088,8 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
                 s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.IsTrayEnabled)));
             if (!ReferenceEquals(_me.SelectedTheme, SelectedTheme))
                 s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.Theme)));
+            if (!ReferenceEquals(_me.SelectedLanguage, SelectedLanguage))
+                s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.UILanguage)));
             if (_me.ToolBarPSSettings != ToolBarPSSettings)
                 s.PropertyChanged(s, new PropertyChangedEventArgs(nameof(AppSettings.HasPSToolbarBtn)));
             if (_me.ToolBar86Settings != ToolBar86Settings)

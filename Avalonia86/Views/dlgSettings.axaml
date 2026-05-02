@@ -117,15 +117,17 @@
 						</gb:GroupBox>
 						<gb:GroupBox Header="{DynamicResource Grp.Appearance}" VerticalAlignment="Top"
 									 Theme="{StaticResource GroupBoxClassic}">
-							<Grid Margin="9" ColumnDefinitions="*, *">
+							<Grid ColumnDefinitions="*, *">
 								<StackPanel Grid.Column="0" Margin="12" Spacing="5">
 									<CheckBox IsChecked="{Binding CompactList}" Content="{DynamicResource Cfg.CompactList}" />
 									<CheckBox IsChecked="{Binding ToolBar86Settings}" Content="{DynamicResource Cfg.Toolbar86}" />
 									<CheckBox IsChecked="{Binding ToolBarPSSettings}" Content="{DynamicResource Cfg.ToolbarPS}" />
 								</StackPanel>
-								<StackPanel Grid.Column="1" Margin="12">
-									<TextBlock Text="{DynamicResource Cfg.AppTheme}" Margin="0, 0, 0, 5" />
-									<ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}" HorizontalAlignment="Stretch" />
+								<StackPanel Grid.Column="1" Margin="12,0">
+									<TextBlock Text="{DynamicResource Cfg.AppTheme}" Margin="0, 0, 0, 0" />
+									<ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}" HorizontalAlignment="Stretch" MinHeight="0" />
+									<TextBlock Text="{DynamicResource Cfg.AppLanguage}" Margin="0, 4, 0, 0" />
+									<ComboBox ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" HorizontalAlignment="Stretch" MinHeight="0" />
 								</StackPanel>
 							</Grid>
 						</gb:GroupBox>

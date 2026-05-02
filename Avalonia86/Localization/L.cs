@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia86.Core;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -149,6 +150,7 @@ internal static class L
         ["Cfg.Toolbar86"] = "Enable 86Box Settings toolbar button",
         ["Cfg.ToolbarPS"] = "Enable Executable Settings toolbar button",
         ["Cfg.AppTheme"] = "Application theme: ",
+        ["Cfg.AppLanguage"] = "UI language: ",
         ["Cfg.TrayIcon"] = "Enable tray icon",
         ["Cfg.MinToTray"] = "Minimize Avalonia86 to tray icon",
         ["Cfg.CloseToTray"] = "Close Avalonia86 to tray icon",
@@ -492,6 +494,7 @@ internal static class L
         ["Cfg.Toolbar86"] = "启用 86Box 设置工具栏按钮",
         ["Cfg.ToolbarPS"] = "启用可执行文件设置工具栏按钮",
         ["Cfg.AppTheme"] = "应用程序主题：",
+        ["Cfg.AppLanguage"] = "界面语言：",
         ["Cfg.TrayIcon"] = "启用托盘图标",
         ["Cfg.MinToTray"] = "最小化 Avalonia86 到托盘图标",
         ["Cfg.CloseToTray"] = "关闭 Avalonia86 到托盘图标",
@@ -835,6 +838,7 @@ internal static class L
         ["Cfg.Toolbar86"] = "啟用 86Box 設定工具列按鈕",
         ["Cfg.ToolbarPS"] = "啟用執行檔設定工具列按鈕",
         ["Cfg.AppTheme"] = "應用程式佈景主題：",
+        ["Cfg.AppLanguage"] = "介面語言：",
         ["Cfg.TrayIcon"] = "啟用系統匣圖示",
         ["Cfg.MinToTray"] = "最小化 Avalonia86 到系統匣圖示",
         ["Cfg.CloseToTray"] = "關閉 Avalonia86 到系統匣圖示",
@@ -1041,7 +1045,16 @@ internal static class L
 
     internal static void Initialize(IResourceDictionary resources)
     {
-        _strings = SelectStrings();
+        string lang = AppSettings.Settings.UILanguage.Key;
+        if (lang.Equals("os-default"))
+        {
+            _strings = SelectOSDefaultStrings();
+        }
+        else
+        {
+            _strings = SelectStrings(lang);
+        }
+
         foreach (var pair in _strings)
         {
             resources[pair.Key] = pair.Value;
@@ -1057,7 +1070,7 @@ internal static class L
         return key;
     }
 
-    private static IReadOnlyDictionary<string, string> SelectStrings()
+    private static IReadOnlyDictionary<string, string> SelectOSDefaultStrings()
     {
         var culture = CultureInfo.CurrentUICulture;
         var name = (culture.Name ?? string.Empty).ToLowerInvariant();
@@ -1072,6 +1085,21 @@ internal static class L
             return ZhHans;
         }
 
-        return ZhHans; // En;
+        return En;
+    }
+
+    private static IReadOnlyDictionary<string, string> SelectStrings(string lang)
+    {
+        switch(lang)
+        {
+            case "zh-Hans":
+                return ZhHans;
+            case "zh-Hant":
+                return ZhHant;
+
+            case "en-US":
+            default:
+                return En;
+        }
     }
 }

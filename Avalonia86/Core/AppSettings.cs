@@ -243,6 +243,18 @@ internal class AppSettings
         }
     }
 
+    public Localization.Language UILanguage
+    {
+        get => Localization.Language.Find(FetchProperty("ui_language", "os-default")) ?? Localization.Language.Languages[0];
+        set
+        {
+            if (value == null)
+                SetProperty("ui_language", "os-default");
+            else
+                SetProperty("ui_language", value.Key);
+        }
+    }
+
     /// <summary>
     /// Path to log file
     /// </summary>

@@ -66,6 +66,10 @@ namespace Avalonia86
                 if (s != null)
                     RequestedThemeVariant = s.Theme;
             }
+            else if (e.PropertyName == nameof(MainModel.UILanguage))
+            {
+                L.Initialize(Resources);
+            }
         }
 
         private void Desktop_Exit(object sender, ControlledApplicationLifetimeExitEventArgs e)

@@ -189,6 +189,8 @@ internal class MainModel : ReactiveObject, IDisposable
 
     public string ApplicationTheme { get => Settings.Theme.ToString(); }
 
+    public string UILanguage { get => Settings.UILanguage.DisplayName; }
+
     private frmMain _ui;
     public frmMain UI {  get => _ui; set { if (_ui == null) _ui = value; } }
 
@@ -280,6 +282,10 @@ internal class MainModel : ReactiveObject, IDisposable
         else if (e.PropertyName == nameof(AppSettings.Theme))
         {
             this.RaisePropertyChanged(nameof(ApplicationTheme));
+        }
+        else if (e.PropertyName == nameof(AppSettings.UILanguage))
+        {
+            this.RaisePropertyChanged(nameof(UILanguage));
         }
         else if (e.PropertyName == nameof(AppSettings.Has86ToolbarBtn))
         {
