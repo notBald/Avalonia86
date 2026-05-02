@@ -1,6 +1,6 @@
 # Avalonia 86
 
-**Avalonia 86** is a configuration manager for the [86Box emulator](https://github.com/86Box/86Box).
+**Avalonia 86** is a configuration manager for the [86Box emulator](https://github.com/86Box/86Box) and [PCBox emulator](https://github.com/PCBox/PCBox).
 
 ![Desktop](/images/UI-white_and_dark.png?raw=true)
 
@@ -10,6 +10,7 @@
 - Sort them into categories
 - Display machine information and images
 - A tray icon so that the Manager window doesn't get in your way
+- Supports both 86Box and PCBox executables
 
 ## Localization
 
@@ -25,7 +26,7 @@ The UI language is automatically selected based on your system settings. To add 
 
 ## System requirements
 
-System requirements are the same as for 86Box. Additionally, the following is required:
+System requirements are the same as for 86Box / PCBox. Additionally, the following is required:
 
 - [86Box 2.0](https://github.com/86Box/86Box/releases) or later (earlier builds are untested)
 - [.NET 9.0](https://dotnet.microsoft.com/download/dotnet/9.0)
@@ -43,7 +44,7 @@ Starting from this version, official release builds are **self-contained** — t
 
 1. Download the desired build [here](https://github.com/notBald/Avalonia86/releases).
 2. Run `Avalonia86.exe`.
-3. Go to Settings, choose the folder where `86Box.exe` is located (along with the roms folder) and a folder where your virtual machines will be located (for configs, nvr folders, etc.).
+3. Go to Settings, choose the folder where `86Box.exe` or `PCBox.exe` is located (along with the roms folder) and a folder where your virtual machines will be located (for configs, nvr folders, etc.).
 4. Start creating new virtual machines and enjoy.
 
 ## Using on Windows
