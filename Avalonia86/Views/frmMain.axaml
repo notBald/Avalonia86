@@ -176,7 +176,7 @@
 								<ContentControl x:Name="IconPresenter"
 												Template="{StaticResource TemplateSortByName}"/>
 							</Canvas>
-							<TextBlock Text="Sort order" />
+							<TextBlock Text="{DynamicResource Toolbar.SortOrder}" />
 						</StackPanel>
 					</Border>
 				</ControlTemplate>
@@ -221,13 +221,13 @@
 						<Setter Property="FontSize" Value="14"></Setter>
 					</Style>
 				</Menu.Styles>
-				<MenuItem Classes="Head" Header="_File">
-					<MenuItem Header="New Virtual Machine" Command="{Binding AddVMCmd}">
+				<MenuItem Classes="Head" Header="{DynamicResource Menu.File}">
+					<MenuItem Header="{DynamicResource Menu.NewVm}" Command="{Binding AddVMCmd}">
 						<MenuItem.Icon>
 							<Image Source="/Assets/Actions/14 - new.png" />
 						</MenuItem.Icon>
 					</MenuItem>
-					<MenuItem Header="Delete Virtual Machine" Command="{Binding DelVMCmd}">
+					<MenuItem Header="{DynamicResource Menu.DeleteVm}" Command="{Binding DelVMCmd}">
 						<MenuItem.IsEnabled>
 							<MultiBinding Converter="{x:Static BoolConverters.And}">
 								<Binding Path="VmIsSelected"/>
@@ -239,14 +239,14 @@
 						</MenuItem.Icon>
 					</MenuItem>
 					<Separator/>
-					<MenuItem Header="Exit" Command="{Binding ExitApplicationCmd}">
+					<MenuItem Header="{DynamicResource Menu.Exit}" Command="{Binding ExitApplicationCmd}">
 						<MenuItem.Icon>
 							<Image Source="/Assets/Actions/4 - close2.png" />
 						</MenuItem.Icon>
 					</MenuItem>
 				</MenuItem>
-				<MenuItem Classes="Head" Header="_Machine">
-					<MenuItem Name="MenuItmStart" Header="Start Machine" Command="{Binding StartVMCmd}">
+				<MenuItem Classes="Head" Header="{DynamicResource Menu.Machine}">
+					<MenuItem Name="MenuItmStart" Header="{DynamicResource Menu.StartMachine}" Command="{Binding StartVMCmd}">
 						<MenuItem.IsEnabled>
 							<MultiBinding Converter="{x:Static BoolConverters.And}">
 								<Binding Path="VmIsSelected"/>
@@ -259,7 +259,7 @@
 							<Image Source="/Assets/Actions/18 - start 32x32.png" />
 						</MenuItem.Icon>
 					</MenuItem>
-					<MenuItem Header="Stop Machine" Command="{Binding StartVMCmd}">
+					<MenuItem Header="{DynamicResource Menu.StopMachine}" Command="{Binding StartVMCmd}">
 						<MenuItem.IsEnabled>
 							<MultiBinding Converter="{x:Static BoolConverters.And}">
 								<Binding Path="VmIsSelected"/>
@@ -273,7 +273,7 @@
 						</MenuItem.Icon>
 					</MenuItem>
 					<Separator/>
-					<MenuItem Header="Send Ctrl-Alt-Del" Command="{Binding SoftResetVMCmd}">
+					<MenuItem Header="{DynamicResource Menu.CtrlAltDel}" Command="{Binding SoftResetVMCmd}">
 						<MenuItem.IsEnabled>
 							<MultiBinding Converter="{x:Static BoolConverters.And}">
 								<Binding Path="VmIsSelected"/>
@@ -286,7 +286,7 @@
 							<Image Source="/Assets/Actions/2 - cad.png" />
 						</MenuItem.Icon>
 					</MenuItem>
-					<MenuItem Header="Reset Machine" Command="{Binding ResetVMCmd}">
+					<MenuItem Header="{DynamicResource Menu.ResetMachine}" Command="{Binding ResetVMCmd}">
 						<MenuItem.IsEnabled>
 							<MultiBinding Converter="{x:Static BoolConverters.And}">
 								<Binding Path="VmIsSelected"/>
@@ -300,7 +300,7 @@
 						</MenuItem.Icon>
 					</MenuItem>
 					<Separator/>
-					<MenuItem Header="Configure" Command="{Binding ConfigVMCmd}">
+					<MenuItem Header="{DynamicResource Menu.Configure}" Command="{Binding ConfigVMCmd}">
 						<MenuItem.IsEnabled>
 							<MultiBinding Converter="{x:Static BoolConverters.And}">
 								<Binding Path="VmIsSelected"/>
@@ -312,19 +312,19 @@
 						</MenuItem.Icon>
 					</MenuItem>
 				</MenuItem>
-				<MenuItem  Classes="Head" Header="_Tools">
-					<MenuItem Header="Program Settings" Command="{Binding ConfigAppCmd}">
+				<MenuItem  Classes="Head" Header="{DynamicResource Menu.Tools}">
+					<MenuItem Header="{DynamicResource Menu.ProgramSettings}" Command="{Binding ConfigAppCmd}">
 						<MenuItem.Icon>
 							<Image Source="/Assets/Actions/29 - gears2 32x32.png" />
 						</MenuItem.Icon>
 					</MenuItem>
-					<MenuItem Header="Edit VM Settings" IsEnabled="{Binding VmIsSelected}" Command="{Binding EditVMCmd}">
+					<MenuItem Header="{DynamicResource Menu.EditVmSettings}" IsEnabled="{Binding VmIsSelected}" Command="{Binding EditVMCmd}">
 						<MenuItem.Icon>
 							<Image Source="/Assets/Actions/32 - tools.png" />
 						</MenuItem.Icon>
 					</MenuItem>
 					<Separator/>
-					<MenuItem Header="Update 86Box" Command="{Binding Update86Cmd}">
+					<MenuItem Header="{DynamicResource Menu.Update86Box}" Command="{Binding Update86Cmd}">
 						<MenuItem.Icon>
 							<Image Source="/Assets/Actions/27 - update 32x32.png" />
 						</MenuItem.Icon>
@@ -409,15 +409,15 @@
 							 it ends up being less of a hassle. -->
 						<StackPanel Classes="start">
 							<Image Height="32" Width="32" Source="/Assets/Actions/18 - start 32x32.png" />
-							<TextBlock Text="Start" />
+							<TextBlock Text="{DynamicResource Toolbar.Start}" />
 						</StackPanel>
 						<StackPanel Classes="stop">
 							<Image Height="32" Width="32" Source="/Assets/Actions/19 - stop 32x32.png" />
-							<TextBlock Text="Stop" />
+							<TextBlock Text="{DynamicResource Toolbar.Stop}" />
 						</StackPanel>
 						<StackPanel Classes="resume">
 							<Image Height="32" Width="32" Source="/Assets/Actions/30 - Resume 32x32.png" />
-							<TextBlock Text="Resume" />
+							<TextBlock Text="{DynamicResource Toolbar.Resume}" />
 						</StackPanel>
 					</Grid>
 				</Button>
@@ -450,13 +450,13 @@
 					</Button.IsEnabled>
 					<StackPanel Classes="start">
 						<Image Height="32" Width="32" Source="/Assets/Actions/9 - gears 32x32.png" />
-						<TextBlock Text="Settings" />
+						<TextBlock Text="{DynamicResource Toolbar.Settings}" />
 					</StackPanel>
 				</Button>
 				<Button Click="btnExe_Click" IsVisible="{Binding ToolbarPSBtn}">
 					<StackPanel Classes="start">
 						<Image Height="32" Width="32" Source="/Assets/Actions/29 - gears2 32x32.png" />
-						<TextBlock Text="Exe Manager" />
+						<TextBlock Text="{DynamicResource Toolbar.ExeManager}" />
 					</StackPanel>
 				</Button>
 				<ToggleButton Classes="SortToggle" IsChecked="{Binding SortListToggle, Mode=TwoWay}" />
@@ -477,7 +477,7 @@
 			<Rectangle Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Height="1" Fill="{DynamicResource statusbar_LineBrush}"/>
 			<!--<TextBlock Grid.Column="0" Grid.Row="1" Name="lblVMCount" Margin="1, 0" Padding="3, 1, 3, 0" Text="{Binding Path=VmCount}" FontSize="10" />-->
 			<TextBlock Grid.Column="0" Grid.Row="1" Margin="1, 0" Padding="3, 1, 3, 0" FontSize="10">
-				All VMs: <Run Text="{Binding AllVmCount}" /> | Running: <Run Text="{Binding AllRunningVMs}" />  | Stopped: <Run Text="{Binding StoppedVMs}" />
+				<Run Text="{DynamicResource Status.AllVms}" /> <Run Text="{Binding AllVmCount}" /> | <Run Text="{DynamicResource Status.Running}" /> <Run Text="{Binding AllRunningVMs}" />  | <Run Text="{DynamicResource Status.Stopped}" /> <Run Text="{Binding StoppedVMs}" />
 			</TextBlock>
 			<view:ctrlGrip Grid.Column="1" Grid.Row="1" Width="10" />
 		</Grid>
@@ -490,7 +490,7 @@
 				</Grid.ColumnDefinitions>
 				<Border Grid.Column="0" BorderThickness="1" BorderBrush="{DynamicResource listVMs_BorderBrush}">
 					<DockPanel>
-						<TextBox Watermark="Filter" Text="{Binding FilterMachines}" DockPanel.Dock="Bottom" BorderThickness="0" Name="SearchBox">
+						<TextBox Watermark="{DynamicResource Search.Filter}" Text="{Binding FilterMachines}" DockPanel.Dock="Bottom" BorderThickness="0" Name="SearchBox">
 							<i:Interaction.Behaviors>
 								<vm:AutoHideCaretBehavior IdleAfter = "0:0:5" />
 							</i:Interaction.Behaviors>
@@ -502,22 +502,22 @@
 								 ScrollViewer.AllowAutoHide="False">
 							<ListBox.Resources>
 								<ContextMenu Name="lstVMpop" x:Key="lstVMpop" DataContext="{Binding #lstVMs.((vm:MainModel)DataContext), Mode=OneWay}">
-									<MenuItem Header="Start" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}" IsVisible="{Binding !SelVmRunning}">
+									<MenuItem Header="{DynamicResource Toolbar.Start}" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}" IsVisible="{Binding !SelVmRunning}">
 										<MenuItem.Icon>
 											<Image Source="/Assets/Actions/18 - start 32x32.png" />
 										</MenuItem.Icon>
 									</MenuItem>
-									<MenuItem Header="Stop" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}" IsVisible="{Binding SelVmRunning}">
+									<MenuItem Header="{DynamicResource Toolbar.Stop}" Click="startToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}" IsVisible="{Binding SelVmRunning}">
 										<MenuItem.Icon>
 											<Image Source="/Assets/Actions/19 - stop 32x32.png" />
 										</MenuItem.Icon>
 									</MenuItem>
-									<MenuItem Header="Configure" Click="configureToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}">
+									<MenuItem Header="{DynamicResource Menu.Configure}" Click="configureToolStripMenuItem_Click" IsEnabled="{Binding !SelVmWating}">
 										<MenuItem.Icon>
 											<Image Source="/Assets/Actions/9 - gears.png" />
 										</MenuItem.Icon>
 									</MenuItem>
-									<MenuItem Header="Pause" Click="pauseToolStripMenuItem_Click" IsVisible="{Binding !SelVmPaused}">
+									<MenuItem Header="{DynamicResource Ctx.Pause}" Click="pauseToolStripMenuItem_Click" IsVisible="{Binding !SelVmPaused}">
 										<MenuItem.IsEnabled>
 											<MultiBinding Converter="{x:Static BoolConverters.And}">
 												<Binding Path="SelVmRunning"/>
@@ -525,7 +525,7 @@
 											</MultiBinding>
 										</MenuItem.IsEnabled>
 									</MenuItem>
-									<MenuItem Header="Resume" Click="pauseToolStripMenuItem_Click" IsVisible="{Binding SelVmPaused}">
+									<MenuItem Header="{DynamicResource Toolbar.Resume}" Click="pauseToolStripMenuItem_Click" IsVisible="{Binding SelVmPaused}">
 										<MenuItem.IsEnabled>
 											<MultiBinding Converter="{x:Static BoolConverters.And}">
 												<Binding Path="SelVmRunning"/>
@@ -533,7 +533,7 @@
 											</MultiBinding>
 										</MenuItem.IsEnabled>
 									</MenuItem>
-									<MenuItem Header="Send CTRL+ALT+DEL" Click="resetCTRLALTDELETEToolStripMenuItem_Click">
+									<MenuItem Header="{DynamicResource Menu.CtrlAltDel}" Click="resetCTRLALTDELETEToolStripMenuItem_Click">
 										<MenuItem.IsEnabled>
 											<MultiBinding Converter="{x:Static BoolConverters.And}">
 												<Binding Path="SelVmRunning"/>
@@ -544,7 +544,7 @@
 											<Image Source="/Assets/Actions/2 - cad 32x32.png" />
 										</MenuItem.Icon>
 									</MenuItem>
-									<MenuItem Header="Hard reset" Click="hardResetToolStripMenuItem_Click">
+									<MenuItem Header="{DynamicResource Menu.ResetMachine}" Click="hardResetToolStripMenuItem_Click">
 										<MenuItem.IsEnabled>
 											<MultiBinding Converter="{x:Static BoolConverters.And}">
 												<Binding Path="SelVmRunning"/>
@@ -556,35 +556,35 @@
 										</MenuItem.Icon>
 									</MenuItem>
 									<Separator />
-									<MenuItem Header="Kill" Click="killToolStripMenuItem_Click" IsEnabled="{Binding SelVmRunning}"/>
-									<MenuItem Header="Wipe config" Click="wipeToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}"/>
+									<MenuItem Header="{DynamicResource Ctx.Kill}" Click="killToolStripMenuItem_Click" IsEnabled="{Binding SelVmRunning}"/>
+									<MenuItem Header="{DynamicResource Ctx.WipeConfig}" Click="wipeToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}"/>
 									<Separator />
-									<MenuItem Header="Edit" Click="editToolStripMenuItem_Click" IsEnabled="True">
+									<MenuItem Header="{DynamicResource Ctx.Edit}" Click="editToolStripMenuItem_Click" IsEnabled="True">
 										<MenuItem.Icon>
 											<Image Source="/Assets/Actions/32 - tools.png" />
 										</MenuItem.Icon>
 									</MenuItem>
-									<MenuItem Header="Clone" Click="cloneToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}">
+									<MenuItem Header="{DynamicResource Ctx.Clone}" Click="cloneToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}">
 										<MenuItem.Icon>
 											<Image Source="/Assets/Actions/3 - clone 32x32.png" />
 										</MenuItem.Icon>
 									</MenuItem>
-									<MenuItem Header="Remove" Click="deleteToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}">
+									<MenuItem Header="{DynamicResource Ctx.Remove}" Click="deleteToolStripMenuItem_Click" IsEnabled="{Binding !SelVmRunning}">
 										<MenuItem.Icon>
 											<Image Source="/Assets/Actions/6 - delete.png" />
 										</MenuItem.Icon>
 									</MenuItem>
-									<MenuItem Header="Open folder in Explorer" Click="openFolderToolStripMenuItem_Click" IsEnabled="True">
+									<MenuItem Header="{DynamicResource Ctx.OpenFolder}" Click="openFolderToolStripMenuItem_Click" IsEnabled="True">
 										<MenuItem.Icon>
 											<Image Source="/Assets/Mix/file.png" />
 										</MenuItem.Icon>
 									</MenuItem>	
-									<MenuItem Header="Open config file" Click="openConfigFileToolStripMenuItem_Click" IsEnabled="True">
+									<MenuItem Header="{DynamicResource Ctx.OpenConfig}" Click="openConfigFileToolStripMenuItem_Click" IsEnabled="True">
 										<MenuItem.Icon>
 											<Image Source="/Assets/Mix/conf.png" />
 										</MenuItem.Icon>
 									</MenuItem>
-									<MenuItem Header="Create a desktop shortcut" Click="createADesktopShortcutToolStripMenuItem_Click" IsEnabled="True" IsVisible="False" />
+									<MenuItem Header="{DynamicResource Ctx.CreateShortcut}" Click="createADesktopShortcutToolStripMenuItem_Click" IsEnabled="True" IsVisible="False" />
 								</ContextMenu>
 							</ListBox.Resources>
 							<ListBox.Styles>
@@ -634,7 +634,7 @@
 							</ListBox.ItemTemplate>
 							<ListBox.ContextMenu>
 								<ContextMenu>
-									<MenuItem Header="New Virtual Machine" Command="{Binding AddVMCmd}">
+									<MenuItem Header="{DynamicResource Menu.NewVm}" Command="{Binding AddVMCmd}">
 										<MenuItem.Icon>
 											<Image Source="/Assets/Actions/14 - new.png" />
 										</MenuItem.Icon>
@@ -668,17 +668,17 @@
 									<StackPanel DockPanel.Dock="Left" Orientation="Horizontal" ToolTip.Placement="Top">
 										<ToolTip.Tip>
 											<StackPanel Orientation="Horizontal">
-												<TextBlock>Total uptime: </TextBlock>
+												<TextBlock><Run Text="{DynamicResource Info.TotalUptime}" /></TextBlock>
 												<TextBlock Margin="5, 0, 0, 0" Text="{Binding Machine.Uptime.Full}" />
 											</StackPanel>
 										</ToolTip.Tip>
-										<TextBlock Margin="12, 8, 12, 8" FontSize="12" IsVisible="{Binding !SelVmRunning}">Was last run:</TextBlock>
-										<TextBlock Margin="12, 8, 12, 8" FontSize="12" IsVisible="{Binding SelVmRunning}">Was started:</TextBlock>
+										<TextBlock Margin="12, 8, 12, 8" FontSize="12" IsVisible="{Binding !SelVmRunning}" Text="{DynamicResource Info.WasLastRun}" />
+										<TextBlock Margin="12, 8, 12, 8" FontSize="12" IsVisible="{Binding SelVmRunning}" Text="{DynamicResource Info.WasStarted}" />
 										<TextBlock Margin="0, 8, 0, 8" FontSize="12" FontWeight="Bold" Text="{Binding Machine.SinceRun, TargetNullValue='Never', Mode=OneWay}" />
 									</StackPanel>
 									<Button DockPanel.Dock="Right" Height="21" Margin="0, 0, 15, 0" CornerRadius="0" BorderThickness="1" BorderBrush="#bfbfbf" Padding="10, 0"
 											VerticalAlignment="Center" VerticalContentAlignment="Stretch" Click="btnTray_Click" IsEnabled="{Binding Machine.HasPrintTray}">
-										<TextBlock Margin="0, 0, 0, 0"  FontSize="12">Printer Tray</TextBlock>
+										<TextBlock Margin="0, 0, 0, 0"  FontSize="12" Text="{DynamicResource Info.PrinterTray}" />
 									</Button>
 									<Rectangle />
 								</DockPanel>
@@ -708,7 +708,7 @@
 									<Border Grid.Column="2" Margin="0, 0, -3, 0" BorderBrush="{DynamicResource TabCtrlBorderBrush}" BorderThickness="1">
 										<DockPanel Margin="6, 0, 6, 0">
 											<DockPanel DockPanel.Dock="Top" Background="{DynamicResource content_BackgroundColor}" Height="35">
-												<TextBlock DockPanel.Dock="Left" Text="Screenshots:" VerticalAlignment="Center" FontSize="12" TextDecorations="Underline" Foreground="#0066cc" Margin="0, 0, 0, 1" 
+												<TextBlock DockPanel.Dock="Left" Text="{DynamicResource Info.Screenshots}" VerticalAlignment="Center" FontSize="12" TextDecorations="Underline" Foreground="#0066cc" Margin="0, 0, 0, 1" 
 															PointerPressed="Screenshots_PointerPressed">
 													<TextBlock.Styles>
 														<Style Selector="TextBlock:pointerover">
@@ -728,27 +728,27 @@
 											</DockPanel>
 											<StackPanel DockPanel.Dock="Bottom">
 												<Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *, *" Margin="0,0,0,2">
-													<TextBlock Grid.Row="0" Grid.Column="0" Text="VM Age"/>
-													<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Machine.SinceCreated, TargetNullValue='Unknown', Mode=OneWay}" HorizontalAlignment="Right"/>
-													<TextBlock Grid.Row="1" Grid.Column="0" Text="Uptime"/>
+													<TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource Info.VmAge}"/>
+													<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Machine.SinceCreated, TargetNullValue={DynamicResource Info.Unknown}, Mode=OneWay}" HorizontalAlignment="Right"/>
+													<TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource Info.Uptime}"/>
 													<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Machine.Uptime.Short, Mode=OneWay}" HorizontalAlignment="Right" ToolTip.Placement="Top">
 														<ToolTip.Tip>
 															<StackPanel Orientation="Horizontal">
-																<TextBlock>Total uptime: </TextBlock>
+																<TextBlock><Run Text="{DynamicResource Info.TotalUptime}" /></TextBlock>
 																<TextBlock Margin="5, 0, 0, 0" Text="{Binding Machine.Uptime.Full, Mode=OneWay}" />
 															</StackPanel>
 														</ToolTip.Tip>
 													</TextBlock>
-													<TextBlock Grid.Row="2" Grid.Column="0" Text="Play count"/>
+													<TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource Info.PlayCount}"/>
 													<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Machine.RunCount, Mode=OneWay}" HorizontalAlignment="Right"/>
-													<TextBlock Grid.Row="3" Grid.Column="0" Text="Disk usage"/>
-													<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Machine.VMSize, TargetNullValue='Calculating...', Mode=OneWay}" HorizontalAlignment="Right"/>
+													<TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource Info.DiskUsage}"/>
+													<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Machine.VMSize, TargetNullValue={DynamicResource Info.Calculating}, Mode=OneWay}" HorizontalAlignment="Right"/>
 												</Grid>
 											</StackPanel>
 											<vm:ConditionalContentPanel>
 												<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" Margin="0, 0, 0, 8">
 													<Grid>
-														<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="(None)" />
+														<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Info.None}" />
 														<vm:AspectContentPanel>
 															<Image Source="{Binding Machine.SelectedImage}" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
 																   RenderOptions.BitmapInterpolationMode="HighQuality"/>
@@ -761,9 +761,9 @@
 									</Border>
 								</Grid>
 								<StackPanel IsVisible="{Binding !Machine.HasValidPath}" HorizontalAlignment="Center" VerticalAlignment="Center">
-									<TextBlock Text="Failed to find the VM's folder" HorizontalAlignment="Stretch" TextAlignment="Center"
+									<TextBlock Text="{DynamicResource Info.FolderMissing}" HorizontalAlignment="Stretch" TextAlignment="Center"
 											   FontSize="24" Foreground="DarkRed"/>
-									<Button Margin="0, 25, 0, 0" HorizontalAlignment="Center" Click="btnBrowse_Click">Give me a helping hand</Button>
+									<Button Margin="0, 25, 0, 0" HorizontalAlignment="Center" Click="btnBrowse_Click" Content="{DynamicResource Info.HelpBrowse}" />
 								</StackPanel>
 							</Grid>
 						</DockPanel>

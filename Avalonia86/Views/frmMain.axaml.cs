@@ -17,6 +17,7 @@ using System.IO;
 using ReactiveUI;
 using Avalonia86.Converters;
 using Avalonia86.DialogBox;
+using Avalonia86.Localization;
 
 namespace Avalonia86.Views;
 
@@ -440,10 +441,8 @@ public partial class frmMain : BaseWindow
         {
             //It's important that the event is canceld before we call await, otherwise the close will proceed.
             e.Cancel = true;
-            var result = await this.ShowQuestion("Some virtual machines are still running. It's " +
-                                                 "recommended you stop them first before closing " +
-                                                 "86Box Manager.\n\nDo you want to stop them now?",
-                                                 "Virtual machines are still running", "Do you want to stop them now?");
+            var result = await this.ShowQuestion(L.T("Dialog.RunningVmsBody"),
+                                                 L.T("Dialog.RunningVmsTitle"), L.T("Dialog.RunningVmsQ"));
             if (result != DialogResult.None)
             {
                 if (result == DialogResult.Yes)
@@ -686,10 +685,8 @@ public partial class frmMain : BaseWindow
         // If there are running VMs, display the warning and stop the VMs if user says so
         if (VMCenter.IsWatching)
         {
-            var result = await this.ShowQuestion("Some virtual machines are still running. " +
-                                                 "It's recommended you stop them first before " +
-                                                 "closing 86Box Manager. Do you want to stop them now?",
-                                                 "Virtual machines are still running");
+            var result = await this.ShowQuestion(L.T("Dialog.RunningVmsBody"),
+                                                 L.T("Dialog.RunningVmsTitle"));
             if (result == DialogResult.Yes)
             {
                 await VMCenter.CloseAllWindows(this);
