@@ -100,6 +100,11 @@ public abstract class CommonManager : IManager
                 if (IsExecutable(exeName))
                     files.Add(exeName.FullName);
             }
+            foreach(var exeName in di.GetFiles("pcbox*", new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false }))
+            {
+                if (IsExecutable(exeName))
+                    files.Add(exeName.FullName);
+            }
 
             return files.ToArray();
         }

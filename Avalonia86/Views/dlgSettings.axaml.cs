@@ -265,7 +265,7 @@ public partial class dlgSettings : BaseWindow
         _m.ExeValid = false;
         _m.ExeError = false;
         _m.ExeWarn = false;
-        _m.ExePath = "86Box executable not found!";
+        _m.ExePath = L.T("Sts.ExeNotFound");
 
         try
         {

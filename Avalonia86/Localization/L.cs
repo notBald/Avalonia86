@@ -291,6 +291,7 @@ internal static class L
         ["Sts.NotSet"] = "Not set",
         ["Sts.Unknown"] = "Unknown",
         ["Sts.DefaultExe"] = "Default 86Box executable",
+        ["Sts.ExeNotFound"] = "Executable not found!",
 
         // Code-behind strings
         ["Msg.SettingsLoadFail"] = "Settings could not be loaded, sorry.",
@@ -633,6 +634,7 @@ internal static class L
         ["Sts.NotSet"] = "未设置",
         ["Sts.Unknown"] = "未知",
         ["Sts.DefaultExe"] = "默认 86Box 可执行文件",
+        ["Sts.ExeNotFound"] = "未找到可执行文件！",
 
         // Code-behind strings
         ["Msg.SettingsLoadFail"] = "设置无法加载，抱歉。",
@@ -975,6 +977,7 @@ internal static class L
         ["Sts.NotSet"] = "未設定",
         ["Sts.Unknown"] = "未知",
         ["Sts.DefaultExe"] = "預設 86Box 執行檔",
+        ["Sts.ExeNotFound"] = "未找到執行檔！",
 
         // Code-behind strings
         ["Msg.SettingsLoadFail"] = "設定無法載入，抱歉。",

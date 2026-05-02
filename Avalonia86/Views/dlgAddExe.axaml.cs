@@ -135,7 +135,7 @@ public partial class dlgAddExe : Window
         _m.ExeValid = false;
         _m.ExeError = false;
         _m.ExeWarn = false;
-        _m.ExeVersion = "86Box executable not found!";
+        _m.ExeVersion = L.T("Sts.ExeNotFound");
         _m._sugested_name = null;
         _m._sugested_ver = null;
 
