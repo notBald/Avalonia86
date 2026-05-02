@@ -11,55 +11,53 @@
 				   DockPanel.Dock="Right" Source="/Assets/Computers/welcome.png" 
 				   RenderOptions.BitmapInterpolationMode="HighQuality"/>
 			<TextBlock TextWrapping="Wrap">
-				<Run FontSize="16" FontWeight="Bold">Welcome to Avalonia 86</Run>
+				<Run FontSize="16" FontWeight="Bold" Text="{DynamicResource Wel.Title}" />
 				<LineBreak />
-				<Run FontStyle="Italic">Based on work by David Simunič and Laci bá'.</Run>
-				<LineBreak />
-				<LineBreak />
-				<Run>
-					This is a front end for 86Box. Note, 86Box now also have a built in manager. 
-				</Run>
+				<Run FontStyle="Italic" Text="{DynamicResource Wel.BasedOn}" />
 				<LineBreak />
 				<LineBreak />
-				<Run FontWeight="Bold">Quickstart</Run>
+				<Run Text="{DynamicResource Wel.Intro}" />
 				<LineBreak />
 				<LineBreak />
-				<Run xml:space="preserve"> 1. Go to Tools -> Program Settings</Run>
-				<LineBreak />
-				<Run xml:space="preserve"> 2. Select an 86Box executable and a VM folder</Run>
-				<LineBreak />
-				<Run xml:space="preserve"> 3. Save settings</Run>
-				<LineBreak />
-				<Run xml:space="preserve"> 4. Go to Files -> New Virtual Machine</Run>
-				<LineBreak />
-				<Run xml:space="preserve"> 5. Write "IBM PC" as the name</Run>
-				<LineBreak />
-				<Run xml:space="preserve"> 6. Click the "Add" button</Run>
-				<LineBreak />
-				<Run xml:space="preserve"> 7. Start the VM</Run>
+				<Run FontWeight="Bold" Text="{DynamicResource Wel.Quickstart}" />
 				<LineBreak />
 				<LineBreak />
-				<Run FontWeight="Bold">Questions</Run>
+				<Run Text="{DynamicResource Wel.Step1}" />
+				<LineBreak />
+				<Run Text="{DynamicResource Wel.Step2}" />
+				<LineBreak />
+				<Run Text="{DynamicResource Wel.Step3}" />
+				<LineBreak />
+				<Run Text="{DynamicResource Wel.Step4}" />
+				<LineBreak />
+				<Run Text="{DynamicResource Wel.Step5}" />
+				<LineBreak />
+				<Run Text="{DynamicResource Wel.Step6}" />
+				<LineBreak />
+				<Run Text="{DynamicResource Wel.Step7}" />
 				<LineBreak />
 				<LineBreak />
-				<Run xml:space="preserve"> Q. Must all virtual machines recide in the VM folder?</Run>
-				<LineBreak />
-				<Run xml:space="preserve" FontStyle="Italic"> A. No, it's just for convinience.</Run>
+				<Run FontWeight="Bold" Text="{DynamicResource Wel.Questions}" />
 				<LineBreak />
 				<LineBreak />
-				<Run xml:space="preserve"> Q. How do I edit a virtual machine?</Run>
+				<Run Text="{DynamicResource Wel.Q1}" />
 				<LineBreak />
-				<Run xml:space="preserve" FontStyle="Italic"> A. Right click on the VM and pick "Edit".</Run>
-				<LineBreak />
-				<LineBreak />
-				<Run xml:space="preserve"> Q. How do I add an existing machine?</Run>
-				<LineBreak />
-				<Run xml:space="preserve" FontStyle="Italic"> A. Use "New Virtual Machine", but set the location to an existing VM folder.</Run>
+				<Run FontStyle="Italic" Text="{DynamicResource Wel.A1}" />
 				<LineBreak />
 				<LineBreak />
-				<Run xml:space="preserve"> Q. Can I move a VM's folder to a different disk?</Run>
+				<Run Text="{DynamicResource Wel.Q2}" />
 				<LineBreak />
-				<Run xml:space="preserve" FontStyle="Italic"> A. Go right ahead. Avalonia 86 will ask you where the VM is now located, that's all.</Run>
+				<Run FontStyle="Italic" Text="{DynamicResource Wel.A2}" />
+				<LineBreak />
+				<LineBreak />
+				<Run Text="{DynamicResource Wel.Q3}" />
+				<LineBreak />
+				<Run FontStyle="Italic" Text="{DynamicResource Wel.A3}" />
+				<LineBreak />
+				<LineBreak />
+				<Run Text="{DynamicResource Wel.Q4}" />
+				<LineBreak />
+				<Run FontStyle="Italic" Text="{DynamicResource Wel.A4}" />
 			</TextBlock>
 		</DockPanel>
 	</ScrollViewer>

@@ -18,7 +18,7 @@
 			<Setter Property="BorderBrush" Value="{DynamicResource TabCtrlBorderBrush}"/>
 		</Style>
 	</UserControl.Styles>
-	<gb:GroupBox Header="Prefered 86Box executable" Margin="0,0,0,10"
+	<gb:GroupBox Header="{DynamicResource Exe.PreferredExe}" Margin="0,0,0,10"
 								   Theme="{StaticResource GroupBoxClassic}">
 		<StackPanel Margin="20, 10">
 			<ComboBox ItemsSource="{Binding ExeFiles}" SelectedItem="{Binding SelectedItem}" HorizontalAlignment="Stretch">
@@ -38,17 +38,17 @@
 						<Setter Property="Margin" Value="0, 2" />
 					</Style>
 				</Grid.Styles>
-				<TextBlock Text="Version:" Grid.Column="0" Grid.Row="0" />
+				<TextBlock Text="{DynamicResource Exe.Version}" Grid.Column="0" Grid.Row="0" />
 				<SelectableTextBlock TextTrimming="CharacterEllipsis" Text="{Binding SelVersion}" Grid.Column="1" Grid.Row="0" />
-				<TextBlock Text="CPU architecture:" Grid.Column="0" Grid.Row="1" />
+				<TextBlock Text="{DynamicResource Exe.CpuArch}" Grid.Column="0" Grid.Row="1" />
 				<SelectableTextBlock Text="{Binding SelectedItem.Arch}" Grid.Column="1" Grid.Row="1" />
-				<TextBlock Text="86Box executable:" Grid.Column="0" Grid.Row="2" />
+				<TextBlock Text="{DynamicResource Exe.ExePath}" Grid.Column="0" Grid.Row="2" />
 				<SelectableTextBlock TextTrimming="CharacterEllipsis" Text="{Binding SelExePath}" Grid.Column="1" Grid.Row="2" />
-				<TextBlock Text="Firmware folder:" Grid.Column="0" Grid.Row="3" />
+				<TextBlock Text="{DynamicResource Exe.FirmwareFolder}" Grid.Column="0" Grid.Row="3" />
 				<SelectableTextBlock TextTrimming="CharacterEllipsis" Text="{Binding SelExeRomDir}" Grid.Column="1" Grid.Row="3" />
-				<TextBlock Text="Assets folder:" Grid.Column="0" Grid.Row="4" />
+				<TextBlock Text="{DynamicResource Exe.AssetsFolder}" Grid.Column="0" Grid.Row="4" />
 				<SelectableTextBlock TextTrimming="CharacterEllipsis" Text="{Binding SelExeAssetDir}" Grid.Column="1" Grid.Row="4" />
-				<TextBlock Text="Comment:" Grid.Column="0" Grid.Row="5" />
+				<TextBlock Text="{DynamicResource Exe.Comment}" Grid.Column="0" Grid.Row="5" />
 				<SelectableTextBlock Text="{Binding SelectedItem.Comment}" Grid.Column="1" Grid.Row="5" />
 			</Grid>
 		</StackPanel>

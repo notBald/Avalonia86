@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ReactiveUI;
+using Avalonia86.Localization;
 using Avalonia86.Tools;
 using Avalonia86.Xplat;
 using System.ComponentModel;
@@ -57,7 +58,7 @@ public partial class dlgAddExe : Window
             if (!string.IsNullOrWhiteSpace(_m._sugested_ver))
                 _m.Version = _m._sugested_ver;
             else
-                _m.Version = "Unknown";
+                _m.Version = L.T("Sts.Unknown");
         }
         if (string.IsNullOrWhiteSpace(_m.RomDir))
             _m.RomDir = null;
@@ -77,7 +78,7 @@ public partial class dlgAddExe : Window
 
     private async void btnPathBrowse_click(object sender, RoutedEventArgs e)
     {
-        var text = "Select an 86Box executable";
+        var text = L.T("Msg.SelectExeFile");
 
         string path = string.IsNullOrWhiteSpace(DefExePath) ? "" : DefExePath;
 
@@ -89,8 +90,8 @@ public partial class dlgAddExe : Window
             if (!Platforms.Manager.IsExecutable(file_name))
             {
                 string name = string.IsNullOrWhiteSpace(file_name) ? "" : System.IO.Path.GetFileName(file_name);
-                var res = await this.ShowQuestion("The file is not executable, do you wish to add it anyway?", 
-                                                 $"File {name} is not a program.");
+                var res = await this.ShowQuestion(L.T("Msg.FileNotExecutable"), 
+                                                 string.Format(L.T("Msg.FileNotProgram"), name));
 
                 if (res == DialogResult.No)
                     file_name = null;
@@ -102,7 +103,7 @@ public partial class dlgAddExe : Window
 
     private async void btnRomBrowse_click(object sender, RoutedEventArgs e)
     {
-        var text = "Select a ROM folder for 86Box";
+        var text = L.T("Msg.SelectRomFolderShort");
 
         string path = string.IsNullOrWhiteSpace(DefExePath) ? "" : DefExePath;
         var folder_name = await Dialogs.SelectFolder(path, text, this);
@@ -115,7 +116,7 @@ public partial class dlgAddExe : Window
 
     private async void btnAssBrowse_click(object sender, RoutedEventArgs e)
     {
-        var text = "Select a Asset folder for 86Box";
+        var text = L.T("Msg.SelectAssetFolderShort");
 
         string path = string.IsNullOrWhiteSpace(DefExePath) ? "" : DefExePath;
         var folder_name = await Dialogs.SelectFolder(path, text, this);
@@ -163,7 +164,7 @@ public partial class dlgAddExe : Window
                 }
                 else //Completely unsupported, since version info can't be obtained anyway
                 {
-                    _m.ExeVersion = "Unknown - may not be compatible";
+                    _m.ExeVersion = L.T("Msg.ExeNotCompatible");
                     _m.ExeError = true;
                 }
 

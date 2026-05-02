@@ -10,7 +10,7 @@
         Width="620" Height="495"
         x:Class="Avalonia86.Views.dlgSettings"
 		x:DataType="v:dlgSettingsModel"
-        Title="Settings"
+        Title="{DynamicResource Dlg.Settings}"
         Opened="dlgSettings_Load"
 		Background="{DynamicResource TabDlgBackground}">
 	<Window.Resources>
@@ -55,114 +55,114 @@
 	<Grid>
 		<DockPanel Margin="12">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0" Spacing="4" DockPanel.Dock="Bottom">
-				<Button Content="Defaults"
+				<Button Content="{DynamicResource Dlg.Defaults}"
 						HorizontalAlignment="Stretch" VerticalAlignment="Center"
 						Margin="0,0,40,0"
 						Click="btnDefaults_Click"/>
-				<Button Content="OK" IsEnabled="{Binding HasChanges}"
+				<Button Content="{DynamicResource Dlg.OK}" IsEnabled="{Binding HasChanges}"
 						HorizontalAlignment="Stretch" VerticalAlignment="Center"
 						IsDefault="True" Click="btnOK_Click"/>
-				<Button Content="Cancel" IsCancel="True"
+				<Button Content="{DynamicResource Dlg.Cancel}" IsCancel="True"
 						HorizontalAlignment="Stretch" VerticalAlignment="Center"
 						Click="btnCancel_Click"/>
-				<Button Content="Apply" IsEnabled="{Binding HasChanges}"
+				<Button Content="{DynamicResource Dlg.Apply}" IsEnabled="{Binding HasChanges}"
 						HorizontalAlignment="Stretch" VerticalAlignment="Center"
 						Click="btnApply_Click"/>
 			</StackPanel>
 			<TabControl SelectedIndex="{Binding SelectedTabIdx}" Theme="{StaticResource CustomTabCtrl}" >
-				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
+				<TabItem Header="{DynamicResource Tab.General}" Theme="{StaticResource CustomTabItm}">
 					<DockPanel>
-						<gb:GroupBox Header="Paths" DockPanel.Dock="Top"
+						<gb:GroupBox Header="{DynamicResource Grp.Paths}" DockPanel.Dock="Top"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<Grid Margin="9" ColumnDefinitions="*, 10, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
-								<Label Content="Path to the default 86Box executable:" 
+								<Label Content="{DynamicResource Cfg.PathDefaultExe}" 
 									   Target="{Binding ElementName=tbPath}"
 									   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
 								<TextBox Text="{Binding ExeDir}" Name="tbPath" 
 										Grid.Row="1" Grid.Column="0" />
-								<Button Click="btnBrowse1_Click" Name="btnBrowse1" Content="Browse..." 
+								<Button Click="btnBrowse1_Click" Name="btnBrowse1" Content="{DynamicResource Dlg.BrowseDots}" 
 										Grid.Row="1" Grid.Column="2"/>
 								<StackPanel Orientation="Horizontal" Margin="5, 5, 5, 10" Spacing="5"
 											Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
-									<TextBlock Text="86Box version:" FontSize="14"/>
+									<TextBlock Text="{DynamicResource Cfg.ExeVersion}" FontSize="14"/>
 									<SelectableTextBlock Classes="version" Classes.error="{Binding ExeError}"
 											Classes.warn="{Binding ExeWarn}" Classes.valid="{Binding ExeValid}"
 											Text="{Binding ExePath, Mode=OneWay, TargetNullValue='&lt;status string goes here&gt;'}"/>
 								</StackPanel>
 								
-								<Label Content="Default destination path for new virtual machines:"
+								<Label Content="{DynamicResource Cfg.DefaultVmPath}"
 									   Target="{Binding ElementName=tbCFG}"
 									   Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"/>
 								<TextBox Text="{Binding CFGDir}" Name="tbCFG" 
 									   Grid.Row="4" Grid.Column="0"/>
-								<Button Click="btnBrowse2_Click" Name="btnBrowse2" Content="Browse..."
+								<Button Click="btnBrowse2_Click" Name="btnBrowse2" Content="{DynamicResource Dlg.BrowseDots}"
 										Grid.Row="4" Grid.Column="2"/>
 
-								<Label Content="Path to roms:"
+								<Label Content="{DynamicResource Cfg.PathRoms}"
 									   Target="{Binding ElementName=tbROM}"
 									   Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"/>
 								<TextBox Text="{Binding ROMDir}" Name="tbROM" Watermark="Default is roms folder in 86Box's folder"
 									   Grid.Row="6" Grid.Column="0"/>
-								<Button Content="Browse..." Click="btnBrowse_rom_Click"
+								<Button Content="{DynamicResource Dlg.BrowseDots}" Click="btnBrowse_rom_Click"
 										Grid.Row="6" Grid.Column="2"/>
 
-								<Label Content="Path to assets:"
+								<Label Content="{DynamicResource Cfg.PathAssets}"
 									   Target="{Binding ElementName=tbAss}"
 									   Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3"/>
 								<TextBox Text="{Binding AssetDir}" Name="tbAss" Watermark="Default assets is determined by 86Box"
 									   Grid.Row="8" Grid.Column="0"/>
-								<Button Content="Browse..." Click="btnBrowse_asset_Click"
+								<Button Content="{DynamicResource Dlg.BrowseDots}" Click="btnBrowse_asset_Click"
 										Grid.Row="9" Grid.Column="2"/>
 							</Grid>
 						</gb:GroupBox>
-						<gb:GroupBox Header="Apperance" VerticalAlignment="Top"
+						<gb:GroupBox Header="{DynamicResource Grp.Appearance}" VerticalAlignment="Top"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<Grid Margin="9" ColumnDefinitions="*, *">
 								<StackPanel Grid.Column="0" Margin="12" Spacing="5">
-									<CheckBox IsChecked="{Binding CompactList}" Content="Show a compacted list of machines" />
-									<CheckBox IsChecked="{Binding ToolBar86Settings}" Content="Enable 86Box Settings toolbar button" />
-									<CheckBox IsChecked="{Binding ToolBarPSSettings}" Content="Enable Executable Settings toolbar button" />
+									<CheckBox IsChecked="{Binding CompactList}" Content="{DynamicResource Cfg.CompactList}" />
+									<CheckBox IsChecked="{Binding ToolBar86Settings}" Content="{DynamicResource Cfg.Toolbar86}" />
+									<CheckBox IsChecked="{Binding ToolBarPSSettings}" Content="{DynamicResource Cfg.ToolbarPS}" />
 								</StackPanel>
 								<StackPanel Grid.Column="1" Margin="12">
-									<TextBlock Text="Application theme: " Margin="0, 0, 0, 5" />
+									<TextBlock Text="{DynamicResource Cfg.AppTheme}" Margin="0, 0, 0, 5" />
 									<ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}" HorizontalAlignment="Stretch" />
 								</StackPanel>
 							</Grid>
 						</gb:GroupBox>
 					</DockPanel>
 				</TabItem>
-				<TabItem Header="Behaviour" Theme="{StaticResource CustomTabItm}">
+				<TabItem Header="{DynamicResource Tab.Behaviour}" Theme="{StaticResource CustomTabItm}">
 					<StackPanel Orientation="Vertical">
-						<gb:GroupBox Header="Tray behaviour"
+						<gb:GroupBox Header="{DynamicResource Grp.TrayBehaviour}"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<Border Margin="9">
 								<Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto, Auto">
-									<CheckBox IsChecked="{Binding IsTrayEnabled}" Content="Enable tray icon" Margin="12" Grid.Column="0" Grid.Row="0" />
-									<CheckBox IsChecked="{Binding MinToTray}" Content="Minimize Avalonia86 to tray icon" Margin="12" Grid.Column="1" Grid.Row="0" IsEnabled="{Binding IsTrayEnabled}" />
-									<CheckBox IsChecked="{Binding CloseToTray}" Content="Close Avalonia86 to tray icon" Margin="12" Grid.Column="0" Grid.Row="1" IsEnabled="{Binding IsTrayEnabled}" />
+									<CheckBox IsChecked="{Binding IsTrayEnabled}" Content="{DynamicResource Cfg.TrayIcon}" Margin="12" Grid.Column="0" Grid.Row="0" />
+									<CheckBox IsChecked="{Binding MinToTray}" Content="{DynamicResource Cfg.MinToTray}" Margin="12" Grid.Column="1" Grid.Row="0" IsEnabled="{Binding IsTrayEnabled}" />
+									<CheckBox IsChecked="{Binding CloseToTray}" Content="{DynamicResource Cfg.CloseToTray}" Margin="12" Grid.Column="0" Grid.Row="1" IsEnabled="{Binding IsTrayEnabled}" />
 								</Grid>
 							</Border>
 						</gb:GroupBox>
-						<gb:GroupBox Header="Startup"
+						<gb:GroupBox Header="{DynamicResource Grp.Startup}"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<StackPanel Margin="9">
-								<CheckBox IsChecked="{Binding AllowInstances}" Content="Allow multiple instances of Avalonia86" Margin="12" />
-								<CheckBox IsChecked="{Binding MinOnStart}" Content="Minimize Avalonia86 when a VM is started" Margin="12" />
+								<CheckBox IsChecked="{Binding AllowInstances}" Content="{DynamicResource Cfg.AllowInstances}" Margin="12" />
+								<CheckBox IsChecked="{Binding MinOnStart}" Content="{DynamicResource Cfg.MinOnStart}" Margin="12" />
 							</StackPanel>
 						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>
-				<TabItem Header="Executable" Theme="{StaticResource CustomTabItm}">
-					<gb:GroupBox Header="Alternative 86Box executables" Margin="0, 0, 0, 10"
+				<TabItem Header="{DynamicResource Tab.Executable}" Theme="{StaticResource CustomTabItm}">
+					<gb:GroupBox Header="{DynamicResource Grp.AltExes}" Margin="0, 0, 0, 10"
 									 Theme="{StaticResource GroupBoxClassic}">
 						<DockPanel Margin="9, 9, 9, 5">
 							<Grid DockPanel.Dock="Top" Margin="0,0,0,2" ColumnDefinitions="Auto, *, Auto">
 								<StackPanel Orientation="Horizontal"  Spacing="2" Grid.Column="0">
-									<Button Click="btnAddExe_Click">Add</Button>
-									<Button Click="btnRemove_Click" IsEnabled="{Binding HasSelectedExe}">Remove</Button>
-									<Button Click="btnEdit_Click" IsEnabled="{Binding HasSelectedExe}">Edit</Button>
+									<Button Click="btnAddExe_Click">{DynamicResource Dlg.Add}</Button>
+									<Button Click="btnRemove_Click" IsEnabled="{Binding HasSelectedExe}">{DynamicResource Dlg.Remove}</Button>
+									<Button Click="btnEdit_Click" IsEnabled="{Binding HasSelectedExe}">{DynamicResource Dlg.Edit}</Button>
 								</StackPanel>
-								<Button Click="btnImport_click" Grid.Column="2">Import folder</Button>
+								<Button Click="btnImport_click" Grid.Column="2">{DynamicResource Dlg.ImportFolder}</Button>
 							</Grid>
 							<DockPanel>
 								<Grid DockPanel.Dock="Bottom" ColumnDefinitions="32, *" Margin="0, 4, 0, 0">
@@ -175,7 +175,7 @@
 											</Style>
 										</RadioButton.Styles>
 									</RadioButton>
-									<Label Grid.Column="1" Content="Prefer default executable" Tapped="label_default_tapped" />
+									<Label Grid.Column="1" Content="{DynamicResource Cfg.PreferDefault}" Tapped="label_default_tapped" />
 								</Grid>
 								<DataGrid x:Name="DG_Exes" RowBackground="{DynamicResource GridRowBackground}" SelectedItem="{Binding SelectedExe}, Mode=OneWayToSource" BorderThickness="0"
 									GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}" LoadingRow="DataGrid_LoadingRow">
@@ -188,7 +188,7 @@
 										</Style>
 									</DataGrid.Styles>
 									<DataGrid.Columns>
-										<DataGridTemplateColumn Header="Use">
+										<DataGridTemplateColumn Header="{DynamicResource Col.Use}">
 											<DataGridTemplateColumn.CellTemplate>
 												<DataTemplate>
 													<RadioButton GroupName="Executable"
@@ -206,62 +206,62 @@
 												</DataTemplate>
 											</DataGridTemplateColumn.CellTemplate>
 										</DataGridTemplateColumn>
-										<DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Name}" />
-										<DataGridTextColumn Header="Path" Width="2*" IsReadOnly="True" Binding="{Binding VMPath}" />
-										<DataGridTextColumn Header="Version" IsReadOnly="True" Binding="{Binding Version}" />
+										<DataGridTextColumn Header="{DynamicResource Col.Name}" IsReadOnly="True" Binding="{Binding Name}" />
+										<DataGridTextColumn Header="{DynamicResource Col.Path}" Width="2*" IsReadOnly="True" Binding="{Binding VMPath}" />
+										<DataGridTextColumn Header="{DynamicResource Col.Version}" IsReadOnly="True" Binding="{Binding Version}" />
 									</DataGrid.Columns>
 								</DataGrid>
 							</DockPanel>
 						</DockPanel>
 					</gb:GroupBox>
 				</TabItem>
-				<TabItem Header="Advanced" Theme="{StaticResource CustomTabItm}">
+				<TabItem Header="{DynamicResource Tab.Advanced}" Theme="{StaticResource CustomTabItm}">
 					<StackPanel Margin="0,0,0,110">
-						<gb:GroupBox Header="Logging"
+						<gb:GroupBox Header="{DynamicResource Grp.Logging}"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<Border Margin="9">
 								<StackPanel Orientation="Vertical">
 									<StackPanel Orientation="Vertical">
-										<CheckBox IsChecked="{Binding EnableLogging}" Content="Enable 86Box logging to file" Margin="12,12,12,5" />
+										<CheckBox IsChecked="{Binding EnableLogging}" Content="{DynamicResource Cfg.EnableLogging}" Margin="12,12,12,5" />
 										<StackPanel Orientation="Horizontal" Margin="12,1,12,32">
 											<TextBox Text="{Binding LogPath}" VerticalAlignment="Center" Width="460" Margin="0,0,10,0" IsEnabled="{Binding EnableLogging}" />
-											<Button Content="Browse..." Click="btnBrowse3_Click" IsEnabled="{Binding EnableLogging}" />
+											<Button Content="{DynamicResource Dlg.BrowseDots}" Click="btnBrowse3_Click" IsEnabled="{Binding EnableLogging}" />
 										</StackPanel>
 									</StackPanel>
 								</StackPanel>
 							</Border>
 						</gb:GroupBox>
-						<gb:GroupBox Header="Miscellaneous"
+						<gb:GroupBox Header="{DynamicResource Grp.Miscellaneous}"
 									 Theme="{StaticResource GroupBoxClassic}">						
 							<Border Margin="9">
 								<StackPanel Orientation="Vertical">
 									<WrapPanel Orientation="Horizontal">
-										<CheckBox IsChecked="{Binding EnableConsole}" Content="Enable 86Box console window" Margin="12" />
-										<CheckBox IsChecked="{Binding RenameFolders}" Content="Rename the VM's folder when changing the name of a VM" />
+										<CheckBox IsChecked="{Binding EnableConsole}" Content="{DynamicResource Cfg.EnableConsole}" Margin="12" />
+										<CheckBox IsChecked="{Binding RenameFolders}" Content="{DynamicResource Cfg.RenameFolders}" />
 									</WrapPanel>
 								</StackPanel>
 							</Border>
 						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>
-				<TabItem Header="About" Theme="{StaticResource CustomTabItm}">
+				<TabItem Header="{DynamicResource Tab.About}" Theme="{StaticResource CustomTabItm}">
 					<DockPanel >
 						<StackPanel DockPanel.Dock="Top">
 							<DockPanel>
 								<Image Name="aboutImg" Margin="8" Source="/Assets/86Box-gray.sm.png" Width="48" Height="48" DockPanel.Dock="Left" />
 								<StackPanel Margin="8" VerticalAlignment="Center">
-									<TextBlock VerticalAlignment="Center" FontSize="18" FontWeight="Bold">Avalonia 86</TextBlock>
+									<TextBlock VerticalAlignment="Center" FontSize="18" FontWeight="Bold" Text="{DynamicResource Abt.AppName}" />
 									<TextBlock FontSize="9" FontStyle="Italic">
 										Version: <Run Text="{Binding Version}" />
 									</TextBlock>
-									<TextBlock FontSize="9" FontStyle="Italic" Text="Copyright © 2018-2022 David Simunič" />
+									<TextBlock FontSize="9" FontStyle="Italic" Text="{DynamicResource Abt.Copyright}" />
 								</StackPanel>
 							</DockPanel>
-							<TextBlock Margin="0, 11, 0, 0" Text="Lisence and contributors:" />
+							<TextBlock Margin="0, 11, 0, 0" Text="{DynamicResource Abt.LicenseContrib}" />
 						</StackPanel>
 
 						<StackPanel DockPanel.Dock="Bottom" Margin="0, 10">
-							<TextBlock Text="Source code and related projects:" />
+							<TextBlock Text="{DynamicResource Abt.SourceCode}" />
 							<HyperlinkButton Padding="10, 0" Content="https://github.com/86Box/86Box" NavigateUri="https://github.com/86Box/86Box" />
 							<HyperlinkButton Padding="10, 0" Content="https://github.com/RetBox/86BoxManagerX" NavigateUri="https://github.com/RetBox/86BoxManagerX" />
 							<HyperlinkButton Padding="10, 0" Content="https://github.com/notBald/Avalonia86" NavigateUri="https://github.com/notBald/Avalonia86" />

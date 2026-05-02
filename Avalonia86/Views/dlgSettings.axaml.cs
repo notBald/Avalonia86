@@ -1,4 +1,5 @@
 using Avalonia86.Core;
+using Avalonia86.Localization;
 using Avalonia86.Tools;
 using Avalonia86.Xplat;
 using Avalonia.Controls;
@@ -71,7 +72,7 @@ public partial class dlgSettings : BaseWindow
         }
         catch (Exception ex)
         {
-            await this.ShowError("Settings could not be loaded, sorry.", ex, "Failure");
+            await this.ShowError(L.T("Msg.SettingsLoadFail"), ex, L.T("Msg.Failure"));
 
             Close();
         }
@@ -86,8 +87,8 @@ public partial class dlgSettings : BaseWindow
 
         // Unsaved changes, ask the user to confirm
         var result = await this.ShowQuestion(
-            "Would you like to save the changes you've made to the settings?", 
-            "Unsaved changes");
+            L.T("Msg.UnsavedChangesBody"), 
+            L.T("Msg.UnsavedChanges"));
         if (result == DialogResult.Yes)
         {
             await SaveSettings();
@@ -127,8 +128,8 @@ public partial class dlgSettings : BaseWindow
     private async void btnBrowse3_Click(object sender, RoutedEventArgs e)
     {
         var dir = Platforms.Env.MyComputer;
-        var title = "Select a file where 86Box logs will be saved";
-        var filter = "Log files (*.log)|*.log";
+        var title = L.T("Msg.SelectLogFile");
+        var filter = L.T("Msg.LogFilter");
         string fileName = null;
 
         try
@@ -137,7 +138,7 @@ public partial class dlgSettings : BaseWindow
         }
         catch (Exception ex)
         {
-            await this.ShowError("Failed to open file dialog.", ex);
+            await this.ShowError(L.T("Msg.FileDlgFail"), ex);
         }
 
         if (!string.IsNullOrWhiteSpace(fileName))
@@ -148,8 +149,7 @@ public partial class dlgSettings : BaseWindow
 
     private async void btnDefaults_Click(object sender, RoutedEventArgs e)
     {
-        var result = await this.ShowQuestion("All settings will be reset to their default values. " +
-                                             "Do you wish to continue?", "Settings will be reset");
+        var result = await this.ShowQuestion(L.T("Msg.ResetConfirm"), L.T("Msg.ResetTitle"));
         if (result == DialogResult.Yes)
         {
             ResetSettings();
@@ -184,7 +184,7 @@ public partial class dlgSettings : BaseWindow
 
     private async void btnBrowse1_Click(object sender, RoutedEventArgs e)
     {
-        var text = "Select a folder where 86Box program files and the roms folder are located";
+        var text = L.T("Msg.Select86BoxFolder");
 
         var fldName = await Dialogs.SelectFolder(_m.ExeDir, text, parent: this);
 
@@ -196,7 +196,7 @@ public partial class dlgSettings : BaseWindow
 
     private async void btnBrowse2_Click(object sender, RoutedEventArgs e)
     {
-        var text = "Select a folder where your virtual machines (configs, nvr folders, etc.) will be located";
+        var text = L.T("Msg.SelectVmFolder");
         var dir = _m.CFGDir;
         if (string.IsNullOrWhiteSpace(dir))
         {
@@ -217,7 +217,7 @@ public partial class dlgSettings : BaseWindow
 
     private async void btnBrowse_rom_Click(object sender, RoutedEventArgs e)
     {
-        var text = "Select the folder where 86Box can find firmware and bios files";
+        var text = L.T("Msg.SelectRomFolder");
         var dir = _m.ROMDir;
         if (string.IsNullOrWhiteSpace(dir))
         {
@@ -238,7 +238,7 @@ public partial class dlgSettings : BaseWindow
 
     private async void btnBrowse_asset_Click(object sender, RoutedEventArgs e)
     {
-        var text = "Select the folder where 86Box can find asset files";
+        var text = L.T("Msg.SelectAssetFolder");
         var dir = _m.AssetDir;
         if (string.IsNullOrWhiteSpace(dir))
         {
@@ -294,7 +294,7 @@ public partial class dlgSettings : BaseWindow
                         }
                         else //Completely unsupported, since version info can't be obtained anyway
                         {
-                            _m.ExePath = "Unknown - may not be compatible";
+                            _m.ExePath = L.T("Msg.ExeNotCompatible");
                             _m.ExeError = true;
                         }
 
@@ -504,7 +504,7 @@ public partial class dlgSettings : BaseWindow
     /// </summary>
     private async void btnImport_click(object sender, RoutedEventArgs e)
     {
-        var text = "Select a folder to scan for 86Box executables";
+        var text = L.T("Msg.SelectScanFolder");
         var DefExePath = _m.CFGDir;
 
         string path = string.IsNullOrWhiteSpace(DefExePath) ? "" : DefExePath;
@@ -512,7 +512,7 @@ public partial class dlgSettings : BaseWindow
 
         if (folder_name != null)
         {
-            await new DialogBoxBuilder(this).WithMessage("Warning: the UI will be unresponsive while importing.")
+            await new DialogBoxBuilder(this).WithMessage(L.T("Msg.ImportWarning"))
                                             .WithIcon(DialogIcon.Warning)
                                             .ShowDialog();
             try
@@ -792,7 +792,7 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
                 var txt = Path.Combine(startupPath, "Resources", "AUTHORS");
                 return File.ReadAllText(txt);
             }
-            catch { return "Author file not loaded."; }
+            catch { return L.T("Msg.AuthorFileNotLoaded"); }
         }
     }
 

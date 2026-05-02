@@ -11,7 +11,7 @@
 		MinWidth="300" MinHeight="250"
         x:Class="Avalonia86.Views.dlgUpdater"
 		x:DataType="v:dlgUpdaterModel"
-        Title="86Box Updater"
+        Title="{DynamicResource Upd.Title}"
 		Background="{DynamicResource TabDlgBackground}">
 	<Window.Resources>
 		
@@ -44,21 +44,21 @@
 							<Binding Path="!HasUpdated" Mode="OneWay" />
 						</MultiBinding>
 					</Button.IsEnabled>
-					Update to latest 86Box
+					<TextBlock Text="{DynamicResource Upd.UpdateLatest}" />
 				</Button>
 				<StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
-					<Button Content="Save settings" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsEnabled="{Binding HasChanges}" Click="btnSave_Click" />
-					<Button Content="Close" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsEnabled="{Binding !DM.IsUpdating}" IsCancel="True" Click="btnCancel_Click" />
+					<Button Content="{DynamicResource Dlg.SaveSettings}" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsEnabled="{Binding HasChanges}" Click="btnSave_Click" />
+					<Button Content="{DynamicResource Dlg.Close}" HorizontalAlignment="Stretch" Margin="0,0,20,0" IsEnabled="{Binding !DM.IsUpdating}" IsCancel="True" Click="btnCancel_Click" />
 				</StackPanel>
 			</Grid>
 			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10" SelectedIndex="{Binding TabIndex}">
-				<TabItem Header="Status" Theme="{StaticResource CustomTabItm}">
+				<TabItem Header="{DynamicResource Tab.Status}" Theme="{StaticResource CustomTabItm}">
 					<DockPanel Margin="0, 0, 0, 10">
 						<Grid DockPanel.Dock="Top" ColumnDefinitions="*, 10, *">
-							<gb:GroupBox Header="Installed build" Theme="{StaticResource GroupBoxClassic}">
+							<gb:GroupBox Header="{DynamicResource Grp.InstalledBuild}" Theme="{StaticResource GroupBoxClassic}">
 								<TextBlock Text="{Binding CurrentExe.Build}" HorizontalAlignment="Center" Margin="10" FontSize="26" />
 							</gb:GroupBox>
-							<gb:GroupBox Header="Latest build" Theme="{StaticResource GroupBoxClassic}" Grid.Column="2">
+							<gb:GroupBox Header="{DynamicResource Grp.LatestBuild}" Theme="{StaticResource GroupBoxClassic}" Grid.Column="2">
 								<Grid>
 									<TextBlock Text="{Binding DM.LatestBuild, Mode=OneWay, TargetNullValue='N/A'}"
 										IsVisible="{Binding !DM.IsFetching, Mode=OneWay}" HorizontalAlignment="Center" 
@@ -103,7 +103,7 @@
 								</Grid>
 							</gb:GroupBox>
 						</Grid>
-						<gb:GroupBox Header="Changelog" Theme="{StaticResource GroupBoxClassic}">
+						<gb:GroupBox Header="{DynamicResource Grp.Changelog}" Theme="{StaticResource GroupBoxClassic}">
 							<ScrollViewer Margin="5">
 								<ItemsControl ItemsSource="{Binding ChangeLog}">
 									<ItemsControl.ItemTemplate>
@@ -116,12 +116,12 @@
 						</gb:GroupBox>
 					</DockPanel>
 				</TabItem>
-				<TabItem Header="Update" Theme="{StaticResource CustomTabItm}" IsEnabled="{Binding CanUpdate}">
+				<TabItem Header="{DynamicResource Tab.Update}" Theme="{StaticResource CustomTabItm}" IsEnabled="{Binding CanUpdate}">
 					<DockPanel>
 						<StackPanel DockPanel.Dock="Top">
-							<gb:GroupBox Header="Select new version" Theme="{StaticResource GroupBoxClassic}">
+							<gb:GroupBox Header="{DynamicResource Grp.SelectNewVersion}" Theme="{StaticResource GroupBoxClassic}">
 								<Grid Margin="20, 10" ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto">
-									<TextBlock Text="Select artifact:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+									<TextBlock Text="{DynamicResource Upd.SelectArtifact}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
 									<ComboBox ItemsSource="{Binding Artifacts}" 
 											  SelectedItem="{Binding SelectedArtifact}" 
 											  Grid.Column="2" Grid.Row="0" 
@@ -129,13 +129,13 @@
 											  IsEnabled="{Binding !HasUpdated}"/>
 									<CheckBox IsChecked="{Binding DownloadROMs}" 
 											  Grid.Row="1" Grid.ColumnSpan="3" 
-											  Content="Also download ROMs" 
+											  Content="{DynamicResource Upd.AlsoDownloadRoms}" 
 											  Margin="0, 10, 0, 0" 
 											  HorizontalAlignment="Right"
 											  IsEnabled="{Binding !HasUpdated}"/>
 								</Grid>
 							</gb:GroupBox>
-							<gb:GroupBox Header="Archive current build" Theme="{StaticResource GroupBoxClassic}">
+							<gb:GroupBox Header="{DynamicResource Grp.ArchiveCurrent}" Theme="{StaticResource GroupBoxClassic}">
 								<gb:GroupBox.IsVisible>
 									<MultiBinding Converter="{x:Static BoolConverters.And}">
 										<Binding Path="CanArchive" Mode="OneWay" />
@@ -144,19 +144,19 @@
 								</gb:GroupBox.IsVisible>
 								<StackPanel Margin="20, 10">
 									<Grid ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto, Auto">
-										<TextBlock Text="Name:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+										<TextBlock Text="{DynamicResource Upd.Name}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
 										<TextBox Text="{Binding ArchiveName}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" />
-										<TextBlock Text="Version:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="0, 2, 0, 0" />
+										<TextBlock Text="{DynamicResource Upd.Version}" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="0, 2, 0, 0" />
 										<TextBox Text="{Binding ArchiveVersion}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" Margin="0, 2, 0, 0" />
-										<TextBlock Text="Comment:" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="0, 2, 0, 0" />
+										<TextBlock Text="{DynamicResource Upd.Comment}" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Margin="0, 2, 0, 0" />
 										<TextBox Text="{Binding ArchiveComment}" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Stretch" Margin="0, 2, 0, 0" />
 									</Grid>
-									<TextBlock TextTrimming="CharacterEllipsis" Text="If you do not want this build archived, leave the name blank." />
+									<TextBlock TextTrimming="CharacterEllipsis" Text="{DynamicResource Upd.ArchiveNote}" />
 								</StackPanel>
 							</gb:GroupBox>
 						</StackPanel>
 						<ProgressBar DockPanel.Dock="Bottom" Margin="0, 5, 0, 10" MinHeight="3" Height="3" Minimum="0" Maximum="100" Value="{Binding DM.Progress}" />
-						<gb:GroupBox Header="Update log" Theme="{StaticResource GroupBoxClassic}">
+						<gb:GroupBox Header="{DynamicResource Grp.UpdateLog}" Theme="{StaticResource GroupBoxClassic}">
 							<ScrollViewer Margin="5" Name="UptScrollViewer">
 								<ItemsControl ItemsSource="{Binding UpdateLog}">
 									<ItemsControl.ItemTemplate>
@@ -169,7 +169,7 @@
 						</gb:GroupBox>
 					</DockPanel>
 				</TabItem>
-				<TabItem Header="Download" Theme="{StaticResource CustomTabItm}" IsVisible="False">
+				<TabItem Header="{DynamicResource Tab.Download}" Theme="{StaticResource CustomTabItm}" IsVisible="False">
 					<StackPanel>
 						<gb:GroupBox Header="Download release a build" Theme="{StaticResource GroupBoxClassic}">
 						
@@ -179,63 +179,57 @@
 						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>
-				<TabItem Header="Information" Theme="{StaticResource CustomTabItm}">
+				<TabItem Header="{DynamicResource Tab.Information}" Theme="{StaticResource CustomTabItm}">
 					<TabItem.Styles>
 						<Style Selector="SelectableTextBlock">
 							<Setter Property="HorizontalAlignment" Value="Right" />
 						</Style>
 					</TabItem.Styles>
 					<StackPanel>
-						<gb:GroupBox Header="Current build" Theme="{StaticResource GroupBoxClassic}">
+						<gb:GroupBox Header="{DynamicResource Grp.CurrentBuild}" Theme="{StaticResource GroupBoxClassic}">
 							<Grid Margin="20, 10" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto">
-								<TextBlock Text="Version:" Grid.Column="0" Grid.Row="0" />
+								<TextBlock Text="{DynamicResource Upd.Version}" Grid.Column="0" Grid.Row="0" />
 								<SelectableTextBlock Text="{Binding CurrentExe.Version}" Grid.Column="1" Grid.Row="0" />
 								<TextBlock Text="Build:" Grid.Column="0" Grid.Row="1" />
 								<SelectableTextBlock Text="{Binding CurrentExe.Build}" Grid.Column="1" Grid.Row="1" />
-								<TextBlock Text="CPU arciteture:" Grid.Column="0" Grid.Row="2" />
+								<TextBlock Text="{DynamicResource Upd.CpuArch}" Grid.Column="0" Grid.Row="2" />
 								<SelectableTextBlock Text="{Binding CurrentExe.Arch}" Grid.Column="1" Grid.Row="2" />
-								<TextBlock Text="Executable:" Grid.Column="0" Grid.Row="3" />
+								<TextBlock Text="{DynamicResource Upd.Executable}" Grid.Column="0" Grid.Row="3" />
 								<SelectableTextBlock Text="{Binding CurrentExe.VMExe}" Grid.Column="1" Grid.Row="3" />
 							</Grid>
 						</gb:GroupBox>
-						<gb:GroupBox Header="Current Firmware / ROMs" Theme="{StaticResource GroupBoxClassic}">
+						<gb:GroupBox Header="{DynamicResource Grp.CurrentFirmware}" Theme="{StaticResource GroupBoxClassic}">
 							<Grid Margin="20, 10" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
-								<TextBlock Text="Path:" Grid.Column="0" Grid.Row="0" />
+								<TextBlock Text="{DynamicResource Upd.Path}" Grid.Column="0" Grid.Row="0" />
 								<SelectableTextBlock Text="{Binding CurrentExe.VMRoms}" Grid.Column="1" Grid.Row="0" />
-								<TextBlock Text="Last updated:" Grid.Column="0" Grid.Row="1" />
+								<TextBlock Text="{DynamicResource Upd.LastUpdated}" Grid.Column="0" Grid.Row="1" />
 								<SelectableTextBlock Text="{Binding RomsLastUpdatedStr}" Grid.Column="1" Grid.Row="1" />
 							</Grid>
 						</gb:GroupBox>
 					</StackPanel>
 				</TabItem>
-				<TabItem Header="Settings" Theme="{StaticResource CustomTabItm}" IsEnabled="{Binding !DM.IsUpdating}">
+				<TabItem Header="{DynamicResource Tab.Settings}" Theme="{StaticResource CustomTabItm}" IsEnabled="{Binding !DM.IsUpdating}">
 					<Grid RowDefinitions="Auto, *">
-						<gb:GroupBox Header="Preserving current build" Theme="{StaticResource GroupBoxClassic}">
+						<gb:GroupBox Header="{DynamicResource Grp.PreservingBuild}" Theme="{StaticResource GroupBoxClassic}">
 							<StackPanel Margin="5, 2" Spacing="5">
-								<TextBlock TextTrimming="CharacterEllipsis">
-									If you wish to keep the current version of 86Box, set an archive folder:
-								</TextBlock>
+								<TextBlock TextTrimming="CharacterEllipsis" Text="{DynamicResource Upd.PreserveBuildText}" />
 								<DockPanel>
-									<Button DockPanel.Dock="Right" Content="Browse..." Margin="10, 0, 0, 0" Click="btnBrowse_Click" />
+									<Button DockPanel.Dock="Right" Content="{DynamicResource Dlg.BrowseDots}" Margin="10, 0, 0, 0" Click="btnBrowse_Click" />
 									<TextBox Text="{Binding ArchivePath}" />
 								</DockPanel>
-								<CheckBox IsChecked="{Binding PreserveROMs}" IsEnabled="{Binding UpdateROMs}" Content="Also preserve ROMs / Firmware" />
-								<TextBlock FontStyle="Italic" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Margin="0, -5, 0, 0">
-									Note, Avalonia86 will only preserve ROMs when you're both archiving 86Box and downloading new ROMs.
-								</TextBlock>
+								<CheckBox IsChecked="{Binding PreserveROMs}" IsEnabled="{Binding UpdateROMs}" Content="{DynamicResource Upd.PreserveRoms}" />
+								<TextBlock FontStyle="Italic" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Margin="0, -5, 0, 0" Text="{DynamicResource Upd.PreserveNote}" />
 							</StackPanel>
 						</gb:GroupBox>
-						<gb:GroupBox Header="Selection of new build" Theme="{StaticResource GroupBoxClassic}" Grid.Row="1" Margin="0, 0, 0, 10">
+						<gb:GroupBox Header="{DynamicResource Grp.SelectionNewBuild}" Theme="{StaticResource GroupBoxClassic}" Grid.Row="1" Margin="0, 0, 0, 10">
 							<Grid ColumnDefinitions="Auto, 10, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto" Margin="5, 2">
-								<TextBlock Text="Preferred CPU arch:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
+								<TextBlock Text="{DynamicResource Upd.PrefCpuArch}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" />
 								<ComboBox ItemsSource="{Binding Architectures}" SelectedItem="{Binding SelectedArch}" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" />
-								<TextBlock Text="Preferred OS:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" />
+								<TextBlock Text="{DynamicResource Upd.PrefOS}" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" />
 								<ComboBox ItemsSource="{Binding OSs}" SelectedItem="{Binding SelectedOS}" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" />
-								<CheckBox IsChecked="{Binding PrefNDR}" Content="Prefer New Dynamic Recompiler" Grid.Row="2" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
-								<CheckBox IsChecked="{Binding UpdateROMs}" Content="Also update ROMs / Firmware" Grid.Row="3" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
-								<TextBlock Grid.Row="4" Grid.ColumnSpan="3" FontStyle="Italic" TextWrapping="Wrap" TextTrimming="CharacterEllipsis">
-									If update roms is set, Avalonia86 will check the box if the stored ROMs are older than the last Github commit on the ROMs repository. 
-								</TextBlock>
+								<CheckBox IsChecked="{Binding PrefNDR}" Content="{DynamicResource Upd.PrefNDR}" Grid.Row="2" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
+								<CheckBox IsChecked="{Binding UpdateROMs}" Content="{DynamicResource Upd.UpdateRoms}" Grid.Row="3" Grid.ColumnSpan="3" Margin="0, 10, 0, 0" />
+								<TextBlock Grid.Row="4" Grid.ColumnSpan="3" FontStyle="Italic" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Text="{DynamicResource Upd.RomsNote}" />
 							</Grid>
 						</gb:GroupBox>
 					</Grid>
@@ -244,20 +238,20 @@
 		</DockPanel>
 		<DockPanel IsVisible="{Binding !Has86BoxFolder, Mode=OneTime}">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
-				<Button Content="Close" HorizontalAlignment="Stretch" Margin="0,0,32,12" 
+				<Button Content="{DynamicResource Dlg.Close}" HorizontalAlignment="Stretch" Margin="0,0,32,12" 
 						IsDefault="{Binding !Has86BoxFolder, Mode=OneTime}"
 						IsCancel="{Binding !Has86BoxFolder, Mode=OneTime}" Click="btnCancel_Click" />
 			</StackPanel>
 			<StackPanel VerticalAlignment="Center">
 				<TextBlock Foreground="Red" FontSize="36"
 						   HorizontalAlignment="Center"
-						   Text="Folder for 86Box not set" />
+						   Text="{DynamicResource Upd.FolderNotSet}" />
 				<TextBlock Foreground="Green"
 						   HorizontalAlignment="Center"
-						   Text="Please set 86Box path in program settings" />
+						   Text="{DynamicResource Upd.SetPathNote}" />
 				<TextBlock Foreground="Green" FontSize="10"
 						   HorizontalAlignment="Center"
-						   Text="(You can then download 86Box from here)" />
+						   Text="{DynamicResource Upd.DownloadNote}" />
 			</StackPanel>
 		</DockPanel>
 		<v:ctrlGrip />

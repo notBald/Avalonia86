@@ -11,23 +11,23 @@
 	</Design.DataContext>
 	<Grid RowDefinitions="*,*">
 		<DockPanel Grid.Row="0">
-			<TextBlock FontWeight="Bold" Text="System description:" DockPanel.Dock="Top" Margin="0, 0, 0, 4" />
+			<TextBlock FontWeight="Bold" Text="{DynamicResource Info.SysDesc}" DockPanel.Dock="Top" Margin="0, 0, 0, 4" />
 			<TextBox Text="{Binding Desc}" 
 					 AcceptsReturn="True"
 					 TextWrapping="Wrap"
 					 BorderThickness="0"
-					 Watermark="Describe the virtual machine"
+					 Watermark="{DynamicResource Wm.DescribeVm}"
 					 Padding="0, 0, 4, 4"
 					 />
 		</DockPanel>
 		<DockPanel Grid.Row="1">
-			<TextBlock FontWeight="Bold" Text="Notes:" DockPanel.Dock="Top" Margin="0, 0, 0, 4" />
+			<TextBlock FontWeight="Bold" Text="{DynamicResource Info.Notes}" DockPanel.Dock="Top" Margin="0, 0, 0, 4" />
 			<ScrollViewer>
 				<TextBox Text="{Binding Comment}" 
 						 AcceptsReturn="True" 
 						 TextWrapping="Wrap" 
 						 BorderThickness="0" 
-						 Watermark="Enter notes about the virtual machine"
+						 Watermark="{DynamicResource Wm.EnterNotes}"
 						 Padding="0, 0, 4, 4"
 						 />
 			</ScrollViewer>

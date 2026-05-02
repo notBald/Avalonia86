@@ -9,7 +9,7 @@
         Width="410" Height="250"
         x:Class="Avalonia86.Views.dlgCloneVM"
 		x:DataType="v:dlgCloneModel"
-        Title="Clone a virtual machine"
+        Title="{DynamicResource Cln.Title}"
         Opened="dlgCloneVM_Load"
 		Background="{DynamicResource TabDlgBackground}">
 	<Window.Styles>
@@ -29,7 +29,7 @@
 	<Grid>
 		<DockPanel Margin="12">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
-				<Button Name="btnClone" Content="Clone" HorizontalAlignment="Stretch" Click="btnClone_Click" Margin="0,0,20,0" IsDefault="True">
+				<Button Name="btnClone" Content="{DynamicResource Dlg.Clone}" HorizontalAlignment="Stretch" Click="btnClone_Click" Margin="0,0,20,0" IsDefault="True">
 					<Button.IsEnabled>
 						<MultiBinding Converter="{x:Static BoolConverters.And}">
 							<Binding Path="HasName"/>
@@ -37,25 +37,25 @@
 						</MultiBinding>
 					</Button.IsEnabled>
 				</Button>
-				<Button Name="btnCancel" Content="Cancel" HorizontalAlignment="Stretch" Click="btnCancel_Click" Margin="0,0,20,0" IsCancel="True" />
+				<Button Name="btnCancel" Content="{DynamicResource Dlg.Cancel}" HorizontalAlignment="Stretch" Click="btnCancel_Click" Margin="0,0,20,0" IsCancel="True" />
 			</StackPanel>
 			<TabControl Theme="{StaticResource CustomTabCtrl}" Margin="0, 0, 0, 10">
-				<TabItem Header="General" Theme="{StaticResource CustomTabItm}">
-					<gb:GroupBox Header="Clone machine" Margin="0, 0, 0, 10"
+				<TabItem Header="{DynamicResource Tab.General}" Theme="{StaticResource CustomTabItm}">
+					<gb:GroupBox Header="{DynamicResource Grp.CloneMachine}" Margin="0, 0, 0, 10"
 									 Theme="{StaticResource GroupBoxClassic}">
 						<StackPanel Margin="20, 10, 20, 0">
 							<StackPanel Orientation="Horizontal">
-								<TextBlock Text="Machine to clone:" Margin="0,0, 5, 0" />
+								<TextBlock Text="{DynamicResource Cln.MachineToClone}" Margin="0,0, 5, 0" />
 								<SelectableTextBlock Text="{Binding OrgName, Mode=OneWay}" />
 							</StackPanel>
 
 							<Grid>
 								<StackPanel IsVisible="{Binding !IsWorking, Mode=OneWay}">
-									<TextBlock Text="Name of cloned machine will be:" Margin="2, 25, 2, 2"/>
-									<TextBox Name="tbName" Watermark="Enter name" Text="{Binding CloneName}" />
+									<TextBlock Text="{DynamicResource Cln.NameOfClone}" Margin="2, 25, 2, 2"/>
+									<TextBox Name="tbName" Watermark="{DynamicResource Wm.EnterName}" Text="{Binding CloneName}" />
 								</StackPanel>
 								<StackPanel IsVisible="{Binding IsWorking, Mode=OneWay}">
-									<TextBlock Text="Copy in progress:" Margin="2, 25, 2, 2"/>
+									<TextBlock Text="{DynamicResource Cln.CopyInProgress}" Margin="2, 25, 2, 2"/>
 									<ProgressBar Minimum="0" Maximum="100"  Value="{Binding ProgressValue, Mode=OneWay}"/>
 								</StackPanel>
 							</Grid>
