@@ -32,81 +32,54 @@ jobs:
     - name: Publish all platforms
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        sudo apt-get update && sudo apt-get install -y zip
+        sudo apt-get update && sudo apt-get install -y zip wget
         VERSION=${GITHUB_REF_NAME#v}
         mkdir -p dist pub
 
-        # Windows
-        dotnet publish Avalonia86 -r win-x64   -c Release --self-contained true -o dist/win-x64
-        dotnet publish Avalonia86 -r win-arm64 -c Release --self-contained true -o dist/win-arm64
-
-        # Linux
+        dotnet publish Avalonia86 -r win-x64     -c Release --self-contained true -o dist/win-x64
+        dotnet publish Avalonia86 -r win-arm64   -c Release --self-contained true -o dist/win-arm64
         dotnet publish Avalonia86 -r linux-x64   -c Release --self-contained true -o dist/linux-x64
         dotnet publish Avalonia86 -r linux-arm64 -c Release --self-contained true -o dist/linux-arm64
+        dotnet publish Avalonia86 -r osx-x64     -c Release --self-contained true -o dist/osx-x64
+        dotnet publish Avalonia86 -r osx-arm64   -c Release --self-contained true -o dist/osx-arm64
 
-        # macOS
-        dotnet publish Avalonia86 -r osx-x64   -c Release --self-contained true -o dist/osx-x64
-        dotnet publish Avalonia86 -r osx-arm64 -c Release --self-contained true -o dist/osx-arm64
-
-        # Windows zip
         cd dist
         zip -q -r "../pub/Avalonia-86-for-Windows-x64-v${VERSION}.zip"     win-x64
         zip -q -r "../pub/Avalonia-86-for-Windows-ARM64-v${VERSION}.zip"   win-arm64
-
-        # macOS zip
         zip -q -r "../pub/Avalonia-86-for-Mac-x64-v${VERSION}.zip"         osx-x64
         zip -q -r "../pub/Avalonia-86-for-Mac-ARM64-v${VERSION}.zip"       osx-arm64
         cd ..
 
-        # Linux AppImage (x64)
-        APPDIR=dist/Avalonia86-x64.AppDir
-        mkdir -p "$APPDIR/usr/bin"
-        cp -r dist/linux-x64/* "$APPDIR/usr/bin/"
-        cat > "$APPDIR/Avalonia86.desktop" <<DESKTOP
+        build_appimage() {
+          ARCH=$1
+          APPDIR=dist/Avalonia86-${ARCH}.AppDir
+          mkdir -p "$APPDIR/usr/bin"
+          cp -r dist/linux-${ARCH}/* "$APPDIR/usr/bin/"
+          cat > "$APPDIR/Avalonia86.desktop" <<EOF
         [Desktop Entry]
         Name=Avalonia 86
         Exec=Avalonia86
         Icon=Avalonia86
         Type=Application
         Categories=Utility;
-        DESKTOP
-        cat > "$APPDIR/AppRun" <<'APPRUN'
+        EOF
+          cat > "$APPDIR/AppRun" <<'EOF'
         #!/bin/sh
         SELF=$(readlink -f "$0")
-        HERE=\${SELF%/*}
-        export PATH="\${HERE}/usr/bin:\${PATH}"
-        export LD_LIBRARY_PATH="\${HERE}/usr/bin:\${LD_LIBRARY_PATH}"
-        exec "\${HERE}/usr/bin/Avalonia86" "\$@"
-        APPRUN
-        chmod +x "$APPDIR/AppRun"
-        wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /tmp/appimagetool
-        chmod +x /tmp/appimagetool
-        /tmp/appimagetool "$APPDIR" "pub/Avalonia-86-for-Linux-x64-v${VERSION}.AppImage" || \
-          tar -czf "pub/Avalonia-86-for-Linux-x64-v${VERSION}.tar.gz" -C dist linux-x64
+        HERE=${SELF%/*}
+        export PATH="${HERE}/usr/bin:${PATH}"
+        export LD_LIBRARY_PATH="${HERE}/usr/bin:${LD_LIBRARY_PATH}"
+        exec "${HERE}/usr/bin/Avalonia86" "$@"
+        EOF
+          chmod +x "$APPDIR/AppRun"
+          wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /tmp/appimagetool
+          chmod +x /tmp/appimagetool
+          /tmp/appimagetool "$APPDIR" "pub/Avalonia-86-for-Linux-${ARCH}-v${VERSION}.AppImage" || \
+            tar -czf "pub/Avalonia-86-for-Linux-${ARCH}-v${VERSION}.tar.gz" -C dist linux-${ARCH}
+        }
 
-        # Linux AppImage (arm64)
-        APPDIR=dist/Avalonia86-arm64.AppDir
-        mkdir -p "$APPDIR/usr/bin"
-        cp -r dist/linux-arm64/* "$APPDIR/usr/bin/"
-        cat > "$APPDIR/Avalonia86.desktop" <<DESKTOP
-        [Desktop Entry]
-        Name=Avalonia 86
-        Exec=Avalonia86
-        Icon=Avalonia86
-        Type=Application
-        Categories=Utility;
-        DESKTOP
-        cat > "$APPDIR/AppRun" <<'APPRUN'
-        #!/bin/sh
-        SELF=$(readlink -f "$0")
-        HERE=\${SELF%/*}
-        export PATH="\${HERE}/usr/bin:\${PATH}"
-        export LD_LIBRARY_PATH="\${HERE}/usr/bin:\${LD_LIBRARY_PATH}"
-        exec "\${HERE}/usr/bin/Avalonia86" "\$@"
-        APPRUN
-        chmod +x "$APPDIR/AppRun"
-        /tmp/appimagetool "$APPDIR" "pub/Avalonia-86-for-Linux-ARM64-v${VERSION}.AppImage" || \
-          tar -czf "pub/Avalonia-86-for-Linux-ARM64-v${VERSION}.tar.gz" -C dist linux-arm64
+        build_appimage x64
+        build_appimage arm64
 
     - name: Release
       uses: softprops/action-gh-release@v1
