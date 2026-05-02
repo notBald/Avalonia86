@@ -1,4 +1,5 @@
 using Avalonia86.Core;
+using Avalonia86.Localization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -178,7 +179,7 @@ public class ctrlSetExecutableModel : ReactiveObject
     {
         var exeModel = new ExeModel()
         {
-            Name = "Default 86Box executable"
+            Name = L.T("Sts.DefaultExe")
         };
         ExeFiles.Add(exeModel);
 

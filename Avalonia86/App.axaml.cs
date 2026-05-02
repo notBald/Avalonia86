@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
+using Avalonia86.Localization;
 
 namespace Avalonia86
 {
@@ -35,6 +36,7 @@ namespace Avalonia86
 
             Me = this;
             AvaloniaXamlLoader.Load(this);
+            L.Initialize(Resources);
         }
 
         public override void OnFrameworkInitializationCompleted()

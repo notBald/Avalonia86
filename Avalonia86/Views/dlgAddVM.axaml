@@ -12,7 +12,7 @@
         Width="360" Height="455" MinHeight="415" MinWidth="260"
         x:Class="Avalonia86.Views.dlgAddVM"
 		x:DataType="v:dlgAddVMModel"
-        Title="Add a virtual machine"
+        Title="{DynamicResource Add.Title}"
 		Background="{DynamicResource TabDlgBackground}">
 	<Window.Resources>
 		<!-- Imports the custom tab control theme -->
@@ -90,34 +90,34 @@
 	<Grid>
 		<DockPanel Margin="12">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0" Spacing="4" DockPanel.Dock="Bottom">
-				<Button Content="Add" Click="btnAdd_Click" IsEnabled="{Binding CanAdd}" IsDefault="True" />
-				<Button Name="btnCancel" Content="Cancel" Click="btnCancel_OnClick" IsCancel="True" />
+				<Button Content="{DynamicResource Dlg.Add}" Click="btnAdd_Click" IsEnabled="{Binding CanAdd}" IsDefault="True" />
+				<Button Name="btnCancel" Content="{DynamicResource Dlg.Cancel}" Click="btnCancel_OnClick" IsCancel="True" />
 			</StackPanel>
 			<TabControl Name="tbc" SelectedIndex="{Binding TabIndex}" Theme="{StaticResource CustomTabCtrl}" >
-				<TabItem Name="tbiNew" Header="Register" Theme="{StaticResource CustomTabItm}">
+				<TabItem Name="tbiNew" Header="{DynamicResource Tab.Register}" Theme="{StaticResource CustomTabItm}">
 					<DockPanel>
 						<StackPanel Orientation="Vertical" DockPanel.Dock="Bottom" Margin="0,0,0,10">
-							<gb:GroupBox Header="Location for new or existing files"
+							<gb:GroupBox Header="{DynamicResource Grp.LocationNew}"
 											 Theme="{StaticResource GroupBoxClassic}">
 								<DockPanel Margin="12">
-									<Button DockPanel.Dock="Right" Click="btnSelFld_OnClick">Browse</Button>
+									<Button DockPanel.Dock="Right" Click="btnSelFld_OnClick">{DynamicResource Dlg.Browse}</Button>
 									<SelectableTextBlock Text="{Binding InstallPath, Mode=OneWay}"></SelectableTextBlock>
 								</DockPanel>						
 							</gb:GroupBox>
-							<gb:GroupBox Header="After registering the VM"
+							<gb:GroupBox Header="{DynamicResource Grp.AfterRegister}"
 											 Theme="{StaticResource GroupBoxClassic}">
 								<StackPanel Spacing="5" Margin="12">
 									<RadioButton Name="cbxStartVM" GroupName="Startup"
-											  Content="Start the virtual machine"/>
+											  Content="{DynamicResource Add.StartVm}"/>
 									<RadioButton Name="cbxOpenCFG" GroupName="Startup"
-											  Content="Configure the virtual machine"/>
+											  Content="{DynamicResource Add.ConfigVm}"/>
 									<RadioButton IsChecked="True"
 											  GroupName="Startup"
-											  Content="Do nothing"/>
+											  Content="{DynamicResource Add.DoNothing}"/>
 								</StackPanel>
 							</gb:GroupBox>
 						</StackPanel>
-						<gb:GroupBox Header="Fundamentals"
+						<gb:GroupBox Header="{DynamicResource Grp.Fundamentals}"
 									 Theme="{StaticResource GroupBoxClassic}">
 							<DockPanel Margin="10, 5">
 								<DockPanel DockPanel.Dock="Top">
@@ -139,9 +139,9 @@
 									</DockPanel>
 									<Grid Margin="12, 6, 0, 4"
 										  ColumnDefinitions="auto, 5, *" RowDefinitions="auto, 5, auto">
-										<TextBlock Text="Name:" Margin="2, 0, 2, 2" Grid.Column="0" Grid.Row="0" />
-										<TextBox Name="tbName" Watermark="Enter name" Grid.Column="2" Grid.Row="0" Text="{Binding VMName}" />
-										<TextBlock Text="Category:" Margin="2" Grid.Column="0" Grid.Row="2" />
+										<TextBlock Text="{DynamicResource Add.Name}" Margin="2, 0, 2, 2" Grid.Column="0" Grid.Row="0" />
+										<TextBox Name="tbName" Watermark="{DynamicResource Wm.EnterName}" Grid.Column="2" Grid.Row="0" Text="{Binding VMName}" />
+										<TextBlock Text="{DynamicResource Add.Category}" Margin="2" Grid.Column="0" Grid.Row="2" />
 										<AutoCompleteBox Grid.Column="2" Grid.Row="2"
 											 IsTextCompletionEnabled="True"
 											 FilterMode="Contains"
@@ -155,22 +155,22 @@
 									</Grid>
 								</DockPanel>
 								<DockPanel>
-									<TextBlock Text="Description:" Margin="2" DockPanel.Dock="Top" />
-									<TextBox Name="txtDescription" Watermark="Enter description"
+									<TextBlock Text="{DynamicResource Add.Description}" Margin="2" DockPanel.Dock="Top" />
+									<TextBox Name="txtDescription" Watermark="{DynamicResource Wm.EnterDesc}"
 										 AcceptsReturn="True" TextWrapping="Wrap" />
 								</DockPanel>
 							</DockPanel>
 						</gb:GroupBox>
 					</DockPanel>
 				</TabItem>
-				<TabItem Name="tbiImport" Header="Mass Import" Theme="{StaticResource CustomTabItm}">
+				<TabItem Name="tbiImport" Header="{DynamicResource Tab.MassImport}" Theme="{StaticResource CustomTabItm}">
 					<DockPanel Margin="12">
 						<StackPanel DockPanel.Dock="Top">
-							<TextBlock>Import VM files from:</TextBlock>
+							<TextBlock Text="{DynamicResource Add.ImportFrom}" />
 							<StackPanel Orientation="Horizontal" Margin="0,0,0,10">
 								<TextBox Name="txtImportPath" Watermark="Enter path" Width="230" IsEnabled="{Binding !IsWorking}" />
 								<Grid>
-									<Button Name="btnBrowse" Content="Browse..." Click="btnBrowse_Click" />
+									<Button Name="btnBrowse" Content="{DynamicResource Dlg.BrowseDots}" Click="btnBrowse_Click" />
 									<Border Name="Acorn" IsVisible="{Binding IsWorking}">
 										<Path Fill="Brown" Classes="Working" Stroke="Black" StrokeThickness="2"
 										RenderTransformOrigin="50%,50%" Stretch="Uniform" Width="20" Height="20"
@@ -182,7 +182,7 @@
 									</Border>
 								</Grid>
 							</StackPanel>
-							<TextBlock>VMs to import:</TextBlock>
+							<TextBlock Text="{DynamicResource Add.VmsToImport}" />
 						</StackPanel>
 						<!--<ListBox ItemsSource="{Binding Imports}">
 							<ListBox.ItemTemplate>
@@ -205,14 +205,14 @@
 								</Style>
 							</DataGrid.Styles>
 							<DataGrid.Columns>
-								<DataGridCheckBoxColumn Header="Import" Binding="{Binding Import}" />
-								<DataGridTextColumn Header="Name"  Binding="{Binding Name}"/>
-								<DataGridTextColumn Header="Folder" Binding="{Binding Path}" IsReadOnly="True" />
+								<DataGridCheckBoxColumn Header="{DynamicResource Col.Import}" Binding="{Binding Import}" />
+								<DataGridTextColumn Header="{DynamicResource Col.Name}"  Binding="{Binding Name}"/>
+								<DataGridTextColumn Header="{DynamicResource Col.Folder}" Binding="{Binding Path}" IsReadOnly="True" />
 							</DataGrid.Columns>
 						</DataGrid>
 					</DockPanel>
 				</TabItem>
-				<TabItem Header="Advanced" Theme="{StaticResource CustomTabItm}">
+				<TabItem Header="{DynamicResource Tab.Advanced}" Theme="{StaticResource CustomTabItm}">
 					<v:ctrlSetExecutable DataContext="{Binding ExeModel}" />
 				</TabItem>
 			</TabControl>

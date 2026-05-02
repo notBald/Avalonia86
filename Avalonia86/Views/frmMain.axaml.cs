@@ -17,6 +17,7 @@ using System.IO;
 using ReactiveUI;
 using Avalonia86.Converters;
 using Avalonia86.DialogBox;
+using Avalonia86.Localization;
 
 namespace Avalonia86.Views;
 
@@ -247,7 +248,7 @@ public partial class frmMain : BaseWindow
         {
             if (DBStore.InMemDB)
             {
-                await this.ShowError("VMs and Settings will not be saved.", "Failed to create DataBase for settings.");
+                await this.ShowError(L.T("Msg.DbSaveFail"), L.T("Msg.DbSaveFailBody"));
             }
         }
 
@@ -286,9 +287,8 @@ public partial class frmMain : BaseWindow
                 }
             }
 
-            await this.ShowError($@"The virtual machine ""{invVmName}"" could not be found. " +
-                                   "It may have been removed or the specified name is incorrect.",
-                                   "Virtual machine not found");
+            await this.ShowError(string.Format(L.T("Msg.VmNotFoundBody"), invVmName),
+                                   L.T("Msg.VmNotFound"));
         }
 
         return true;
@@ -440,10 +440,8 @@ public partial class frmMain : BaseWindow
         {
             //It's important that the event is canceld before we call await, otherwise the close will proceed.
             e.Cancel = true;
-            var result = await this.ShowQuestion("Some virtual machines are still running. It's " +
-                                                 "recommended you stop them first before closing " +
-                                                 "86Box Manager.\n\nDo you want to stop them now?",
-                                                 "Virtual machines are still running", "Do you want to stop them now?");
+            var result = await this.ShowQuestion(L.T("Dialog.RunningVmsBody"),
+                                                 L.T("Dialog.RunningVmsTitle"), L.T("Dialog.RunningVmsQ"));
             if (result != DialogResult.None)
             {
                 if (result == DialogResult.Yes)
@@ -537,7 +535,7 @@ public partial class frmMain : BaseWindow
 
     private async void btnBrowse_Click(object sender, RoutedEventArgs e)
     {
-        var text = "Select the folder where the virtual machine's (configs, nvr folders, etc.) is located";
+        var text = L.T("Msg.SelectFolderDlg");
         long uid = Model.Machine.Tag.UID;
 
         var fldName = await Dialogs.SelectFolder(Model.Settings.CFGdir, text, parent: this);
@@ -547,7 +545,7 @@ public partial class frmMain : BaseWindow
             var name = Model.Settings.PathToName(fldName);
             if (name != null)
             {
-                await this.ShowError($"The folder you selected is already used by the VM \"{name}\"", "Folder already in use");
+                await this.ShowError(string.Format(L.T("Msg.VmFolderInUseBody"), name), L.T("Msg.VmFolderInUse"));
             }
             else
             {
@@ -686,10 +684,8 @@ public partial class frmMain : BaseWindow
         // If there are running VMs, display the warning and stop the VMs if user says so
         if (VMCenter.IsWatching)
         {
-            var result = await this.ShowQuestion("Some virtual machines are still running. " +
-                                                 "It's recommended you stop them first before " +
-                                                 "closing 86Box Manager. Do you want to stop them now?",
-                                                 "Virtual machines are still running");
+            var result = await this.ShowQuestion(L.T("Dialog.RunningVmsBody"),
+                                                 L.T("Dialog.RunningVmsTitle"));
             if (result == DialogResult.Yes)
             {
                 await VMCenter.CloseAllWindows(this);

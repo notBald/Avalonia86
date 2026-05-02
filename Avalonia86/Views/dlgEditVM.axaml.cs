@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia86.Core;
 using Avalonia86.DialogBox;
+using Avalonia86.Localization;
 using Avalonia86.Tools;
 using Avalonia86.ViewModels;
 using ReactiveUI;
@@ -87,7 +88,7 @@ public partial class dlgEditVM : BaseWindow
         }
         catch (Exception ex)
         {
-            await this.ShowError($@"Unable to save edit: "+ex.Message, ex);
+            await this.ShowError(string.Format(L.T("Msg.EditFail"), ex.Message), ex);
         }
 
         //await Dialogs.ShowMessageBox($@"Virtual machine ""{name}"" was successfully modified.",

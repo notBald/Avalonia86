@@ -27,10 +27,10 @@
 				<TrayIcon Icon="/Assets/86Box-gray.ico" ToolTipText="Avalonia86" Clicked="trayIcon_MouseClick" IsVisible="False">
                     <TrayIcon.Menu>
                         <NativeMenu>
-                            <NativeMenuItem Header="Show Avalonia86" Click="open86BoxManagerToolStripMenuItem_Click" />
-                            <NativeMenuItem Header="Settings" Click="settingsToolStripMenuItem_Click" />
+                            <NativeMenuItem Header="{DynamicResource Tray.Show}" Click="open86BoxManagerToolStripMenuItem_Click" />
+                            <NativeMenuItem Header="{DynamicResource Tray.Settings}" Click="settingsToolStripMenuItem_Click" />
 							<NativeMenuItemSeparator />
-                            <NativeMenuItem Header="Exit" Click="exitToolStripMenuItem_Click" />
+                            <NativeMenuItem Header="{DynamicResource Tray.Exit}" Click="exitToolStripMenuItem_Click" />
                         </NativeMenu>
                     </TrayIcon.Menu>
                 </TrayIcon>

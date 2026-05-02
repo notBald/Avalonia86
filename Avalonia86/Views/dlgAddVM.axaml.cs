@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia86.Core;
 using Avalonia86.DialogBox;
+using Avalonia86.Localization;
 using Avalonia86.Tools;
 using Avalonia86.Xplat;
 using ReactiveUI;
@@ -84,7 +85,7 @@ public partial class dlgAddVM : Window
 
                 if (!is_writable)
                 {
-                    await this.ShowError("You must select a default location for virtual machines, do it in settings.", "No VM folder");
+                    await this.ShowError(L.T("Msg.NoVmSelectedBody"), L.T("Msg.NoVmSelected"));
                     Close();
                 }
                 else
@@ -112,7 +113,7 @@ public partial class dlgAddVM : Window
         var initDir = Platforms.Env.MyComputer;
         if (!string.IsNullOrWhiteSpace(txtImportPath.Text))
             initDir = txtImportPath.Text;
-        var text = "Select a folder that will be searched for virtual machines";
+        var text = L.T("Msg.SelectImportFolder");
 
         var fileName = await Dialogs.SelectFolder(initDir, text, this);
 
@@ -158,7 +159,7 @@ public partial class dlgAddVM : Window
 
                     if (_m.Imports.Count == 0)
                     {
-                        await this.ShowMsg("Sorry, didn't find any Virtual Machines.");
+                        await this.ShowMsg(L.T("Msg.NoVmFound"));
                     }
                 });
             }, bag, empty_bag, cts.Token);
@@ -193,7 +194,7 @@ public partial class dlgAddVM : Window
     {
         if (string.IsNullOrWhiteSpace(_s.CFGdir))
         {
-            await this.ShowError("Please select a folder for imported virtual machines in the program settings.");
+            await this.ShowError(L.T("Msg.ImportNoFolder"));
 
             return false;
         }
@@ -207,7 +208,7 @@ public partial class dlgAddVM : Window
 
         if (to_import.Count == 0)
         {
-            await this.ShowMsg("You have not selected any virtual machines to import.");
+            await this.ShowMsg(L.T("Msg.ImportNoSelection"));
             
             return false;
         }
@@ -258,7 +259,7 @@ public partial class dlgAddVM : Window
     {
         if (!_m.HasPath)
         {
-            await this.ShowError($@"You need to set a VM folder in settings or select a folder.", "No VM Folder");
+            await this.ShowError(L.T("Msg.NoVmFolderBody"), L.T("Msg.NoVmFolder"));
             return false;
         }
 
@@ -268,7 +269,7 @@ public partial class dlgAddVM : Window
         string name = _s.PathToName(ip);
         if (name != null)
         {
-            await this.ShowError($"The folder you selected is already used by the VM \"{name}\"", "Folder already in use");
+            await this.ShowError(string.Format(L.T("Msg.FolderInUseBody"), name), L.T("Msg.FolderInUse"));
             return false;
         }
 
@@ -314,7 +315,7 @@ public partial class dlgAddVM : Window
     private async void btnSelFld_OnClick(object sender, RoutedEventArgs e)
     {
         var initDir = _m.InstallPath;
-        var text = "Select a folder where the 86Box files are (to be) located";
+        var text = L.T("Msg.SelectVmDestFolder");
 
         var fldName = await Dialogs.SelectFolder(initDir, text, parent: this);
 

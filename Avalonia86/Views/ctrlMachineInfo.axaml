@@ -31,49 +31,49 @@
 	<Border BorderBrush="{DynamicResource TopLeftBorder}" BorderThickness="1, 1, 0, 0">
 		<ScrollViewer VerticalAlignment="Stretch">
 			<StackPanel VerticalAlignment="Stretch" Spacing="10">
-				<Expander HorizontalAlignment="Stretch" Header="System" IsExpanded="True">
+				<Expander HorizontalAlignment="Stretch" Header="{DynamicResource HW.System}" IsExpanded="True">
 					<Grid ColumnDefinitions="Auto, 5, Auto" RowDefinitions="*, *, *, *">
-						<TextBlock Grid.Row="0" Grid.Column="0">Machine:</TextBlock>
+						<TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource HW.Machine}" />
 						<SelectableTextBlock Grid.Row="0" Grid.Column="2" Text="{Binding SystemMachine, Mode=OneWay}" />
-						<TextBlock Grid.Row="1" Grid.Column="0">Type:</TextBlock>
+						<TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource HW.Type}" />
 						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SystemType, Mode=OneWay}" />
-						<TextBlock Grid.Row="2" Grid.Column="0">Memory:</TextBlock>
+						<TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource HW.Memory}" />
 						<SelectableTextBlock Grid.Row="2" Grid.Column="2" Text="{Binding SystemMemory, Mode=OneWay}" />
-						<TextBlock Grid.Row="3" Grid.Column="0">CPU:</TextBlock>
+						<TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource HW.CPU}" />
 						<SelectableTextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CPUandMHz, Mode=OneWay}" />
 					</Grid>
 				</Expander>
-				<Expander HorizontalAlignment="Stretch" Header="Display" IsExpanded="True">
+				<Expander HorizontalAlignment="Stretch" Header="{DynamicResource HW.Display}" IsExpanded="True">
 					<Grid ColumnDefinitions="Auto, 5, Auto" RowDefinitions="*, *">
-						<TextBlock Grid.Row="0" Grid.Column="0">Graphics:</TextBlock>
+						<TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource HW.Graphics}" />
 						<SelectableTextBlock Grid.Row="0" Grid.Column="2" Text="{Binding System2D, Mode=OneWay}" />
-						<TextBlock Grid.Row="1" Grid.Column="0">Accelerator:</TextBlock>
+						<TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource HW.Accelerator}" />
 						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding System3D, Mode=OneWay}" />
 					</Grid>
 				</Expander>
-				<Expander HorizontalAlignment="Stretch" Header="Audio" IsExpanded="True">
+				<Expander HorizontalAlignment="Stretch" Header="{DynamicResource HW.Audio}" IsExpanded="True">
 					<Grid ColumnDefinitions="Auto, 5, Auto" RowDefinitions="*, *">
-						<TextBlock Grid.Row="0" Grid.Column="0">Sound:</TextBlock>
+						<TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource HW.Sound}" />
 						<SelectableTextBlock Grid.Row="0" Grid.Column="2" Text="{Binding SystemAud, Mode=OneWay}" />
-						<TextBlock Grid.Row="1" Grid.Column="0">MIDI:</TextBlock>
+						<TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource HW.MIDI}" />
 						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SystemMidi, Mode=OneWay}" />
 					</Grid>
 				</Expander>
-				<Expander HorizontalAlignment="Stretch" Header="Storage" IsExpanded="True">
+				<Expander HorizontalAlignment="Stretch" Header="{DynamicResource HW.Storage}" IsExpanded="True">
 					<Grid ColumnDefinitions="Auto, 5, Auto" RowDefinitions="*, *, *">
-						<TextBlock Grid.Row="0" Grid.Column="0">Floppy:</TextBlock>
+						<TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource HW.Floppy}" />
 						<SelectableTextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Floppy, Mode=OneWay}" />
-						<TextBlock Grid.Row="1" Grid.Column="0">Hard Disk:</TextBlock>
+						<TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource HW.HardDisk}" />
 						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding HardDisk, Mode=OneWay}" />
-						<TextBlock Grid.Row="2" Grid.Column="0">CD-drive:</TextBlock>
+						<TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource HW.CDDrive}" />
 						<SelectableTextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CDROM, Mode=OneWay}" />
 					</Grid>
 				</Expander>
-				<Expander HorizontalAlignment="Stretch" Header="Input Devices" IsExpanded="True">
+				<Expander HorizontalAlignment="Stretch" Header="{DynamicResource HW.InputDevices}" IsExpanded="True">
 					<Grid ColumnDefinitions="Auto, 5, Auto" RowDefinitions="*, *">
-						<TextBlock Grid.Row="0" Grid.Column="0">Mouse:</TextBlock>
+						<TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource HW.Mouse}" />
 						<SelectableTextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Mouse, Mode=OneWay}" />
-						<TextBlock Grid.Row="1" Grid.Column="0">Joystick:</TextBlock>
+						<TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource HW.Joystick}" />
 						<SelectableTextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Joystick, Mode=OneWay}" />
 					</Grid>
 				</Expander>

@@ -1,6 +1,6 @@
 # Avalonia 86
 
-**Avalonia 86** is a configuration manager for the [86Box emulator](https://github.com/86Box/86Box).
+**Avalonia 86** is a configuration manager for the [86Box emulator](https://github.com/86Box/86Box) and [PCBox emulator](https://github.com/PCBox/PCBox).
 
 ![Desktop](/images/UI-white_and_dark.png?raw=true)
 
@@ -10,19 +10,41 @@
 - Sort them into categories
 - Display machine information and images
 - A tray icon so that the Manager window doesn't get in your way
+- Supports both 86Box and PCBox executables
+
+## Localization
+
+Avalonia 86 supports the following languages:
+
+| Language | Status |
+|----------|--------|
+| English | Complete |
+| 简体中文 (Simplified Chinese) | Complete |
+| 繁體中文 (Traditional Chinese) | Complete |
+
+The UI language is automatically selected based on your system settings. To add a new language, edit `Avalonia86/Localization/L.cs`.
 
 ## System requirements
 
-System requirements are the same as for 86Box. Additionally, the following is required:
+System requirements are the same as for 86Box / PCBox. Additionally, the following is required:
 
 - [86Box 2.0](https://github.com/86Box/86Box/releases) or later (earlier builds are untested)
 - [.NET 9.0](https://dotnet.microsoft.com/download/dotnet/9.0)
+
+### Self-contained builds
+
+Starting from this version, official release builds are **self-contained** — the .NET runtime is bundled inside the application. You do **not** need to install .NET separately.
+
+- **Baseline**: .NET 6.0
+- **Windows**: Supported from Windows 7 to Windows 11 (x64 / ARM64)
+- **Linux**: x64 / ARM64 (AppImage)
+- **macOS**: x64 / ARM64
 
 ## How to use
 
 1. Download the desired build [here](https://github.com/notBald/Avalonia86/releases).
 2. Run `Avalonia86.exe`.
-3. Go to Settings, choose the folder where `86Box.exe` is located (along with the roms folder) and a folder where your virtual machines will be located (for configs, nvr folders, etc.).
+3. Go to Settings, choose the folder where `86Box.exe` or `PCBox.exe` is located (along with the roms folder) and a folder where your virtual machines will be located (for configs, nvr folders, etc.).
 4. Start creating new virtual machines and enjoy.
 
 ## Using on Windows
@@ -39,7 +61,7 @@ You may have to install .net 9.0. In that case, you will get a message like the 
 
 For older builds, see the [Linux Guide](Linux.md).
 
-Newer builds are AppImages, same as 86Box. Just remember to set the AppImage executable before running. 
+Newer builds are AppImages, same as 86Box. Just remember to set the AppImage executable before running.
 
 ## How to build
 
@@ -48,6 +70,21 @@ Newer builds are AppImages, same as 86Box. Just remember to set the AppImage exe
 3. Make your changes
 4. Choose the `Release` or `Debug` configuration
 5. Build the solution
+
+### Building self-contained releases
+
+```sh
+# Windows x64
+dotnet publish Avalonia86 -r win-x64 -c Release --self-contained true
+
+# Linux x64
+dotnet publish Avalonia86 -r linux-x64 -c Release --self-contained true
+
+# macOS ARM64
+dotnet publish Avalonia86 -r osx-arm64 -c Release --self-contained true
+```
+
+Or use `build.sh` to build all platforms at once.
 
 ## License
 

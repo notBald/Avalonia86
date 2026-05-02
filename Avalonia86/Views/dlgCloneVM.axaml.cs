@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia86.Core;
 using Avalonia86.DialogBox;
+using Avalonia86.Localization;
 using Avalonia86.Tools;
 using ReactiveUI;
 using System;
@@ -59,7 +60,7 @@ public partial class dlgCloneVM : Window
         if (_m.IsWorking && !_stop_cloning)
         {
             e.Cancel = true;
-            var resp = await this.ShowQuestion("Cloning is in progress, do you really want to cancel it?");
+            var resp = await this.ShowQuestion(L.T("Msg.CloneCancel"));
 
             if (resp == DialogResult.Yes)
             {
@@ -76,7 +77,7 @@ public partial class dlgCloneVM : Window
         
         if (_m.OrgName == null)
         { 
-            await this.ShowError("Fatal error, failed to find machine that was to be cloned");
+            await this.ShowError(L.T("Msg.CloneFatal"));
             Close();
             return;
         }
@@ -87,7 +88,7 @@ public partial class dlgCloneVM : Window
         var cfgpath = _s.CFGdir;
         if (string.IsNullOrWhiteSpace(cfgpath))
         {
-            await this.ShowError($@"You need to set a VM folder in settings!", "No VM Folder");
+            await this.ShowError(L.T("Msg.NoVmFolderSettings"), L.T("Msg.NoVmFolder"));
             return;
         }
 
@@ -103,7 +104,7 @@ public partial class dlgCloneVM : Window
 
         if (old_path == null)
         {
-            await this.ShowError($@"There was an error reading from the database, try again.", "Import failed");
+            await this.ShowError(L.T("Msg.DbReadErrorBody"), L.T("Msg.DbReadError"));
 
             return;
         }
@@ -144,7 +145,7 @@ public partial class dlgCloneVM : Window
 
             if (importFailed)
             {
-                await this.ShowError($@"Virtual machine could not be imported: {error}", "Import failed");
+                await this.ShowError(string.Format(L.T("Msg.ImportFailBody"), error), L.T("Msg.ImportFail"));
 
                 return;
             }
@@ -163,14 +164,12 @@ public partial class dlgCloneVM : Window
 
             if (importFailed)
             {
-                await this.ShowError($@"Virtual machine was copied but could not be registered: {error}", "Import failed");
+                await this.ShowError(string.Format(L.T("Msg.ImportRegFail"), error), L.T("Msg.ImportFail"));
 
                 return;
             }
 
-            await this.ShowMsg($@"Virtual machine ""{sp.Name}"" was successfully created, files " +
-                                 "were imported. Remember to update any paths pointing to disk images in " +
-                                 "your config!", "Success");
+            await this.ShowMsg(string.Format(L.T("Msg.ImportSuccessBody"), sp.Name), L.T("Msg.ImportSuccess"));
 
             Close(DialogResult.Ok);
         });

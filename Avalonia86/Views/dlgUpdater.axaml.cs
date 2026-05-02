@@ -1,4 +1,5 @@
 using Avalonia86.Core;
+using Avalonia86.Localization;
 using Avalonia86.Tools;
 using Avalonia86.Xplat;
 using Avalonia;
@@ -135,7 +136,7 @@ public partial class dlgUpdater : BaseWindow
 
     private async void btnBrowse_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        var text = "Select a folder where 86Box builds will be archived";
+        var text = L.T("Msg.SelectArchiveFolder");
 
         var fldName = await Dialogs.SelectFolder(_m.CurrentExe.VMExe ?? AppDomain.CurrentDomain.BaseDirectory, text, parent: this);
 
@@ -146,7 +147,7 @@ public partial class dlgUpdater : BaseWindow
             if (!FolderHelper.IsDirectoryWritable(fldName))
             {
                 await new DialogBoxBuilder(this)
-                         .WithMessage("The selected folder is not writable.")
+                         .WithMessage(L.T("Msg.FolderNotWritable"))
                          .WithIcon(DialogIcon.Warning)
                          .ShowDialog();
             }
@@ -340,15 +341,15 @@ public class dlgUpdaterModel : ReactiveObject, IDisposable
 
         Architectures = new List<IDtoNAME> 
         { 
-            new IDtoNAME() { ID = "arm", Name = "Arm 64" },
-            new IDtoNAME() { ID = "64", Name = "Intel/AMD x64"}
+            new IDtoNAME() { ID = "arm", Name = L.T("Msg.Arm64") },
+            new IDtoNAME() { ID = "64", Name = L.T("Msg.X64")}
         };
 
         OSs = new()
         {
-            new IDtoNAME() { ID = "linux", Name = "Linux" },
+            new IDtoNAME() { ID = "linux", Name = L.T("Msg.Linux") },
             new IDtoNAME() { ID = "mac", Name = "macOS" },
-            new IDtoNAME() { ID = "windows", Name = "Windows" },
+            new IDtoNAME() { ID = "windows", Name = L.T("Msg.Windows") },
         };
 
         if (Design.IsDesignMode)
