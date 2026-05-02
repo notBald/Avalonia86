@@ -100,7 +100,7 @@
 							<gb:GroupBox Header="{DynamicResource Grp.LocationNew}"
 											 Theme="{StaticResource GroupBoxClassic}">
 								<DockPanel Margin="12">
-									<Button DockPanel.Dock="Right" Click="btnSelFld_OnClick">{DynamicResource Dlg.Browse}</Button>
+									<Button DockPanel.Dock="Right" Click="btnSelFld_OnClick" Content="{DynamicResource Dlg.Browse}" />
 									<SelectableTextBlock Text="{Binding InstallPath, Mode=OneWay}"></SelectableTextBlock>
 								</DockPanel>						
 							</gb:GroupBox>

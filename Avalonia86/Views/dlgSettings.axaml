@@ -158,11 +158,11 @@
 						<DockPanel Margin="9, 9, 9, 5">
 							<Grid DockPanel.Dock="Top" Margin="0,0,0,2" ColumnDefinitions="Auto, *, Auto">
 								<StackPanel Orientation="Horizontal"  Spacing="2" Grid.Column="0">
-									<Button Click="btnAddExe_Click">{DynamicResource Dlg.Add}</Button>
-									<Button Click="btnRemove_Click" IsEnabled="{Binding HasSelectedExe}">{DynamicResource Dlg.Remove}</Button>
-									<Button Click="btnEdit_Click" IsEnabled="{Binding HasSelectedExe}">{DynamicResource Dlg.Edit}</Button>
+									<Button Click="btnAddExe_Click" Content="{DynamicResource Dlg.Add}" />
+									<Button Click="btnRemove_Click" IsEnabled="{Binding HasSelectedExe}" Content="{DynamicResource Dlg.Remove}" />
+									<Button Click="btnEdit_Click" IsEnabled="{Binding HasSelectedExe}" Content="{DynamicResource Dlg.Edit}" />
 								</StackPanel>
-								<Button Click="btnImport_click" Grid.Column="2">{DynamicResource Dlg.ImportFolder}</Button>
+								<Button Click="btnImport_click" Grid.Column="2" Content="{DynamicResource Dlg.ImportFolder}" />
 							</Grid>
 							<DockPanel>
 								<Grid DockPanel.Dock="Bottom" ColumnDefinitions="32, *" Margin="0, 4, 0, 0">
@@ -177,7 +177,7 @@
 									</RadioButton>
 									<Label Grid.Column="1" Content="{DynamicResource Cfg.PreferDefault}" Tapped="label_default_tapped" />
 								</Grid>
-								<DataGrid x:Name="DG_Exes" RowBackground="{DynamicResource GridRowBackground}" SelectedItem="{Binding SelectedExe}, Mode=OneWayToSource" BorderThickness="0"
+								<DataGrid x:Name="DG_Exes" RowBackground="{DynamicResource GridRowBackground}" SelectedItem="{Binding SelectedExe, Mode=OneWayToSource}" BorderThickness="0"
 									GridLinesVisibility="All" BeginningEdit="DataGrid_BeginningEdit" ItemsSource="{Binding FilteredExecutables}" LoadingRow="DataGrid_LoadingRow">
 									<DataGrid.Styles>
 										<Style Selector="ScrollBar">
