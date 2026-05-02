@@ -39,6 +39,7 @@ APPDIR=dist/Avalonia86-x64.AppDir
 rm -rf "$APPDIR"
 mkdir -p "$APPDIR/usr/bin"
 cp -r dist/linux-x64/* "$APPDIR/usr/bin/"
+cp Avalonia86/Assets/86Box-gray.png "$APPDIR/Avalonia86.png"
 cat > "$APPDIR/Avalonia86.desktop" <<'EOF'
 [Desktop Entry]
 Name=Avalonia 86
@@ -63,6 +64,7 @@ APPDIR=dist/Avalonia86-arm64.AppDir
 rm -rf "$APPDIR"
 mkdir -p "$APPDIR/usr/bin"
 cp -r dist/linux-arm64/* "$APPDIR/usr/bin/"
+cp Avalonia86/Assets/86Box-gray.png "$APPDIR/Avalonia86.png"
 cat > "$APPDIR/Avalonia86.desktop" <<'EOF'
 [Desktop Entry]
 Name=Avalonia 86
