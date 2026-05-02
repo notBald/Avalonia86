@@ -55,6 +55,7 @@ jobs:
 
         wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /tmp/appimagetool
         chmod +x /tmp/appimagetool
+        export APPIMAGE_EXTRACT_AND_RUN=1
 
         build_appimage() {
           ARCH=$1
