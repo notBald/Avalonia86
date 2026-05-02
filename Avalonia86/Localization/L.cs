@@ -220,7 +220,7 @@ internal static class L
         // Welcome page
         ["Wel.Title"] = "Welcome to Avalonia 86",
         ["Wel.BasedOn"] = "Based on work by David Simunič and Laci bá'.",
-        ["Wel.Intro"] = "This is a front end for 86Box. Note, 86Box now also have a built in manager.",
+        ["Wel.Intro"] = "This is a front end for 86Box. Note, 86Box now includes a built-in manager.",
         ["Wel.Quickstart"] = "Quickstart",
         ["Wel.Step1"] = " 1. Go to Tools -> Program Settings",
         ["Wel.Step2"] = " 2. Select an 86Box executable and a VM folder",
