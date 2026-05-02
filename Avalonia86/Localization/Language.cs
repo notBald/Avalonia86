@@ -30,6 +30,11 @@
             return Key.GetHashCode();
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is Language other && Key.Equals(other.Key);
+        }
+
         internal static Language Find(string key)
         {
             for(int i = 0; i < Languages.Length; i++)
