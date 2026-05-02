@@ -25,11 +25,21 @@ zip -q -r ../pub/Avalonia-86-for-Mac-x64.zip         osx-x64
 zip -q -r ../pub/Avalonia-86-for-Mac-ARM64.zip       osx-arm64
 cd ..
 
+# Download appimagetool if not present
+if ! command -v appimagetool >/dev/null 2>&1; then
+  wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /tmp/appimagetool
+  chmod +x /tmp/appimagetool
+  APPIMAGETOOL=/tmp/appimagetool
+else
+  APPIMAGETOOL=appimagetool
+fi
+
 # Package Linux AppImage (x64)
 APPDIR=dist/Avalonia86-x64.AppDir
+rm -rf "$APPDIR"
 mkdir -p "$APPDIR/usr/bin"
 cp -r dist/linux-x64/* "$APPDIR/usr/bin/"
-cat > "$APPDIR/Avalonia86.desktop" <<EOF
+cat > "$APPDIR/Avalonia86.desktop" <<'EOF'
 [Desktop Entry]
 Name=Avalonia 86
 Exec=Avalonia86
@@ -46,17 +56,14 @@ export LD_LIBRARY_PATH="${HERE}/usr/bin:${LD_LIBRARY_PATH}"
 exec "${HERE}/usr/bin/Avalonia86" "$@"
 EOF
 chmod +x "$APPDIR/AppRun"
-if command -v appimagetool >/dev/null 2>&1; then
-  appimagetool "$APPDIR" "pub/Avalonia-86-for-Linux-x64.AppImage"
-else
-  tar -czf pub/Avalonia-86-for-Linux-x64.tar.gz -C dist linux-x64
-fi
+$APPIMAGETOOL --no-appstream "$APPDIR" "pub/Avalonia-86-for-Linux-x64.AppImage"
 
 # Package Linux AppImage (arm64)
 APPDIR=dist/Avalonia86-arm64.AppDir
+rm -rf "$APPDIR"
 mkdir -p "$APPDIR/usr/bin"
 cp -r dist/linux-arm64/* "$APPDIR/usr/bin/"
-cat > "$APPDIR/Avalonia86.desktop" <<EOF
+cat > "$APPDIR/Avalonia86.desktop" <<'EOF'
 [Desktop Entry]
 Name=Avalonia 86
 Exec=Avalonia86
@@ -73,8 +80,4 @@ export LD_LIBRARY_PATH="${HERE}/usr/bin:${LD_LIBRARY_PATH}"
 exec "${HERE}/usr/bin/Avalonia86" "$@"
 EOF
 chmod +x "$APPDIR/AppRun"
-if command -v appimagetool >/dev/null 2>&1; then
-  appimagetool "$APPDIR" "pub/Avalonia-86-for-Linux-ARM64.AppImage"
-else
-  tar -czf pub/Avalonia-86-for-Linux-ARM64.tar.gz -C dist linux-arm64
-fi
+$APPIMAGETOOL --no-appstream "$APPDIR" "pub/Avalonia-86-for-Linux-ARM64.AppImage"

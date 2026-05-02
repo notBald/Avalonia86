@@ -35,7 +35,7 @@ jobs:
     - name: Publish all platforms
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        sudo apt-get update && sudo apt-get install -y zip wget
+        sudo apt-get update && sudo apt-get install -y zip wget file
         VERSION=${GITHUB_REF_NAME#v}
         mkdir -p dist pub
 
@@ -53,32 +53,36 @@ jobs:
         zip -q -r "../pub/Avalonia-86-for-Mac-ARM64-v${VERSION}.zip"       osx-arm64
         cd ..
 
+        wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /tmp/appimagetool
+        chmod +x /tmp/appimagetool
+
         build_appimage() {
           ARCH=$1
           APPDIR=dist/Avalonia86-${ARCH}.AppDir
+          rm -rf "$APPDIR"
           mkdir -p "$APPDIR/usr/bin"
           cp -r dist/linux-${ARCH}/* "$APPDIR/usr/bin/"
-          cat > "$APPDIR/Avalonia86.desktop" <<EOF
+
+          cat > "$APPDIR/Avalonia86.desktop" <<'DESKTOP'
         [Desktop Entry]
         Name=Avalonia 86
         Exec=Avalonia86
         Icon=Avalonia86
         Type=Application
         Categories=Utility;
-        EOF
-          cat > "$APPDIR/AppRun" <<'EOF'
+        DESKTOP
+
+          cat > "$APPDIR/AppRun" <<'APPRUN'
         #!/bin/sh
         SELF=$(readlink -f "$0")
         HERE=${SELF%/*}
         export PATH="${HERE}/usr/bin:${PATH}"
         export LD_LIBRARY_PATH="${HERE}/usr/bin:${LD_LIBRARY_PATH}"
         exec "${HERE}/usr/bin/Avalonia86" "$@"
-        EOF
+        APPRUN
           chmod +x "$APPDIR/AppRun"
-          wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /tmp/appimagetool
-          chmod +x /tmp/appimagetool
-          /tmp/appimagetool "$APPDIR" "pub/Avalonia-86-for-Linux-${ARCH}-v${VERSION}.AppImage" || \
-            tar -czf "pub/Avalonia-86-for-Linux-${ARCH}-v${VERSION}.tar.gz" -C dist linux-${ARCH}
+
+          /tmp/appimagetool --no-appstream "$APPDIR" "pub/Avalonia-86-for-Linux-${ARCH}-v${VERSION}.AppImage"
         }
 
         build_appimage x64
