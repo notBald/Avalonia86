@@ -36,13 +36,12 @@
     <PackageReference Include="Avalonia" Version="11.3.8" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.8" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.8" />
-    <PackageReference Include="Avalonia.X11" Version="11.3.8" />
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.7" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.8" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.8" />
     <PackageReference Include="Avalonia.Diagnostics" Condition="'$(Configuration)'=='Debug-MSDB'">
       <Version>11.3.8</Version>
     </PackageReference>
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.8" />
-    <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.8" />
     <PackageReference Include="Xaml.Behaviors.Interactivity" Version="11.3.6.6" />
   </ItemGroup>
 
