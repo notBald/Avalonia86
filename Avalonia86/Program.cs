@@ -1,5 +1,7 @@
 ﻿using Avalonia;
+#if !NET10_0_OR_GREATER
 using Avalonia.ReactiveUI;
+#endif
 using Avalonia86.Core;
 using Avalonia86.Tools;
 using Avalonia86.Views;
@@ -126,10 +128,22 @@ internal static class Program
 
     private static AppBuilder BuildAvaloniaApp(string[] args, bool withLife = true)
     {
-        return AppBuilder.Configure<App>()
+        var builder = AppBuilder.Configure<App>();
+
+#if NET10_0_OR_GREATER
+        // Avalonia 12.0+ with native Wayland support
+        builder = builder
+            .UsePlatformDetect()
+            .LogToTrace();
+#else
+        // Avalonia 11.x - use platform detect (X11/XWayland)
+        builder = builder
             .UsePlatformDetect()
             .LogToTrace()
             .UseReactiveUI();
+#endif
+
+        return builder;
     }
 
     private static bool CheckRunningManagerAndAbort(string[] args, string window_title)
