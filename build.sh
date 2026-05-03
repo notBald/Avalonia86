@@ -3,17 +3,17 @@ set -e
 
 mkdir -p dist pub
 
-# Windows
-dotnet publish Avalonia86 -r win-x64     -c Release --self-contained true -o dist/win-x64
-dotnet publish Avalonia86 -r win-arm64   -c Release --self-contained true -o dist/win-arm64
+# Windows (net6.0 for compatibility)
+dotnet publish Avalonia86 -r win-x64     -f net6.0 -c Release --self-contained true -o dist/win-x64
+dotnet publish Avalonia86 -r win-arm64   -f net6.0 -c Release --self-contained true -o dist/win-arm64
 
-# Linux
-dotnet publish Avalonia86 -r linux-x64   -c Release --self-contained true -o dist/linux-x64
-dotnet publish Avalonia86 -r linux-arm64 -c Release --self-contained true -o dist/linux-arm64
+# Linux (net10.0 with native Wayland support)
+dotnet publish Avalonia86 -r linux-x64   -f net10.0 -c Release --self-contained true -o dist/linux-x64
+dotnet publish Avalonia86 -r linux-arm64 -f net10.0 -c Release --self-contained true -o dist/linux-arm64
 
-# macOS
-dotnet publish Avalonia86 -r osx-x64     -c Release --self-contained true -o dist/osx-x64
-dotnet publish Avalonia86 -r osx-arm64   -c Release --self-contained true -o dist/osx-arm64
+# macOS (net6.0 for compatibility)
+dotnet publish Avalonia86 -r osx-x64     -f net6.0 -c Release --self-contained true -o dist/osx-x64
+dotnet publish Avalonia86 -r osx-arm64   -f net6.0 -c Release --self-contained true -o dist/osx-arm64
 
 # Package Windows zip
 cd dist
@@ -25,14 +25,14 @@ zip -q -r ../pub/Avalonia-86-for-Mac-x64.zip         osx-x64
 zip -q -r ../pub/Avalonia-86-for-Mac-ARM64.zip       osx-arm64
 cd ..
 
-# Download appimagetool if not present
-if ! command -v appimagetool >/dev/null 2>&1; then
-  wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /tmp/appimagetool
-  chmod +x /tmp/appimagetool
-  APPIMAGETOOL=/tmp/appimagetool
-else
-  APPIMAGETOOL=appimagetool
+# Download appimagetool from GitHub if not present
+APPIMAGETOOL=/tmp/appimagetool-x86_64.AppImage
+if [ ! -f "$APPIMAGETOOL" ]; then
+  echo "Downloading appimagetool..."
+  wget -q "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage" -O "$APPIMAGETOOL"
+  chmod +x "$APPIMAGETOOL"
 fi
+echo "Using appimagetool: $APPIMAGETOOL"
 
 # Package Linux AppImage (x64)
 APPDIR=dist/Avalonia86-x64.AppDir
