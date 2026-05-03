@@ -136,12 +136,8 @@ internal static class Program
             .UsePlatformDetect()
             .LogToTrace();
 #else
-        // Avalonia 11.x - force software rendering for XWayland compatibility
+        // Avalonia 11.x - use platform detect (X11/XWayland)
         builder = builder
-            .With(new Avalonia.X11.X11PlatformOptions
-            {
-                RenderingMode = new[] { Avalonia.X11.X11RenderingMode.Software }
-            })
             .UsePlatformDetect()
             .LogToTrace()
             .UseReactiveUI();
