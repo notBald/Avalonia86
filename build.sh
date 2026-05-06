@@ -4,16 +4,16 @@ set -e
 mkdir -p dist pub
 
 # Windows (net6.0 for compatibility)
-dotnet publish Avalonia86 -r win-x64     -f net6.0 -c Release --self-contained true -o dist/win-x64
-dotnet publish Avalonia86 -r win-arm64   -f net6.0 -c Release --self-contained true -o dist/win-arm64
+dotnet publish Avalonia86 -r win-x64     -f net6.0 -c Release-MSDB --self-contained true -o dist/win-x64
+dotnet publish Avalonia86 -r win-arm64   -f net6.0 -c Release-MSDB --self-contained true -o dist/win-arm64
 
 # Linux (net10.0 with native Wayland support)
-dotnet publish Avalonia86 -r linux-x64   -f net10.0 -c Release --self-contained true -o dist/linux-x64
-dotnet publish Avalonia86 -r linux-arm64 -f net10.0 -c Release --self-contained true -o dist/linux-arm64
+dotnet publish Avalonia86 -r linux-x64   -f net10.0 -c Release-MSDB --self-contained true -o dist/linux-x64
+dotnet publish Avalonia86 -r linux-arm64 -f net10.0 -c Release-MSDB --self-contained true -o dist/linux-arm64
 
 # macOS (net6.0 for compatibility)
-dotnet publish Avalonia86 -r osx-x64     -f net6.0 -c Release --self-contained true -o dist/osx-x64
-dotnet publish Avalonia86 -r osx-arm64   -f net6.0 -c Release --self-contained true -o dist/osx-arm64
+dotnet publish Avalonia86 -r osx-x64     -f net6.0 -c Release-MSDB --self-contained true -o dist/osx-x64
+dotnet publish Avalonia86 -r osx-arm64   -f net6.0 -c Release-MSDB --self-contained true -o dist/osx-arm64
 
 # Package Windows zip
 cd dist
