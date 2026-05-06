@@ -4,8 +4,10 @@
 			 xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
              x:Class="Avalonia86.App">	
     <Application.Styles>
-        <FluentTheme />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <!--<FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>-->
+        <SimpleTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml"/>
 	</Application.Styles>
 	<Application.Resources>
 		<ResourceDictionary>
