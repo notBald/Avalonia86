@@ -8,6 +8,9 @@ namespace Avalonia86.Views;
 
 public abstract class BaseWindow : Window
 {
+    /// <summary>
+    /// Unique idenity for this window. Used for storing window size and position
+    /// </summary>
     protected readonly string ID;
 
     #region Private fields

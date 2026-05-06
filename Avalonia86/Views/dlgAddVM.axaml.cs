@@ -17,15 +17,16 @@ using System.Threading.Tasks;
 
 namespace Avalonia86.Views;
 
-public partial class dlgAddVM : Window
+public partial class dlgAddVM : BaseWindow
 {
     private readonly dlgAddVMModel _m;
     private readonly AppSettings _s;
     CancellationTokenSource cts = new CancellationTokenSource();
 
-    public dlgAddVM()
+    public dlgAddVM() : base ("add_vm")
     {
         InitializeComponent();
+        BaseInit();
 
         if (Design.IsDesignMode)
             _m = new dlgAddVMModel(null);
