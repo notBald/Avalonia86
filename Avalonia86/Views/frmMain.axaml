@@ -182,6 +182,46 @@
 				</ControlTemplate>
 			</Setter>
 		</Style>
+		<Style Selector="ToggleButton.OrderToggle">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border x:Name="BaseBorder"
+							Background="{TemplateBinding Background}"
+							BorderBrush="Transparent"
+							BorderThickness="2,5,2,2">
+						<StackPanel Classes="start">
+						<DockPanel Height="32" Width="32">
+							<Path Data="M 0 5 L 5 0 L 10 5"
+								  Stroke="{Binding $parent[ToggleButton].Foreground}" 
+								  StrokeThickness="2"
+								  HorizontalAlignment="Center"
+								  VerticalAlignment="Center">
+								<Path.Transitions>
+									<Transitions>
+										<!-- Smooth rotation animation -->
+										<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2"/>
+									</Transitions>
+								</Path.Transitions>
+        
+								<Path.Styles>
+									<Style Selector="Path">
+										<!-- Default state: Pointing Down -->
+										<Setter Property="RenderTransform" Value="rotate(180deg)" />
+									</Style>
+									<Style Selector="ToggleButton:checked Path">
+										<!-- Checked state: Pointing Up -->
+										<Setter Property="RenderTransform" Value="rotate(0deg)" />
+									</Style>
+								</Path.Styles>
+							</Path>
+						</DockPanel>
+						<TextBlock Text="{DynamicResource Toolbar.SortDirection}" />
+					</StackPanel>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
 
 		<Style Selector="ToggleButton.SortToggle:checked /template/ ContentControl#IconPresenter">
 			<Setter Property="Template" Value="{StaticResource TemplateSortByDate}" />
@@ -460,6 +500,7 @@
 					</StackPanel>
 				</Button>
 				<ToggleButton Classes="SortToggle" IsChecked="{Binding SortListToggle, Mode=TwoWay}" />
+				<ToggleButton Classes="OrderToggle" IsChecked="{Binding SortListDirection, Mode=TwoWay}" />
 				<Rectangle Fill="#8a8a8a" Width="1" Margin="1,2,0,2"/>
 				<Rectangle Fill="#FFFFFF" Opacity=".3" Width="1" Margin="0,2,1,2"/>
 				<ComboBox SelectedIndex="{Binding CategoryIndex}" Background="transparent" Width="150" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Center" ItemsSource="{Binding Categories}" />

@@ -181,6 +181,12 @@ internal class MainModel : ReactiveObject, IDisposable
         get => Settings.SortMachineListOrder != "name";
         set { Settings.SortMachineListOrder = value ? "date" : "name"; }
     }
+    public bool SortListDirection
+    {
+        get => Settings.SortMachineListDirection != "desc";
+        set { Settings.SortMachineListDirection = value ? "asc" : "desc"; }
+    }
+
     public bool CompactList { get => Settings.CompactMachineList; }
     public bool Toolbar86Btn { get => Settings.Has86ToolbarBtn; }
     public bool ToolbarPSBtn { get => Settings.HasPSToolbarBtn; }
@@ -274,6 +280,10 @@ internal class MainModel : ReactiveObject, IDisposable
         else if (e.PropertyName == nameof(AppSettings.SortMachineListOrder))
         {
             this.RaisePropertyChanged(nameof(SortListToggle));
+        }
+        else if (e.PropertyName == nameof(AppSettings.SortMachineListDirection))
+        {
+            this.RaisePropertyChanged(nameof(SortListDirection));
         }
         else if (e.PropertyName == nameof(AppSettings.IsTrayEnabled))
         {

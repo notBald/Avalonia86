@@ -262,12 +262,19 @@
 							<TextBlock Margin="0, 11, 0, 0" Text="{DynamicResource Abt.LicenseContrib}" />
 						</StackPanel>
 
-						<StackPanel DockPanel.Dock="Bottom" Margin="0, 10">
-							<TextBlock Text="{DynamicResource Abt.SourceCode}" />
-							<HyperlinkButton Padding="10, 0" Content="https://github.com/86Box/86Box" NavigateUri="https://github.com/86Box/86Box" />
-							<HyperlinkButton Padding="10, 0" Content="https://github.com/RetBox/86BoxManagerX" NavigateUri="https://github.com/RetBox/86BoxManagerX" />
-							<HyperlinkButton Padding="10, 0" Content="https://github.com/notBald/Avalonia86" NavigateUri="https://github.com/notBald/Avalonia86" />
-						</StackPanel>
+						<DockPanel DockPanel.Dock="Bottom" Margin="0, 10">
+							<StackPanel DockPanel.Dock="Left">
+								<TextBlock Text="{DynamicResource Abt.SourceCode}" />
+								<HyperlinkButton Padding="10, 0" Content="https://github.com/86Box/86Box" NavigateUri="https://github.com/86Box/86Box" />
+								<HyperlinkButton Padding="10, 0" Content="https://github.com/RetBox/86BoxManagerX" NavigateUri="https://github.com/RetBox/86BoxManagerX" />
+								<HyperlinkButton Padding="10, 0" Content="https://github.com/notBald/Avalonia86" NavigateUri="https://github.com/notBald/Avalonia86" />
+							</StackPanel>
+							<StackPanel DockPanel.Dock="Right" VerticalAlignment="Bottom">
+								<TextBlock TextAlignment="Right">
+									Avalonia <Run Text="{Binding AvaloniaVersion}" />
+								</TextBlock>
+							</StackPanel>
+						</DockPanel>
 						
 						<Border BorderBrush="#a0a0a0" BorderThickness="1, 1, 0, 0" MinHeight="100">
 							<Border BorderBrush="#f0f0f0" BorderThickness="0, 0, 1, 1">

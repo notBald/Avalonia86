@@ -1045,6 +1045,8 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
 
     public int SelectedTabIdx { get; set; }
 
+    public string AvaloniaVersion => typeof(Application).Assembly.GetName().Version?.ToString();
+
     public ThemeVariant[] Themes { get; private set; }
 
     public Language[] Languages => Language.Languages;

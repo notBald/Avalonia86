@@ -36,6 +36,7 @@ internal static class L
 
         // Toolbar
         ["Toolbar.SortOrder"] = "Sort order",
+        ["Toolbar.SortDirection"] = "Direction",
         ["Toolbar.Start"] = "Start",
         ["Toolbar.Stop"] = "Stop",
         ["Toolbar.Resume"] = "Resume",
@@ -380,6 +381,7 @@ internal static class L
 
         // Toolbar
         ["Toolbar.SortOrder"] = "排序方式",
+        ["Toolbar.SortDirection"] = "排序方向",
         ["Toolbar.Start"] = "启动",
         ["Toolbar.Stop"] = "停止",
         ["Toolbar.Resume"] = "继续",
@@ -724,6 +726,7 @@ internal static class L
 
         // Toolbar
         ["Toolbar.SortOrder"] = "排序方式",
+        ["Toolbar.SortDirection"] = "排序方向",
         ["Toolbar.Start"] = "啟動",
         ["Toolbar.Stop"] = "停止",
         ["Toolbar.Resume"] = "繼續",

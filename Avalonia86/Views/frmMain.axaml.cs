@@ -128,7 +128,7 @@ public partial class frmMain : BaseWindow
             {
                 if (e.PropertyName == nameof(MainModel.CompactList))
                     mts.CompactMachine = dc.CompactList;
-                else if (e.PropertyName == nameof(MainModel.SortListToggle))
+                else if (e.PropertyName == nameof(MainModel.SortListToggle) || e.PropertyName == nameof(MainModel.SortListDirection))
                 {
                     var hold = dc.Machine;
                     AppSettings.Settings.RefreshVMs();

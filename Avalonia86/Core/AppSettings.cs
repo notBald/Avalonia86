@@ -177,6 +177,16 @@ internal class AppSettings
         }
     }
 
+    public string SortMachineListDirection
+    {
+        get => FetchProperty("vm_list_direction", "asc");
+        set
+        {
+            SetProperty("vm_list_direction", value ?? "asc");
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(SortMachineListDirection)));
+        }
+    }
+
     public string PreferedCPUArch
     {
         get => FetchProperty("pref_cpu_arch", (string) null);
@@ -327,7 +337,10 @@ internal class AppSettings
         int count = 0;
         bool notify = false;
 
-        string order_by = SortMachineListOrder == "name" ? "order by name" : "order by created desc";
+        string order_by = SortMachineListOrder == "name" ? "order by name" : "order by created";
+
+        if (SortMachineListDirection == "desc")
+            order_by += " desc";
 
         foreach (var vm in _store.Query("select id, name, category, iconpath from VMs " + order_by))
         {
