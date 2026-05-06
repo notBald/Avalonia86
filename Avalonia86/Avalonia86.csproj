@@ -42,7 +42,7 @@
       <Version>11.3.8</Version>
     </PackageReference>
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.8" />
-    <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.14" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.8" />
     <PackageReference Include="Xaml.Behaviors.Interactivity" Version="11.3.6.6" />
   </ItemGroup>
 
