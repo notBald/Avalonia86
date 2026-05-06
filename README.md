@@ -4,6 +4,18 @@
 
 ![Desktop](/images/UI-white_and_dark.png?raw=true)
 
+## What's New
+
+### v1.5.0 - Linux Display Server Support
+
+- **Native Wayland Support**: Full support for Wayland display server on Linux (via Avalonia 12.0)
+- **X11 Compatibility**: Backward compatibility with X11 and XWayland
+- **Multi-Target Framework**: 
+  - Windows/macOS: .NET 6.0 (Avalonia 11.3.x) for maximum compatibility
+  - Linux: .NET 10.0 (Avalonia 12.0) with native Wayland support
+- **AppImage Distribution**: Easy installation on Linux with AppImage format
+- **Auto Display Detection**: Automatically detects and uses the available display server
+
 ## Features
 
 - Create/Delete Virtual Machines
@@ -29,16 +41,28 @@ The UI language is automatically selected based on your system settings. To add 
 System requirements are the same as for 86Box / PCBox. Additionally, the following is required:
 
 - [86Box 2.0](https://github.com/86Box/86Box/releases) or later (earlier builds are untested)
-- [.NET 9.0](https://dotnet.microsoft.com/download/dotnet/9.0)
 
 ### Self-contained builds
 
 Starting from this version, official release builds are **self-contained** — the .NET runtime is bundled inside the application. You do **not** need to install .NET separately.
 
-- **Baseline**: .NET 6.0
-- **Windows**: Supported from Windows 7 to Windows 11 (x64 / ARM64)
-- **Linux**: x64 / ARM64 (AppImage)
-- **macOS**: x64 / ARM64
+| Platform | Target Framework | Avalonia Version | Notes |
+|----------|-----------------|------------------|-------|
+| **Windows** | .NET 6.0 | 11.3.x | Compatible with Windows 7+ |
+| **Linux** | .NET 10.0 | 12.0 | Native Wayland support |
+| **macOS** | .NET 6.0 | 11.3.x | Compatible with macOS 10.15+ |
+
+### Linux Display Server Support
+
+Avalonia 86 supports both **Wayland** and **X11** display servers on Linux:
+
+| Display Server | Support | Notes |
+|---------------|---------|-------|
+| **Wayland** (native) | ✅ Full support | Default on modern distros (Fedora, Ubuntu 22.04+, etc.) |
+| **X11** | ✅ Full support | Legacy support for older systems |
+| **XWayland** | ✅ Full support | Compatibility layer for X11 apps on Wayland |
+
+The application automatically detects and uses the available display server.
 
 ## How to use
 
@@ -59,9 +83,28 @@ You may have to install .net 9.0. In that case, you will get a message like the 
 
 ## Using on Linux
 
-For older builds, see the [Linux Guide](Linux.md).
+### AppImage (Recommended)
 
 Newer builds are AppImages, same as 86Box. Just remember to set the AppImage executable before running.
+
+```bash
+# Make the AppImage executable
+chmod +x Avalonia-86-for-Linux-x64.AppImage
+
+# Run
+./Avalonia-86-for-Linux-x64.AppImage
+```
+
+### Display Server Compatibility
+
+The application works seamlessly with:
+- **Wayland** (native) - Used by default on modern distributions
+- **X11** - Full compatibility with legacy systems
+- **XWayland** - Automatic fallback for X11 apps on Wayland
+
+No additional configuration is needed. The application automatically detects your display server.
+
+For older builds, see the [Linux Guide](Linux.md).
 
 ## How to build
 
@@ -71,20 +114,38 @@ Newer builds are AppImages, same as 86Box. Just remember to set the AppImage exe
 4. Choose the `Release` or `Debug` configuration
 5. Build the solution
 
+### Multi-Target Framework
+
+The project supports multiple target frameworks:
+
+- **net6.0**: For Windows and macOS compatibility (Avalonia 11.3.x)
+- **net10.0**: For Linux with native Wayland support (Avalonia 12.0)
+
 ### Building self-contained releases
 
 ```sh
-# Windows x64
-dotnet publish Avalonia86 -r win-x64 -c Release --self-contained true
+# Windows x64 (net6.0)
+dotnet publish Avalonia86 -r win-x64 -f net6.0 -c Release --self-contained true
 
-# Linux x64
-dotnet publish Avalonia86 -r linux-x64 -c Release --self-contained true
+# Linux x64 (net10.0 with Wayland support)
+dotnet publish Avalonia86 -r linux-x64 -f net10.0 -c Release --self-contained true
 
-# macOS ARM64
-dotnet publish Avalonia86 -r osx-arm64 -c Release --self-contained true
+# macOS ARM64 (net6.0)
+dotnet publish Avalonia86 -r osx-arm64 -f net6.0 -c Release --self-contained true
 ```
 
 Or use `build.sh` to build all platforms at once.
+
+### Building AppImage
+
+```sh
+# Build Linux release first
+dotnet publish Avalonia86 -r linux-x64 -f net10.0 -c Release --self-contained true -o dist/linux-x64
+
+# Create AppImage (requires appimagetool)
+chmod +x /path/to/appimagetool-x86_64.AppImage
+/path/to/appimagetool-x86_64.AppImage --no-appstream dist/Avalonia86-x64.AppDir pub/Avalonia-86-for-Linux-x64.AppImage
+```
 
 ## License
 
