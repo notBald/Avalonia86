@@ -4,7 +4,7 @@
 
 ## Downloads
 
-- [Microsoft .NET 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+- [Microsoft .NET 10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 - [86Box AppImage](https://github.com/86Box/86Box/releases/)
 - [86Box roms](https://github.com/86Box/roms/releases)
 
@@ -12,7 +12,7 @@
 
 # Step 1.1 - The .NET runtime
 
-Download the (x64) .NET 9 runtime and unpack its files into a folder called `dotnet`. Put this folder into your `home` directory.
+Download the (x64) .NET 10 runtime and unpack its files into a folder called `dotnet`. Put this folder into your `home` directory.
 
 # Step 1.2 - Edit .bashrc
 
@@ -37,7 +37,7 @@ Type `dotnet --info`. You should get output similar to this:
 VirtualBox:~$ dotnet --info
 
 Host:
-  Version:      9.0.0
+  Version:      10.0.0
   Architecture: x64
   Commit:       9d5a6a9aa4
   RID:          linux-x64
