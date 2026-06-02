@@ -21,5 +21,12 @@ public class ExePaths
         AssetPath = asset;
         Arch = arch;
         long.TryParse(build, out Build);
+
+        if (Build < 3333)
+        {
+            //Quick fix for PCBox. Should instead recognize if the Exe is 86Box, PCBox or unknown. 
+            if (ExePath == null || !exe.Contains("86box", StringComparison.OrdinalIgnoreCase))
+                Build = 3333;
+        }
     }
 }
