@@ -6,15 +6,14 @@
 
 ## What's New
 
-### v1.5.0 - Linux Display Server Support
+### v1.5.0 - Linux Platform Upgrade
 
-- **Native Wayland Support**: Full support for Wayland display server on Linux (via Avalonia 12.0)
-- **X11 Compatibility**: Backward compatibility with X11 and XWayland
+- **Avalonia 12.0 on Linux**: Upgraded to Avalonia 12.0 (.NET 10.0) for improved Linux support
+- **X11/XWayland Support**: Runs natively on X11 and via XWayland on Wayland compositors
 - **Multi-Target Framework**: 
   - Windows/macOS: .NET 6.0 (Avalonia 11.3.x) for maximum compatibility
-  - Linux: .NET 10.0 (Avalonia 12.0) with native Wayland support
+  - Linux: .NET 10.0 (Avalonia 12.0) with latest platform improvements
 - **AppImage Distribution**: Easy installation on Linux with AppImage format
-- **Auto Display Detection**: Automatically detects and uses the available display server
 
 ## Features
 
@@ -49,20 +48,19 @@ Starting from this version, official release builds are **self-contained** — t
 | Platform | Target Framework | Avalonia Version | Notes |
 |----------|-----------------|------------------|-------|
 | **Windows** | .NET 6.0 | 11.3.x | Compatible with Windows 7+ |
-| **Linux** | .NET 10.0 | 12.0 | Native Wayland support |
+| **Linux** | .NET 10.0 | 12.0 | X11 native, Wayland via XWayland |
 | **macOS** | .NET 6.0 | 11.3.x | Compatible with macOS 10.15+ |
 
 ### Linux Display Server Support
 
-Avalonia 86 supports both **Wayland** and **X11** display servers on Linux:
+Avalonia 86 uses the X11 backend on Linux. On Wayland compositors, it runs through **XWayland** automatically.
 
 | Display Server | Support | Notes |
 |---------------|---------|-------|
-| **Wayland** (native) | ✅ Full support | Default on modern distros (Fedora, Ubuntu 22.04+, etc.) |
-| **X11** | ✅ Full support | Legacy support for older systems |
-| **XWayland** | ✅ Full support | Compatibility layer for X11 apps on Wayland |
+| **X11** | ✅ Native | Full support |
+| **XWayland** | ✅ Automatic | X11 apps run transparently on Wayland via XWayland |
 
-The application automatically detects and uses the available display server.
+> **Note**: Avalonia does not yet have a native Wayland backend (planned for ~12.1). If you experience issues on Wayland, the application is running through XWayland which is included by default on most Wayland compositors.
 
 ## How to use
 
@@ -97,12 +95,7 @@ chmod +x Avalonia-86-for-Linux-x64.AppImage
 
 ### Display Server Compatibility
 
-The application works seamlessly with:
-- **Wayland** (native) - Used by default on modern distributions
-- **X11** - Full compatibility with legacy systems
-- **XWayland** - Automatic fallback for X11 apps on Wayland
-
-No additional configuration is needed. The application automatically detects your display server.
+The application uses the X11 backend and works on both X11 and Wayland (via XWayland) desktops. No additional configuration is needed — XWayland is included by default on most Wayland compositors (Fedora, Ubuntu 22.04+, etc.).
 
 For older builds, see the [Linux Guide](Linux.md).
 
@@ -119,7 +112,7 @@ For older builds, see the [Linux Guide](Linux.md).
 The project supports multiple target frameworks:
 
 - **net6.0**: For Windows and macOS compatibility (Avalonia 11.3.x)
-- **net10.0**: For Linux with native Wayland support (Avalonia 12.0)
+- **net10.0**: For Linux with latest Avalonia 12.0 platform improvements (Avalonia 12.0)
 
 ### Building self-contained releases
 
@@ -127,7 +120,7 @@ The project supports multiple target frameworks:
 # Windows x64 (net6.0)
 dotnet publish Avalonia86 -r win-x64 -f net6.0 -c Release --self-contained true
 
-# Linux x64 (net10.0 with Wayland support)
+# Linux x64 (net10.0)
 dotnet publish Avalonia86 -r linux-x64 -f net10.0 -c Release --self-contained true
 
 # macOS ARM64 (net6.0)
