@@ -82,7 +82,7 @@ internal static class L
 
         // Dialog common
         ["Dialog.RunningVmsTitle"] = "Virtual machines are still running",
-        ["Dialog.RunningVmsBody"] = "Some virtual machines are still running. It's recommended you stop them first before closing 86Box Manager.\n\nDo you want to stop them now?",
+        ["Dialog.RunningVmsBody"] = "Some virtual machines are still running. It's recommended you stop them first before closing Avalonia 86.\n\nDo you want to stop them now?",
         ["Dialog.RunningVmsQ"] = "Do you want to stop them now?",
 
         // Common dialog buttons
@@ -348,7 +348,7 @@ internal static class L
         ["Msg.VmFolderInUseBody"] = "The folder you selected is already used by the VM \"{0}\"",
         ["Msg.ExeNotCompatible"] = "Unknown - may not be compatible",
         ["Msg.AuthorFileNotLoaded"] = "Author file not loaded.",
-        ["Msg.Arm64"] = "Arm 64",
+        ["Msg.Arm64"] = "ARM64",
         ["Msg.X64"] = "Intel/AMD x64",
         ["Msg.Linux"] = "Linux",
         ["Msg.Windows"] = "Windows",
