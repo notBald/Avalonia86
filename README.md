@@ -1,6 +1,6 @@
-# Avalonia 86
+# Avalonia86
 
-**Avalonia 86** is a configuration manager for the [86Box emulator](https://github.com/86Box/86Box) and [PCBox emulator](https://github.com/PCBox/PCBox).
+**Avalonia86** is a configuration manager for the [86Box emulator](https://github.com/86Box/86Box) and [PCBox emulator](https://github.com/PCBox/PCBox).
 
 ![Desktop](/images/UI-white_and_dark.png?raw=true)
 
@@ -25,7 +25,7 @@
 
 ## Localization
 
-Avalonia 86 supports the following languages:
+Avalonia86 supports the following languages:
 
 | Language | Status |
 |----------|--------|
@@ -53,7 +53,7 @@ Starting from this version, official release builds are **self-contained** — t
 
 ### Linux Display Server Support
 
-Avalonia 86 uses the X11 backend on Linux. On Wayland compositors, it runs through **XWayland** automatically.
+Avalonia86 uses the X11 backend on Linux. On Wayland compositors, it runs through **XWayland** automatically.
 
 | Display Server | Support | Notes |
 |---------------|---------|-------|
@@ -77,7 +77,7 @@ You may have to install .net 9.0. In that case, you will get a message like the 
 
 ### If .Net 9.0 fails on Windows 10
 
-[KB5058379](https://support.microsoft.com/en-us/topic/may-13-2025-kb5058379-os-builds-19044-5854-and-19045-5854-0a30e9ee-5038-45dd-a5d7-70a8813a5e39) is required for .Net 9.0 to function properly. If you're using Windows 10 without this update you can either the Windows 7 release of Avalonia 86 or to follow [this guide](https://www.reddit.com/r/WindowsLTSC/comments/1klhp4e/comment/mst7tjf/) to install the update.
+[KB5058379](https://support.microsoft.com/en-us/topic/may-13-2025-kb5058379-os-builds-19044-5854-and-19045-5854-0a30e9ee-5038-45dd-a5d7-70a8813a5e39) is required for .NET 9.0 to function properly. If you're using Windows 10 without this update you can either the Windows 7 release of Avalonia86 or to follow [this guide](https://www.reddit.com/r/WindowsLTSC/comments/1klhp4e/comment/mst7tjf/) to install the update.
 
 ## Using on Linux
 
