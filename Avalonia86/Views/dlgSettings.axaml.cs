@@ -462,9 +462,13 @@ public partial class dlgSettings : BaseWindow
         foreach(var r in s.ListExecutables())
         {
 #if MSDB
-            var exe = new dlgSettingsModel.ExeEntery(((long)r["IsDef"]) == 1, false)
+            bool is_default = ((long)r["IsDef"]) == 1;
+
+            var exe = new dlgSettingsModel.ExeEntery(_m, false)
 #else
-            var exe = new dlgSettingsModel.ExeEntery((bool)r["IsDef"], false)
+            bool is_default = (bool)r["IsDef"];
+
+            var exe = new dlgSettingsModel.ExeEntery(_m, false)
 #endif
             {
                 ID = (long) r["ID"],
@@ -481,8 +485,11 @@ public partial class dlgSettings : BaseWindow
             try { exe.ExeExists = File.Exists(exe.VMPath); }
             catch { }
 
-            if (exe.IsDefault)
+            if (is_default)
+            {
                 is_def = false;
+                _m.SelectedExe = exe;
+            }
 
             exe.PropertyChanged += (o, e) => _m.IsExeListChanged = true;
 
@@ -540,7 +547,7 @@ public partial class dlgSettings : BaseWindow
 
                             var ver_str = $"{vi.FileMajorPart}.{vi.FileMinorPart}.{vi.FileBuildPart}";
 
-                            _m.Executables.AddOrUpdate(new dlgSettingsModel.ExeEntery(false)
+                            _m.Executables.AddOrUpdate(new dlgSettingsModel.ExeEntery(_m)
                             {
                                 ID = -1 - _m.Executables.Count,
                                 VMPath = exe,
@@ -585,7 +592,7 @@ public partial class dlgSettings : BaseWindow
 
                 if (add)
                 {
-                    _m.Executables.AddOrUpdate(new dlgSettingsModel.ExeEntery(false)
+                    _m.Executables.AddOrUpdate(new dlgSettingsModel.ExeEntery(_m)
                     {
                         ID = -1 - _m.Executables.Count,
                         VMPath = m.ExePath,
@@ -731,7 +738,10 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
         {
             if (_sel_exe != value)
             {
+                if (_sel_exe != null)
+                    _sel_exe.IsChanged = true;
                 _sel_exe = value;
+
                 this.RaisePropertyChanged(nameof(HasSelectedExe));
             }
         }
@@ -744,6 +754,7 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
         {
             if (value != _is_default_selected)
             {
+                SelectedExe = null;
                 this.RaiseAndSetIfChanged(ref _is_default_selected, value);
                 IsExeListChanged = true;
             }
@@ -1109,12 +1120,12 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
 
     public class ExeEntery : ReactiveObject
     {
-        private bool _is_default;
+        private readonly dlgSettingsModel _model;
 
         public bool IsNew;
-        public bool IsChanged { get; private set; }
+        public bool IsChanged { get; internal set; }
 
-        public ExeEntery(bool is_default, bool is_new = true) { IsNew = is_new; _is_default = is_default; }
+        public ExeEntery(dlgSettingsModel model, bool is_new = true) { IsNew = is_new; _model = model; }
 
         public long ID { get; set; }
         public string Name { get; set; }
@@ -1130,13 +1141,16 @@ internal class dlgSettingsModel : ReactiveObject, IDisposable
 
         public bool IsDefault 
         { 
-            get => _is_default; 
+            get => ReferenceEquals(_model.SelectedExe, this); 
             set
             {
-                if (value != _is_default)
+                if (value != IsDefault)
                 {
-                    _is_default = value;
                     IsChanged = true;
+                    if (value)
+                        _model.SelectedExe = this;
+                    else if (_model.SelectedExe == this)
+                        _model.SelectedExe = null;
                     this.RaisePropertyChanged(nameof(IsChanged));
                 }
             }
